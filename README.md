@@ -111,7 +111,7 @@ You'll see the V3AM FOB dashboard with all service statuses, controls, and the e
 | ImageGen | 9230 | Supporting | Image generation |
 | Proxy25565 | 25565 | Supporting | Mobile gateway |
 | Launcher API | 9399 | Core | Dashboard + Control API |
-| llama.cpp | 8080 | LLM | Local AI server |
+| llama.cpp | 8084 | LLM | Local AI server |
 
 ---
 
@@ -126,7 +126,7 @@ Edit `~/fob/config/fob-config.json`:
   "llm": {
     "provider": "llamacpp",
     "llamacpp": {
-      "endpoint": "http://127.0.0.1:8080/completion",
+      "endpoint": "http://127.0.0.1:8084/completion",
       "temperature": 0.7,
       "max_tokens": 4096
     }
@@ -338,7 +338,7 @@ kill -9 $(lsof -ti :PORT)
 - Make sure Node.js is installed: `node --version`
 
 ### LLM doesn't respond
-- Check llama.cpp status: `curl http://127.0.0.1:8080/health`
+- Check llama.cpp status: `curl http://127.0.0.1:8084/health`
 - Make sure the model loaded: `tail -f ~/fob/logs/llama-server.log`
 - Try with a cloud provider: edit `config/fob-config.json` and set `"provider": "gemini"` with your API key
 
