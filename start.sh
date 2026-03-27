@@ -73,7 +73,12 @@ if $START_LLAMA; then
   else
     # Find a model file
     MODEL_FILE=""
-    if [ -d "${MODELS_DIR}" ]; then
+    
+    # Check custom model location first
+    CUSTOM_MODEL="/data/data/com.termux/files/home/models/qwen2.5-coder-7b/qwen2.5-coder-7b-instruct-q4_k_m.gguf"
+    if [ -f "${CUSTOM_MODEL}" ]; then
+      MODEL_FILE="${CUSTOM_MODEL}"
+    elif [ -d "${MODELS_DIR}" ]; then
       MODEL_FILE=$(find "${MODELS_DIR}" -name "*.gguf" | head -1)
     fi
 

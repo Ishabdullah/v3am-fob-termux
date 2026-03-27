@@ -115,23 +115,26 @@ fi
 
 log "Step 4/6: Checking for default LLM model..."
 
-mkdir -p "${MODELS_DIR}"
+# Custom model path (matches start.sh)
+CUSTOM_MODEL_DIR="/data/data/com.termux/files/home/models/qwen2.5-coder-7b"
+MODEL_FILE="${CUSTOM_MODEL_DIR}/qwen2.5-coder-7b-instruct-q4_k_m.gguf"
+MODEL_URL="https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct-GGUF/resolve/main/qwen2.5-coder-7b-instruct-q4_k_m.gguf"
 
-MODEL_FILE="${MODELS_DIR}/Qwen2.5-7B-Instruct-Q4_K_M.gguf"
-MODEL_URL="https://huggingface.co/Qwen/Qwen2.5-7B-Instruct-GGUF/resolve/main/qwen2.5-7b-instruct-q4_k_m.gguf"
-
+# Check if model already exists at custom location
 if [ -f "${MODEL_FILE}" ]; then
   ok "Model already exists: ${MODEL_FILE}"
 else
-  log "  Downloading Qwen2.5-7B-Q4_K_M (~4.7GB)..."
+  log "  Downloading Qwen2.5-Coder-7B-Q4_K_M (~4.5GB)..."
   log "  This will take a while on slow connections."
-  log "  You can Ctrl+C and manually place a GGUF file in: ${MODELS_DIR}"
+  log "  You can Ctrl+C and manually place a GGUF file in: ${CUSTOM_MODEL_DIR}"
   echo ""
+
+  mkdir -p "${CUSTOM_MODEL_DIR}"
 
   if command -v wget &>/dev/null; then
     wget -c --progress=bar:force:noscroll -O "${MODEL_FILE}" "${MODEL_URL}" || {
       warn "Download failed. Skipping model download."
-      warn "Place any GGUF model in: ${MODELS_DIR}"
+      warn "Place any GGUF model in: ${CUSTOM_MODEL_DIR}"
       rm -f "${MODEL_FILE}"
     }
   elif command -v curl &>/dev/null; then
