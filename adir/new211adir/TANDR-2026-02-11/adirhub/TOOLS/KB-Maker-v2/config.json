@@ -1,0 +1,107 @@
+{
+  "_meta": {
+    "name": "KB-Maker v2 Configuration",
+    "version": "2.0.0",
+    "template": "TANDRSocial",
+    "description": "Knowledge base bot factory - adapted from TANDRSocial with bot generation"
+  },
+  "port": 9220,
+  "bot_port_range": [
+    9220,
+    9229
+  ],
+  "paths": {
+    "knowledge_base": "C:\\FOB\\adir\\new211adir\\TANDR-2026-02-11\\adirhub\\TOOLS\\KB-Maker-v2\\data\\kb-knowledge",
+    "data_directory": "./data",
+    "logs_directory": "./adir/logs",
+    "bot_queue": "./adir/logs/bot-queue",
+    "deployed_bots": "./adir/logs/deployed"
+  },
+  "llm": {
+    "provider": "llamacpp",
+    "ollama": {
+      "endpoint": "http://127.0.0.1:11434/api/generate",
+      "model": "gemma:2b",
+      "temperature": 0.7,
+      "num_predict": 2048
+    },
+    "anthropic": {
+      "api_key": "set_your_api_key_here",
+      "model": "claude-haiku-4-5-20251001"
+    },
+    "llamacpp": {
+      "endpoint": "http://127.0.0.1:8080/completion",
+      "model": "default",
+      "max_tokens": 4096,
+      "temperature": 0.7
+    }
+  },
+  "voice": {
+    "enabled": true,
+    "provider": "web-speech",
+    "settings": {
+      "rate": 1.0,
+      "pitch": 1.0,
+      "volume": 1.0,
+      "language": "en-US"
+    },
+    "auto_speak": false,
+    "speak_button": true
+  },
+  "ngrok": {
+    "enabled": true,
+    "auth_token": "placeholder_token_here",
+    "domain": "kb-maker.ngrok.app",
+    "bot_domain_pattern": "kb-maker-bot-{id}.ngrok.app",
+    "status": "placeholder",
+    "auto_start": false,
+    "instructions": "See NGROK-SETUP-GUIDE.md to configure with your domain"
+  },
+  "agent": {
+    "name": "KB-Maker v2",
+    "type": "bot-factory",
+    "system_prompt": "You are KB-Maker v2, a knowledge base bot factory. Your role is to:\n\n1. Accept user specifications for knowledge bots\n2. Generate bot configurations\n3. Create deployment packages\n4. Manage bot lifecycle\n\nYou help users create custom knowledge bots with their own knowledge bases, LLM models, and system prompts."
+  },
+  "ui": {
+    "theme": "professional",
+    "title": "KB-Maker v2",
+    "tabs": [
+      "form",
+      "models",
+      "preview",
+      "queue",
+      "voice-settings",
+      "ngrok-status",
+      "settings"
+    ]
+  },
+  "knowledge": {
+    "base_path": "./data/kb-knowledge",
+    "auto_refresh": true,
+    "cache_ttl": 300,
+    "max_context_files": 20,
+    "file_scan_on_start": true
+  },
+  "bot_generation": {
+    "output_format": "config+startup",
+    "include_boot_md": true,
+    "include_documentation": true,
+    "deployment_directory": "./adir/logs/bot-queue",
+    "auto_port_assignment": true
+  },
+  "port_policy": {
+    "description": "Port allocation for generated bots",
+    "reference": "See PORT-POLICY.md for complete framework",
+    "kb_maker_range": [
+      9220,
+      9229
+    ],
+    "next_available": 9220
+  },
+  "logging": {
+    "enabled": true,
+    "level": "info",
+    "log_path": "./adir/logs/kb-maker.log",
+    "conversations_log": "./adir/logs/conversations.txt"
+  }
+}

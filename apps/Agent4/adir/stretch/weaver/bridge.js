@@ -1,0 +1,1 @@
+async function updateLogs() { const l = document.getElementById('logs'); try { const r = await fetch('/api/agent.php?action=read&file=adir/logs/conversations.txt'); const t = await r.text(); l.innerText = t.split('\n').slice(-20).join('\n'); l.scrollTop = l.scrollHeight; } catch(e) { l.innerText = 'LOG_SYNC_ERROR'; } } setInterval(updateLogs, 3000); updateLogs(); 

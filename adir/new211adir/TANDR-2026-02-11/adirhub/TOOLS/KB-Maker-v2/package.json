@@ -1,0 +1,27 @@
+{
+  "name": "kb-maker-v2",
+  "version": "2.0.0",
+  "description": "Knowledge Base Bot Factory - TANDRSocial Template Adaptation",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "kb-maker",
+    "knowledge-base",
+    "bot",
+    "tandr",
+    "factory"
+  ],
+  "author": "TANDR System",
+  "license": "PROPRIETARY",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

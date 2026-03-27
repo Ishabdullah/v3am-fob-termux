@@ -1,0 +1,12 @@
+{
+  "name": "v3am-adirhub",
+  "version": "1.0.0",
+  "description": "ADIR Hub Dashboard - V3AM Central Command",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

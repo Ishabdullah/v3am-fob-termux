@@ -1,0 +1,1 @@
+{"file":"adir/index.md","content":"# ADIR Hub Index\n\n## Quick Links\n\n### Services\n- **TANDRbot** (port 8081) - Field assistant\n- **TANDRAgent** (port 9200) - Operations hub\n- **TANDRSocial** (port 8099) - Social media assistant\n- **TANDRmgr** (port 8085) - API orchestrator & chat relay\n  - [TANDRmgr BOOT.md

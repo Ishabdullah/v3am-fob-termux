@@ -1,0 +1,45 @@
+{
+  "endpoints": [
+    { "label": "Librarian",   "url": "http://127.0.0.1:57785/" },
+    { "label": "ADIR Hub",    "url": "http://127.0.0.1:9303/"  },
+    { "label": "KB-Maker",    "url": "http://127.0.0.1:9220/"  },
+    { "label": "TANDRmgr",   "url": "http://127.0.0.1:8086/"  },
+    { "label": "FOB Server",  "url": "http://127.0.0.1:8100/"  },
+    { "label": "GGBot",       "url": "http://127.0.0.1:10336/" },
+    { "label": "StartPower",  "url": "http://127.0.0.1:57775/" }
+  ],
+  "manualServices": [],
+  "llm": {
+    "provider": "llamacpp",
+    "llamacpp": {
+      "endpoint": "http://127.0.0.1:8080/completion",
+      "model": "default",
+      "temperature": 0.7,
+      "max_tokens": 4096
+    },
+    "anthropic": {
+      "api_key": "",
+      "endpoint": "https://api.anthropic.com/v1/messages",
+      "model": "claude-haiku-4-5-20251001",
+      "max_tokens": 4096,
+      "temperature": 0.7
+    },
+    "gemini": {
+      "api_key": "",
+      "model": "gemini-2.0-flash",
+      "max_tokens": 8192,
+      "temperature": 0.7
+    },
+    "fallback": {
+      "enabled": false,
+      "provider": "anthropic"
+    }
+  },
+  "skin": {
+    "fontSize": 13,
+    "textColor": "#e0e8ff",
+    "panelOpacity": 0.88
+  },
+  "globalZoom": 1.0,
+  "_comment": "V3AM FOB Termux Configuration — edit this file to customize services and LLM providers"
+}

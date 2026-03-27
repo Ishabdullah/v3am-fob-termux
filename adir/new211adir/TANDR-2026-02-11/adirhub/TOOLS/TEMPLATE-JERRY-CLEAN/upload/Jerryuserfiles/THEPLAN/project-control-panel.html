@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>V3AM Project Control Panel - THE PLAN</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            height: 100vh;
+            gap: 0;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-right: 2px solid rgba(102, 126, 234, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .sidebar-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .sidebar-header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .sidebar-header p {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .project-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .project-item {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .project-item:hover {
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .project-item.active {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .project-item h3 {
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .project-item p {
+            font-size: 11px;
+            opacity: 0.7;
+        }
+
+        .sidebar-actions {
+            padding: 15px;
+            border-top: 2px solid rgba(102, 126, 234, 0.3);
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            border: 2px solid #667eea;
+            color: #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        /* Main Panel */
+        .main-panel {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            overflow-y: auto;
+            padding: 30px;
+        }
+
+        .main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .main-header h2 {
+            font-size: 28px;
+            color: #333;
+        }
+
+        .main-header .project-path {
+            font-size: 13px;
+            color: #666;
+            font-family: 'Courier New', monospace;
+            background: #f5f5f5;
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+
+        .sections-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .section:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 16px rgba(102, 126, 234, 0.2);
+        }
+
+        .section-full {
+            grid-column: 1 / -1;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .section-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 16px;
+        }
+
+        .section-header h3 {
+            font-size: 16px;
+            color: #333;
+        }
+
+        .section-content {
+            margin-top: 12px;
+        }
+
+        textarea, input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 13px;
+            transition: all 0.2s;
+            resize: vertical;
+        }
+
+        textarea:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea {
+            min-height: 100px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .file-list, .changelog-list {
+            margin-top: 10px;
+        }
+
+        .file-item, .changelog-item {
+            background: #f9f9f9;
+            border-left: 4px solid #667eea;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+        }
+
+        .file-item input, .changelog-item input {
+            margin-bottom: 8px;
+        }
+
+        .file-item textarea, .changelog-item textarea {
+            min-height: 60px;
+        }
+
+        .add-item-btn {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .add-item-btn:hover {
+            background: #764ba2;
+        }
+
+        .remove-item-btn {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .status-production {
+            background: #2ecc71;
+            color: white;
+        }
+
+        .status-development {
+            background: #f39c12;
+            color: white;
+        }
+
+        .status-research {
+            background: #3498db;
+            color: white;
+        }
+
+        .status-blocked {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .auto-save-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(46, 204, 113, 0.9);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        .auto-save-indicator.show {
+            opacity: 1;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        /* Color coding for sections */
+        .section-summary .section-icon { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .section-files .section-icon { background: linear-gradient(135deg, #f093fb, #f5576c); }
+        .section-stack .section-icon { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+        .section-state .section-icon { background: linear-gradient(135deg, #43e97b, #38f9d7); }
+        .section-changelog .section-icon { background: linear-gradient(135deg, #fa709a, #fee140); }
+        .section-notes .section-icon { background: linear-gradient(135deg, #30cfd0, #330867); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h1>🎯 THE PLAN</h1>
+                <p>V3AM Project Control Panel</p>
+            </div>
+
+            <div class="project-list" id="projectList">
+                <!-- Projects populated by JS -->
+            </div>
+
+            <div class="sidebar-actions">
+                <button class="btn btn-primary" onclick="addNewProject()">+ New Project</button>
+                <button class="btn btn-secondary" onclick="exportData()">📥 Export JSON</button>
+                <button class="btn btn-secondary" onclick="exportSiteWeaver()">🌐 Export Site Weaver</button>
+                <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📤 Import JSON</button>
+                <input type="file" id="importFile" accept=".json" onchange="importData(event)">
+            </div>
+        </div>
+
+        <!-- Main Panel -->
+        <div class="main-panel" id="mainPanel">
+            <div class="empty-state">
+                <h2>Welcome to THE PLAN</h2>
+                <p>Create a new project or select one from the sidebar to get started</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="auto-save-indicator" id="autoSaveIndicator">✓ Auto-saved</div>
+
+    <!-- JSZip Library for Site Weaver Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+    <script>
+        // Data structure
+        let projectData = {
+            projects: {}
+        };
+
+        let currentProject = null;
+
+        // Initialize
+        function init() {
+            loadFromLocalStorage();
+            renderProjectList();
+            if (Object.keys(projectData.projects).length > 0) {
+                const firstProject = Object.keys(projectData.projects)[0];
+                selectProject(firstProject);
+            }
+        }
+
+        // Local Storage
+        function saveToLocalStorage() {
+            localStorage.setItem('v3am_project_data', JSON.stringify(projectData));
+            showAutoSaveIndicator();
+        }
+
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('v3am_project_data');
+            if (saved) {
+                projectData = JSON.parse(saved);
+            }
+        }
+
+        function showAutoSaveIndicator() {
+            const indicator = document.getElementById('autoSaveIndicator');
+            indicator.classList.add('show');
+            setTimeout(() => {
+                indicator.classList.remove('show');
+            }, 2000);
+        }
+
+        // Project Management
+        function addNewProject() {
+            const projectName = prompt('Enter project name:');
+            if (!projectName) return;
+
+            const projectSlug = projectName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+
+            projectData.projects[projectSlug] = {
+                name: projectName,
+                path: 'D:\\01V3AM_aistart\\',
+                summary: '',
+                files: [],
+                directories: [],
+                stack: {
+                    language: '',
+                    frameworks: [],
+                    dependencies: []
+                },
+                state: {
+                    status: 'Development',
+                    lastUpdated: new Date().toISOString().split('T')[0],
+                    version: '1.0.0',
+                    issues: []
+                },
+                changelog: [],
+                notes: ''
+            };
+
+            saveToLocalStorage();
+            renderProjectList();
+            selectProject(projectSlug);
+        }
+
+        function deleteProject(slug) {
+            if (confirm(`Delete project "${projectData.projects[slug].name}"?`)) {
+                delete projectData.projects[slug];
+                saveToLocalStorage();
+                renderProjectList();
+                document.getElementById('mainPanel').innerHTML = `
+                    <div class="empty-state">
+                        <h2>Project deleted</h2>
+                        <p>Select another project or create a new one</p>
+                    </div>
+                `;
+            }
+        }
+
+        function selectProject(slug) {
+            currentProject = slug;
+            renderProjectList();
+            renderProjectDetails(slug);
+        }
+
+        // Render Functions
+        function renderProjectList() {
+            const listEl = document.getElementById('projectList');
+            listEl.innerHTML = '';
+
+            Object.keys(projectData.projects).forEach(slug => {
+                const project = projectData.projects[slug];
+                const div = document.createElement('div');
+                div.className = `project-item ${currentProject === slug ? 'active' : ''}`;
+                div.onclick = () => selectProject(slug);
+                div.innerHTML = `
+                    <h3>${project.name}</h3>
+                    <p>${project.path}</p>
+                `;
+                listEl.appendChild(div);
+            });
+        }
+
+        function renderProjectDetails(slug) {
+            const project = projectData.projects[slug];
+            const mainPanel = document.getElementById('mainPanel');
+
+            mainPanel.innerHTML = `
+                <div class="main-header">
+                    <div>
+                        <h2>${project.name}</h2>
+                        <span class="status-badge status-${project.state.status.toLowerCase()}">${project.state.status}</span>
+                    </div>
+                    <div class="project-path">${project.path}</div>
+                </div>
+
+                <div class="sections-grid">
+                    <!-- Summary Section -->
+                    <div class="section section-full section-summary">
+                        <div class="section-header">
+                            <div class="section-icon">📋</div>
+                            <h3>Project Summary</h3>
+                        </div>
+                        <div class="section-content">
+                            <textarea id="summary" placeholder="Describe this project...">${project.summary}</textarea>
+                        </div>
+                    </div>
+
+                    <!-- Files Section -->
+                    <div class="section section-files">
+                        <div class="section-header">
+                            <div class="section-icon">📄</div>
+                            <h3>Key Files</h3>
+                        </div>
+                        <div class="section-content">
+                            <div class="file-list" id="fileList"></div>
+                            <button class="add-item-btn" onclick="addFile()">+ Add File</button>
+                        </div>
+                    </div>
+
+                    <!-- Directories Section -->
+                    <div class="section section-files">
+                        <div class="section-header">
+                            <div class="section-icon">📁</div>
+                            <h3>Key Directories</h3>
+                        </div>
+                        <div class="section-content">
+                            <div class="file-list" id="dirList"></div>
+                            <button class="add-item-btn" onclick="addDirectory()">+ Add Directory</button>
+                        </div>
+                    </div>
+
+                    <!-- Stack Section -->
+                    <div class="section section-stack">
+                        <div class="section-header">
+                            <div class="section-icon">⚙️</div>
+                            <h3>Tech Stack</h3>
+                        </div>
+                        <div class="section-content">
+                            <input type="text" id="language" placeholder="Primary Language" value="${project.stack.language}">
+                            <textarea id="frameworks" placeholder="Frameworks (one per line)">${project.stack.frameworks.join('\n')}</textarea>
+                            <textarea id="dependencies" placeholder="Dependencies (one per line)">${project.stack.dependencies.join('\n')}</textarea>
+                        </div>
+                    </div>
+
+                    <!-- State Section -->
+                    <div class="section section-state">
+                        <div class="section-header">
+                            <div class="section-icon">🎯</div>
+                            <h3>Current State</h3>
+                        </div>
+                        <div class="section-content">
+                            <select id="status" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                                <option value="Research" ${project.state.status === 'Research' ? 'selected' : ''}>Research</option>
+                                <option value="Development" ${project.state.status === 'Development' ? 'selected' : ''}>Development</option>
+                                <option value="Production" ${project.state.status === 'Production' ? 'selected' : ''}>Production</option>
+                                <option value="Blocked" ${project.state.status === 'Blocked' ? 'selected' : ''}>Blocked</option>
+                            </select>
+                            <input type="text" id="version" placeholder="Version" value="${project.state.version}">
+                            <textarea id="issues" placeholder="Current Issues (one per line)">${project.state.issues.join('\n')}</textarea>
+                        </div>
+                    </div>
+
+                    <!-- Changelog Section -->
+                    <div class="section section-full section-changelog">
+                        <div class="section-header">
+                            <div class="section-icon">📝</div>
+                            <h3>Changelog</h3>
+                        </div>
+                        <div class="section-content">
+                            <div class="changelog-list" id="changelogList"></div>
+                            <button class="add-item-btn" onclick="addChangelogEntry()">+ Add Entry</button>
+                        </div>
+                    </div>
+
+                    <!-- Notes Section -->
+                    <div class="section section-full section-notes">
+                        <div class="section-header">
+                            <div class="section-icon">💡</div>
+                            <h3>Free-form Notes</h3>
+                        </div>
+                        <div class="section-content">
+                            <textarea id="notes" style="min-height: 200px;" placeholder="Add any additional notes, ideas, or context here...">${project.notes}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px; text-align: right;">
+                    <button class="btn btn-secondary" style="width: auto; display: inline-block;" onclick="deleteProject('${slug}')">🗑️ Delete Project</button>
+                </div>
+            `;
+
+            renderFiles();
+            renderDirectories();
+            renderChangelog();
+            attachEventListeners();
+        }
+
+        function renderFiles() {
+            const project = projectData.projects[currentProject];
+            const fileList = document.getElementById('fileList');
+            fileList.innerHTML = '';
+
+            project.files.forEach((file, index) => {
+                const div = document.createElement('div');
+                div.className = 'file-item';
+                div.innerHTML = `
+                    <input type="text" value="${file.path}" placeholder="File path" onchange="updateFile(${index}, 'path', this.value)">
+                    <textarea placeholder="Description" onchange="updateFile(${index}, 'description', this.value)">${file.description}</textarea>
+                    <button class="remove-item-btn" onclick="removeFile(${index})">Remove</button>
+                `;
+                fileList.appendChild(div);
+            });
+        }
+
+        function renderDirectories() {
+            const project = projectData.projects[currentProject];
+            const dirList = document.getElementById('dirList');
+            dirList.innerHTML = '';
+
+            project.directories.forEach((dir, index) => {
+                const div = document.createElement('div');
+                div.className = 'file-item';
+                div.innerHTML = `
+                    <input type="text" value="${dir.path}" placeholder="Directory path" onchange="updateDirectory(${index}, 'path', this.value)">
+                    <textarea placeholder="Description" onchange="updateDirectory(${index}, 'description', this.value)">${dir.description}</textarea>
+                    <button class="remove-item-btn" onclick="removeDirectory(${index})">Remove</button>
+                `;
+                dirList.appendChild(div);
+            });
+        }
+
+        function renderChangelog() {
+            const project = projectData.projects[currentProject];
+            const changelogList = document.getElementById('changelogList');
+            changelogList.innerHTML = '';
+
+            project.changelog.forEach((entry, index) => {
+                const div = document.createElement('div');
+                div.className = 'changelog-item';
+                div.innerHTML = `
+                    <input type="date" value="${entry.date}" onchange="updateChangelogEntry(${index}, 'date', this.value)">
+                    <textarea placeholder="Changes" onchange="updateChangelogEntry(${index}, 'changes', this.value)">${entry.changes}</textarea>
+                    <button class="remove-item-btn" onclick="removeChangelogEntry(${index})">Remove</button>
+                `;
+                changelogList.appendChild(div);
+            });
+        }
+
+        function attachEventListeners() {
+            const project = projectData.projects[currentProject];
+
+            // Summary
+            document.getElementById('summary').addEventListener('input', (e) => {
+                project.summary = e.target.value;
+                saveToLocalStorage();
+            });
+
+            // Stack
+            document.getElementById('language').addEventListener('input', (e) => {
+                project.stack.language = e.target.value;
+                saveToLocalStorage();
+            });
+
+            document.getElementById('frameworks').addEventListener('input', (e) => {
+                project.stack.frameworks = e.target.value.split('\n').filter(f => f.trim());
+                saveToLocalStorage();
+            });
+
+            document.getElementById('dependencies').addEventListener('input', (e) => {
+                project.stack.dependencies = e.target.value.split('\n').filter(d => d.trim());
+                saveToLocalStorage();
+            });
+
+            // State
+            document.getElementById('status').addEventListener('change', (e) => {
+                project.state.status = e.target.value;
+                saveToLocalStorage();
+                renderProjectDetails(currentProject);
+            });
+
+            document.getElementById('version').addEventListener('input', (e) => {
+                project.state.version = e.target.value;
+                saveToLocalStorage();
+            });
+
+            document.getElementById('issues').addEventListener('input', (e) => {
+                project.state.issues = e.target.value.split('\n').filter(i => i.trim());
+                saveToLocalStorage();
+            });
+
+            // Notes
+            document.getElementById('notes').addEventListener('input', (e) => {
+                project.notes = e.target.value;
+                saveToLocalStorage();
+            });
+        }
+
+        // File Management
+        function addFile() {
+            const project = projectData.projects[currentProject];
+            project.files.push({ path: '', description: '' });
+            renderFiles();
+            saveToLocalStorage();
+        }
+
+        function updateFile(index, field, value) {
+            const project = projectData.projects[currentProject];
+            project.files[index][field] = value;
+            saveToLocalStorage();
+        }
+
+        function removeFile(index) {
+            const project = projectData.projects[currentProject];
+            project.files.splice(index, 1);
+            renderFiles();
+            saveToLocalStorage();
+        }
+
+        // Directory Management
+        function addDirectory() {
+            const project = projectData.projects[currentProject];
+            project.directories.push({ path: '', description: '' });
+            renderDirectories();
+            saveToLocalStorage();
+        }
+
+        function updateDirectory(index, field, value) {
+            const project = projectData.projects[currentProject];
+            project.directories[index][field] = value;
+            saveToLocalStorage();
+        }
+
+        function removeDirectory(index) {
+            const project = projectData.projects[currentProject];
+            project.directories.splice(index, 1);
+            renderDirectories();
+            saveToLocalStorage();
+        }
+
+        // Changelog Management
+        function addChangelogEntry() {
+            const project = projectData.projects[currentProject];
+            project.changelog.unshift({
+                date: new Date().toISOString().split('T')[0],
+                changes: ''
+            });
+            renderChangelog();
+            saveToLocalStorage();
+        }
+
+        function updateChangelogEntry(index, field, value) {
+            const project = projectData.projects[currentProject];
+            project.changelog[index][field] = value;
+            saveToLocalStorage();
+        }
+
+        function removeChangelogEntry(index) {
+            const project = projectData.projects[currentProject];
+            project.changelog.splice(index, 1);
+            renderChangelog();
+            saveToLocalStorage();
+        }
+
+        // Import/Export
+        function exportData() {
+            const dataStr = JSON.stringify(projectData, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `v3am-projects-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    projectData = JSON.parse(e.target.result);
+                    saveToLocalStorage();
+                    renderProjectList();
+                    if (Object.keys(projectData.projects).length > 0) {
+                        selectProject(Object.keys(projectData.projects)[0]);
+                    }
+                    alert('Import successful!');
+                } catch (err) {
+                    alert('Error importing file: ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // Export as Site Weaver
+        async function exportSiteWeaver() {
+            if (Object.keys(projectData.projects).length === 0) {
+                alert('No projects to export!');
+                return;
+            }
+
+            const zip = new JSZip();
+            const pagesFolder = zip.folder('pages');
+
+            // Create index.json
+            const indexData = {
+                rootId: 'home',
+                pages: {
+                    'home': {
+                        id: 'home',
+                        title: 'V3AM Projects - THE PLAN',
+                        summary: 'Master project control panel for V3AM universe'
+                    }
+                }
+            };
+
+            let prevId = 'home';
+
+            // Create homepage HTML
+            let homeHTML = `<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.6;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background: #f5f5f5;
+}
+article {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+h1 {
+    color: #333;
+    border-bottom: 3px solid #667eea;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+.project-card {
+    background: #f9f9f9;
+    border-left: 4px solid #667eea;
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 4px;
+}
+.project-card h2 {
+    margin: 0 0 10px 0;
+    color: #667eea;
+}
+.status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-left: 10px;
+}
+.status-production { background: #2ecc71; color: white; }
+.status-development { background: #f39c12; color: white; }
+.status-research { background: #3498db; color: white; }
+.status-blocked { background: #e74c3c; color: white; }
+.nav-link {
+    display: inline-block;
+    background: #667eea;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    margin: 5px 5px 5px 0;
+    font-size: 13px;
+}
+.nav-link:hover {
+    background: #764ba2;
+}
+</style>
+
+<article>
+<h1>🎯 THE PLAN - V3AM Projects Overview</h1>
+<p><strong>Master Control Panel for V3AM Universe</strong></p>
+<p>This Site Weaver site contains detailed documentation for all V3AM projects, including summaries, file structures, dependencies, current state, and changelogs.</p>
+
+<h2>📁 Projects in this Archive</h2>
+`;
+
+            // Add project cards to homepage
+            Object.keys(projectData.projects).forEach(slug => {
+                const project = projectData.projects[slug];
+                homeHTML += `
+<div class="project-card">
+    <h2>${project.name}</h2>
+    <span class="status-badge status-${project.state.status.toLowerCase()}">${project.state.status}</span>
+    <p><strong>Path:</strong> <code>${project.path}</code></p>
+    <p>${project.summary || 'No summary provided'}</p>
+    <a href="${slug}.html" class="nav-link">View Details →</a>
+</div>
+`;
+            });
+
+            homeHTML += `
+<h2>🗂️ Quick Navigation</h2>
+<div style="margin-top: 15px;">
+`;
+
+            // Add navigation links
+            Object.keys(projectData.projects).forEach(slug => {
+                const project = projectData.projects[slug];
+                homeHTML += `<a href="${slug}.html" class="nav-link">${project.name}</a>\n`;
+            });
+
+            homeHTML += `
+</div>
+</article>
+`;
+
+            pagesFolder.file('home.html', homeHTML);
+
+            // Create a page for each project
+            Object.keys(projectData.projects).forEach((slug, index) => {
+                const project = projectData.projects[slug];
+
+                // Add to index.json
+                indexData.pages[slug] = {
+                    id: slug,
+                    title: project.name,
+                    summary: project.summary || 'No summary',
+                    parentId: prevId
+                };
+                prevId = slug;
+
+                // Generate HTML fragment
+                let projectHTML = `<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.6;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background: #f5f5f5;
+}
+article {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+h1 {
+    color: #333;
+    border-bottom: 3px solid #667eea;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+h2 {
+    color: #667eea;
+    margin-top: 30px;
+    margin-bottom: 15px;
+}
+.section {
+    background: #f9f9f9;
+    border-left: 4px solid #667eea;
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 4px;
+}
+.file-item, .dir-item {
+    background: white;
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 4px;
+    border: 1px solid #e0e0e0;
+}
+.changelog-entry {
+    background: white;
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 4px;
+    border-left: 3px solid #667eea;
+}
+code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+}
+pre {
+    background: #f0f0f0;
+    padding: 15px;
+    border-radius: 6px;
+    overflow-x: auto;
+}
+.status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-left: 10px;
+}
+.status-production { background: #2ecc71; color: white; }
+.status-development { background: #f39c12; color: white; }
+.status-research { background: #3498db; color: white; }
+.status-blocked { background: #e74c3c; color: white; }
+.page-navigation {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 6px;
+    margin: 20px 0;
+    text-align: center;
+}
+.nav-link {
+    color: #667eea;
+    text-decoration: none;
+    margin: 0 10px;
+    padding: 8px 16px;
+    background: white;
+    border-radius: 4px;
+    display: inline-block;
+}
+.nav-link:hover {
+    background: #667eea;
+    color: white;
+}
+</style>
+
+<article>
+<div class="page-navigation">
+    <a href="home.html" class="nav-link">🏠 Home</a>
+`;
+
+                // Add prev/next navigation
+                const projectKeys = Object.keys(projectData.projects);
+                const currentIndex = projectKeys.indexOf(slug);
+
+                if (currentIndex > 0) {
+                    const prevSlug = projectKeys[currentIndex - 1];
+                    projectHTML += `<a href="${prevSlug}.html" class="nav-link">← ${projectData.projects[prevSlug].name}</a>\n`;
+                }
+
+                if (currentIndex < projectKeys.length - 1) {
+                    const nextSlug = projectKeys[currentIndex + 1];
+                    projectHTML += `<a href="${nextSlug}.html" class="nav-link">${projectData.projects[nextSlug].name} →</a>\n`;
+                }
+
+                projectHTML += `</div>
+
+<h1>${project.name}</h1>
+<span class="status-badge status-${project.state.status.toLowerCase()}">${project.state.status}</span>
+<p><strong>Version:</strong> ${project.state.version} | <strong>Last Updated:</strong> ${project.state.lastUpdated}</p>
+<p><strong>Path:</strong> <code>${project.path}</code></p>
+
+<div class="section">
+<h2>📋 Summary</h2>
+<p>${project.summary || 'No summary provided'}</p>
+</div>
+`;
+
+                // Key Files
+                if (project.files && project.files.length > 0) {
+                    projectHTML += `
+<div class="section">
+<h2>📄 Key Files</h2>
+`;
+                    project.files.forEach(file => {
+                        projectHTML += `
+<div class="file-item">
+    <strong><code>${file.path}</code></strong><br>
+    ${file.description}
+</div>
+`;
+                    });
+                    projectHTML += `</div>\n`;
+                }
+
+                // Directories
+                if (project.directories && project.directories.length > 0) {
+                    projectHTML += `
+<div class="section">
+<h2>📁 Key Directories</h2>
+`;
+                    project.directories.forEach(dir => {
+                        projectHTML += `
+<div class="dir-item">
+    <strong><code>${dir.path}</code></strong><br>
+    ${dir.description}
+</div>
+`;
+                    });
+                    projectHTML += `</div>\n`;
+                }
+
+                // Tech Stack
+                projectHTML += `
+<div class="section">
+<h2>⚙️ Tech Stack</h2>
+<p><strong>Language:</strong> ${project.stack.language || 'Not specified'}</p>
+`;
+                if (project.stack.frameworks && project.stack.frameworks.length > 0) {
+                    projectHTML += `<p><strong>Frameworks:</strong></p><ul>`;
+                    project.stack.frameworks.forEach(fw => {
+                        projectHTML += `<li>${fw}</li>`;
+                    });
+                    projectHTML += `</ul>`;
+                }
+
+                if (project.stack.dependencies && project.stack.dependencies.length > 0) {
+                    projectHTML += `<p><strong>Dependencies:</strong></p><ul>`;
+                    project.stack.dependencies.forEach(dep => {
+                        projectHTML += `<li>${dep}</li>`;
+                    });
+                    projectHTML += `</ul>`;
+                }
+                projectHTML += `</div>\n`;
+
+                // Current State
+                if (project.state.issues && project.state.issues.length > 0) {
+                    projectHTML += `
+<div class="section">
+<h2>⚠️ Current Issues</h2>
+<ul>
+`;
+                    project.state.issues.forEach(issue => {
+                        projectHTML += `<li>${issue}</li>\n`;
+                    });
+                    projectHTML += `</ul>\n</div>\n`;
+                }
+
+                // Changelog
+                if (project.changelog && project.changelog.length > 0) {
+                    projectHTML += `
+<div class="section">
+<h2>📝 Changelog</h2>
+`;
+                    project.changelog.forEach(entry => {
+                        projectHTML += `
+<div class="changelog-entry">
+    <strong>${entry.date}</strong><br>
+    ${entry.changes}
+</div>
+`;
+                    });
+                    projectHTML += `</div>\n`;
+                }
+
+                // Notes
+                if (project.notes) {
+                    projectHTML += `
+<div class="section">
+<h2>💡 Notes</h2>
+<pre>${project.notes}</pre>
+</div>
+`;
+                }
+
+                projectHTML += `
+<div class="page-navigation">
+    <a href="home.html" class="nav-link">🏠 Home</a>
+`;
+
+                // Repeat prev/next at bottom
+                if (currentIndex > 0) {
+                    const prevSlug = projectKeys[currentIndex - 1];
+                    projectHTML += `<a href="${prevSlug}.html" class="nav-link">← ${projectData.projects[prevSlug].name}</a>\n`;
+                }
+
+                if (currentIndex < projectKeys.length - 1) {
+                    const nextSlug = projectKeys[currentIndex + 1];
+                    projectHTML += `<a href="${nextSlug}.html" class="nav-link">${projectData.projects[nextSlug].name} →</a>\n`;
+                }
+
+                projectHTML += `</div>
+</article>`;
+
+                pagesFolder.file(`${slug}.html`, projectHTML);
+            });
+
+            // Create site.json
+            const siteJson = {
+                id: 'v3am-the-plan',
+                name: 'V3AM THE PLAN',
+                theme: {},
+                defaultTemplate: 'default'
+            };
+
+            zip.file('site.json', JSON.stringify(siteJson, null, 2));
+            zip.file('index.json', JSON.stringify(indexData, null, 2));
+
+            // Generate and download zip
+            const blob = await zip.generateAsync({ type: 'blob' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `v3am-the-plan-${new Date().toISOString().split('T')[0]}.zip`;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            alert('Site Weaver export complete! Upload to Site Weaver to browse your projects.');
+        }
+
+        // Initialize on load
+        init();
+    </script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+{
+  "name": "[EXAMPLE] 02 - Social Post",
+  "description": "Create platform-specific social posts. Agentic Prompt: promptsocialpost1. Agent: Randy (9201). Cycles: 6-8.",
+  "nodes": [
+    {
+      "id": "trigger1",
+      "type": "trigger.manual",
+      "title": "Start Social Post",
+      "x": 100,
+      "y": 100,
+      "data": {}
+    },
+    {
+      "id": "var1",
+      "type": "action.tool",
+      "title": "Get platform (Facebook/LinkedIn/etc)",
+      "x": 350,
+      "y": 50,
+      "data": {
+        "tool": "datetime",
+        "params": "{}"
+      }
+    },
+    {
+      "id": "action1",
+      "type": "action.http",
+      "title": "Call Randy: Execute promptsocialpost1",
+      "x": 350,
+      "y": 150,
+      "data": {
+        "method": "GET",
+        "url": "http://localhost:9201/agent/api/agent.php?action=chat&input=Execute_promptsocialpost1_platform_Facebook_topic_Company_announcement",
+        "body": ""
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "trigger1",
+      "to": "var1",
+      "cond": null
+    },
+    {
+      "from": "var1",
+      "to": "action1",
+      "cond": null
+    }
+  ],
+  "vars": {
+    "prompt": "promptsocialpost1",
+    "agent": "Randy (9201)",
+    "cycles_estimated": "6-8",
+    "platform": "Facebook"
+  }
+}

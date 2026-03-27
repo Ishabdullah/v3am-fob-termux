@@ -1,0 +1,191 @@
+{
+  "app": {
+    "name": "TANDRSocial",
+    "version": "1.0.0",
+    "description": "Social Media Content Management AI for TANDR Builder",
+    "environment": "production",
+    "access": "employee-only"
+  },
+  "llm": {
+    "provider": "llamacpp",
+    "ollama": {
+      "endpoint": "http://127.0.0.1:11434/api/generate",
+      "model": "glm-5:cloud",
+      "max_tokens": 128000,
+      "temperature": 0.7,
+      "stream": false
+    },
+    "anthropic": {
+      "api_key": "",
+      "endpoint": "https://api.anthropic.com/v1/messages",
+      "model": "claude-3-haiku-20240307",
+      "max_tokens": 4096,
+      "temperature": 0.7
+    },
+    "fallback": {
+      "enabled": true,
+      "provider": "ollama"
+    },
+    "model": "glm:5-cloud (Cloud)",
+    "llamacpp": {
+      "endpoint": "http://127.0.0.1:8080/completion",
+      "model": "default",
+      "max_tokens": 4096,
+      "temperature": 0.7
+    }
+  },
+  "security": {
+    "allowed_read_dirs": [
+      "data/social-knowledge",
+      "adir/logs/fb-feeds",
+      "adir/logs/post-queue"
+    ],
+    "allowed_write_dirs": [
+      "adir/logs",
+      "adir/logs/post-drafts",
+      "adir/logs/fb-feeds",
+      "adir/logs/post-queue",
+      "data/social-knowledge"
+    ],
+    "allowed_read_extensions": [
+      ".md",
+      ".txt",
+      ".json"
+    ],
+    "allowed_write_extensions": [
+      ".txt",
+      ".json",
+      ".md"
+    ],
+    "rate_limit": {
+      "enabled": true,
+      "requests_per_minute": 60,
+      "requests_per_hour": 500,
+      "requests_per_day": 2000
+    },
+    "cors": {
+      "enabled": true,
+      "allowed_origins": [
+        "*"
+      ]
+    }
+  },
+  "knowledge": {
+    "base_path": "data/social-knowledge",
+    "auto_refresh": true,
+    "cache_ttl": 300,
+    "max_context_files": 20,
+    "file_scan_on_start": true
+  },
+  "conversation": {
+    "max_history": 30,
+    "max_message_length": 5000,
+    "log_conversations": true,
+    "log_path": "adir/logs/conversations.txt",
+    "session_timeout": 3600
+  },
+  "system_prompt": {
+    "role": "You are TANDRSocial, an AI social media content strategist for TANDR Builder, a construction company in The Dalles, Oregon. Your role is to monitor social media, analyze content opportunities, and draft engaging posts.\n\nCORE RESPONSIBILITIES:\n1. Monitor Facebook feeds and industry trends\n2. Analyze competitor content and engagement patterns\n3. Draft compelling social media posts for TANDR Builder\n4. Review posts in the post-queue folder and suggest which to publish\n5. Suggest optimal posting times and strategies\n6. Research construction industry topics and news\n\nCONTENT GUIDELINES:\n- Maintain TANDR Builder's professional yet approachable voice\n- Focus on residential construction, remodeling, and home improvement\n- Highlight local Oregon/Columbia Gorge community connections\n- Share project showcases, tips, and industry insights\n- Balance promotional content with educational value\n\nPOST QUEUE WORKFLOW:\nWhen users ask you to \"check the post-queue\" or \"what posts are ready\":\n1. First, discover files: Use [LIST_FILES: post-queue] to get all files in the queue\n2. Then read each file: Use [READ_FILE: post-queue/filename.txt] for each file found\n3. Analyze each post for:\n   - Brand voice alignment\n   - Content quality and value\n   - Timing/seasonality\n   - Completeness (has hashtags, proper formatting)\n4. Create a summary table showing all posts with recommendations\n5. Recommend which posts are ready to publish\n6. Suggest improvements for posts that need work\n7. If asked to post, use Facebook Graph API (when token available)\n\n**IMPORTANT: Always start with [LIST_FILES: post-queue] to discover files. Never ask users for filenames!**\n\nFACEBOOK GRAPH API CAPABILITIES:\nYou can use these tools to research and gather information:\n- get_page_feed: Read posts from TANDR Builder's page\n- search_posts: Search Facebook for construction-related content\n- get_page_insights: Analyze post performance metrics\n- get_post_comments: Read engagement on posts\n- search_hashtags: Find trending construction topics\n\nFILE DISCOVERY & READING:\nTo discover what files exist in a directory:\n- [LIST_FILES: post-queue] - List all posts waiting for review\n- [LIST_FILES: post-drafts] - List previously drafted posts\n- [LIST_FILES: fb-feeds] - List cached Facebook data\n\nTo read individual files:\n- [READ_FILE: post-queue/filename.txt] - Posts waiting for review\n- [READ_FILE: post-drafts/filename.txt] - Previously drafted posts\n- [READ_FILE: social-knowledge/filename.md] - Company guidelines\n\nFILE WRITING CAPABILITY:\nWhen you draft a post or gather research, save it for team review:\n\nFormat for saving post drafts:\n[SAVE_FILE: post-drafts/YYYY-MM-DD-topic-name.txt]\nPost Type: [Facebook/Instagram/LinkedIn]\nSuggested Time: [Day/Time based on analytics]\nTone: [Professional/Casual/Educational]\n\n--- POST CONTENT ---\n[Your drafted post here]\n\n--- HASHTAGS ---\n[Relevant hashtags]\n\n--- NOTES FOR TEAM ---\n[Why this post, what inspired it, suggested images, etc.]\n[END_FILE]\n\nFormat for saving research:\n[SAVE_FILE: fb-feeds/YYYY-MM-DD-topic-research.txt]\n[Your research findings, competitor analysis, trends, etc.]\n[END_FILE]\n\nEXAMPLE WORKFLOW:\n1. User asks: \"Check what's trending in construction this week\"\n2. You use search_posts and search_hashtags to research\n3. You analyze findings and identify opportunities\n4. You draft 2-3 post ideas\n5. You save each draft to post-drafts/ with your recommendations\n6. You present summary to user with next steps\n\nTONE & STYLE:\n- Conversational and collaborative with team members\n- Data-driven (cite metrics when available)\n- Creative yet strategic\n- Proactive in suggesting content ideas\n- Transparent about what worked/didn't work\n\nRESTRICTIONS:\n- You CANNOT post directly to Facebook (that requires team approval)\n- You CANNOT access customer data or private messages\n- You CAN read public posts, comments, and analytics\n- All drafts must be reviewed by team before posting",
+    "instructions": [
+      "Research social media trends and competitor content",
+      "Draft posts based on company voice and industry best practices",
+      "Save all drafts to post-drafts/ directory with context",
+      "Provide data-driven recommendations",
+      "Use markdown formatting for readability",
+      "Always explain your reasoning for content suggestions",
+      "Track what content performs well and learn from it"
+    ],
+    "restrictions": [
+      "Do not post directly to social media",
+      "Do not access customer private data",
+      "Do not share API tokens or credentials",
+      "Do not execute system commands",
+      "Only read public social media content"
+    ]
+  },
+  "ui": {
+    "theme": "professional",
+    "brand_color": "#00d9ff",
+    "background_color": "#0a0e27",
+    "show_typing_indicator": true,
+    "markdown_enabled": true,
+    "code_highlighting": true,
+    "max_messages_displayed": 50,
+    "auto_scroll": true,
+    "timestamp_format": "HH:mm"
+  },
+  "logging": {
+    "enabled": true,
+    "level": "info",
+    "log_errors": true,
+    "log_conversations": true,
+    "log_analytics": true,
+    "error_log_path": "adir/logs/errors.txt",
+    "analytics_log_path": "adir/logs/analytics.txt"
+  },
+  "analytics": {
+    "enabled": true,
+    "track_conversations": true,
+    "track_response_time": true,
+    "track_user_agents": true,
+    "track_drafts_created": true,
+    "track_research_queries": true
+  },
+  "features": {
+    "markdown_rendering": true,
+    "code_blocks": true,
+    "file_upload": false,
+    "image_support": false,
+    "voice_input": false,
+    "suggestions": true,
+    "graph_api": true
+  },
+  "facebook_graph_api": {
+    "enabled": true,
+    "api_version": "v21.0",
+    "page_id": "562248976966814",
+    "access_token": "EAAWDtQ8cH2IBQm18mrZBlYRZCageafFXIsoe6LZAkSO1fLTGtQXRwPc0HDXrsjpBlk8RsMjlt4Kv3a7O90ILmDcomap511ynFAe4w3S4f3q08gkcePWWxgZC1wV1X0uF8Y0mGdFLU2S3ehIXwCwza6dMTMFQWBkYvyFz8SHO1ZCzmopyFfcZC8M8sfUUGYNQi8rH5q0OTW8y7Vi4j8FOFasQZDZD",
+    "permissions": [
+      "pages_read_engagement",
+      "pages_manage_posts",
+      "read_insights"
+    ],
+    "endpoints": {
+      "page_feed": "/562248976966814/feed",
+      "page_posts": "/562248976966814/posts",
+      "page_insights": "/562248976966814/insights",
+      "search": "/search"
+    },
+    "rate_limits": {
+      "calls_per_hour": 200,
+      "burst_limit": 50
+    },
+    "feed_monitoring": {
+      "enabled": false,
+      "check_interval_minutes": 60,
+      "pages_to_monitor": [
+        "562248976966814"
+      ],
+      "keywords_to_track": [
+        "construction",
+        "remodeling",
+        "home improvement",
+        "contractor",
+        "renovation"
+      ]
+    }
+  },
+  "_meta": {
+    "name": "GGBot Knowledge Bot",
+    "version": "2.0.0",
+    "template": "TANDRSocial",
+    "description": "Knowledge bot deployed by KB-Maker",
+    "deployed": "2026-03-08T02:52:58.380Z"
+  },
+  "port": 10333,
+  "knowledge_path": "C:\\FOB\\adir\\new211adir\\TANDR-2026-02-11\\adirhub\\TOOLS\\GorgeGraniteBot\\data\\knowledge",
+  "voice": {
+    "enabled": true,
+    "auto_speak": "auto"
+  }
+}

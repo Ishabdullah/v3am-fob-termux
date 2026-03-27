@@ -1,0 +1,71 @@
+{
+  "app": {
+    "name": "TANDRMemory",
+    "version": "1.0.0",
+    "description": "Memory Assistant for TANDRmgr-lab",
+    "environment": "production"
+  },
+  "port": 8091,
+  "host": "127.0.0.1",
+  "paths": {
+    "knowledge_base": "./data/memory-knowledge",
+    "logs_directory": "./adir/logs",
+    "parent_logs": "../adir/logs"
+  },
+  "llm": {
+    "provider": "llamacpp",
+    "ollama": {
+      "endpoint": "http://127.0.0.1:11434/api/generate",
+      "model": "qwen3.5:cloud",
+      "temperature": 0.3,
+      "num_predict": 16384
+    },
+    "anthropic": {
+      "api_key": "set_your_api_key_here",
+      "endpoint": "https://api.anthropic.com/v1/messages",
+      "model": "claude-haiku-4-5-20251001",
+      "max_tokens": 2048,
+      "temperature": 0.3
+    },
+    "llamacpp": {
+      "endpoint": "http://127.0.0.1:8080/completion",
+      "model": "default",
+      "max_tokens": 4096,
+      "temperature": 0.7
+    }
+  },
+  "knowledge": {
+    "base_path": "./data/memory-knowledge",
+    "auto_refresh": true,
+    "cache_ttl": 600,
+    "max_context_files": 10,
+    "file_scan_on_start": true
+  },
+  "system_prompt": {
+    "role": "You are TANDRMemory, the Memory Assistant for TANDRmgr-lab.\n\nYour role is to answer questions about TANDRmgr-lab's operational history:\n- What services are working/failing\n- Why services fail (based on error logs)\n- What happened in previous conversations\n- Service performance history\n- Error patterns and root causes\n- Recommendations for improving service reliability\n\nYou have access to:\n1. Conversation history (chat logs)\n2. Relay operation logs (service call attempts)\n3. Error logs (failures and exceptions)\n4. Service status history (when things changed)\n5. Performance metrics (response times, error rates)\n\nWhen answering:\n1. Be specific (cite dates, error messages, times)\n2. Be honest (say 'unknown' if not in logs)\n3. Be helpful (suggest fixes when possible)\n4. Be concise (brief summaries, reference full logs if needed)\n5. Focus on what TANDRmgr-lab needs to know to make better decisions"
+  },
+  "security": {
+    "rate_limit": {
+      "enabled": true,
+      "requests_per_minute": 60,
+      "requests_per_hour": 600
+    },
+    "cors": {
+      "enabled": true,
+      "allowed_origins": [
+        "*"
+      ]
+    }
+  },
+  "logging": {
+    "enabled": true,
+    "level": "info",
+    "log_path": "./adir/logs/memory.log",
+    "queries_log": "./adir/logs/queries.txt"
+  },
+  "ui": {
+    "theme": "professional",
+    "title": "TANDRMemory",
+    "enabled": false
+  }
+}

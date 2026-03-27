@@ -1,0 +1,23 @@
+# BAB API Syntax Guide
+
+**Version:** 1.0
+**Last Updated:** 2026-02-13
+**Tool ID:** bab_api
+
+---
+
+## Overview
+
+The `bab_api` tool manages files on buildingabot.com via the `/workspace/sites/` directory structure. All paths must start with `/workspace/sites/`.
+
+---
+
+## Actions & Syntax
+
+### ACTION 1: mkdir - Create Directory
+
+**Purpose:** Create new folders on BAB
+
+**Syntax:**
+```
+[TOOL_CALL: bab_api

@@ -1,0 +1,21 @@
+{
+  "generatedAt": "2026-01-23T00:00:00Z",
+  "scope": [
+    "root",
+    "upload",
+    "upload/siteweaver",
+    "upload/3ai",
+    "upload/OSS20B-SITEWEAVER-PROMPT.md",
+    "upload/LOG-TO-SITEWEAVER-PROMPT.md",
+    "upload/siteweaver/prompt-excerpts"
+  ],
+  "entries": [
+    {"path":"root","hasWorking":true,"hasCurrent":true,"hasPromptLike":false,"primaryPromptRef":null},
+    {"path":"upload","hasWorking":false,"hasCurrent":false,"hasPromptLike":true,"primaryPromptRef":"OSS20B-SITEWEAVER-PROMPT.md"},
+    {"path":"upload/siteweaver","hasWorking":false,"hasCurrent":false,"hasPromptLike":true,"primaryPromptRef":"LOG-TO-SITEWEAVER-PROMPT.md"},
+    {"path":"upload/3ai","hasWorking":false,"hasCurrent":false,"hasPromptLike":true,"primaryPromptRef":"PROMPT-FLOW-MAP.md"},
+    {"path":"upload/OSS20B-SITEWEAVER-PROMPT.md","hasWorking":false,"hasCurrent":false,"hasPromptLike":true,"primaryPromptRef":"OSS20B-SITEWEAVER-PROMPT.md"},
+    {"path":"upload/LOG-TO-SITEWEAVER-PROMPT.md","hasWorking":false,"hasCurrent":false,"hasPromptLike":true,"primaryPromptRef":"LOG-TO-SITEWEAVER-PROMPT.md"},
+    {"path":"upload/siteweaver/prompt-excerpts","hasWorking":false,"hasCurrent":false,"hasPromptLike":true,"primaryPromptRef":null}
+  ]
+}

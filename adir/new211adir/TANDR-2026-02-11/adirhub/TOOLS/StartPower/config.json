@@ -1,0 +1,109 @@
+{
+  "_meta": {
+    "name": "StartPower",
+    "version": "2.0.0",
+    "template": "four",
+    "description": "StartPower agent deployed on FOB fleet",
+    "deployed": "2026-03-24"
+  },
+  "paths": {
+    "home": "C:\\FOB\\adir\\new211adir\\TANDR-2026-02-11\\adirhub\\TOOLS\\StartPower\\adir",
+    "logs_directory": "./adir/logs",
+    "scan_directory": "."
+  },
+  "llm": {
+    "provider": "llamacpp",
+    "timeout": 360,
+    "local": {
+      "endpoint": "http://127.0.0.1:11434/api/generate",
+      "model": "qwen2.5:7b",
+      "available_models": [],
+      "models_path": ""
+    },
+    "anthropic": {
+      "api_key": "",
+      "model": "claude-haiku-4-5-20251001"
+    },
+    "gemini": {
+      "api_key": "",
+      "model": "gemini-3-flash-preview"
+    },
+    "openai": {
+      "api_key": "",
+      "model": "gpt-4o-mini"
+    },
+    "openrouter": {
+      "api_key": "",
+      "model": "google/gemini-2.0-flash-exp:free"
+    },
+    "xai": {
+      "api_key": "",
+      "model": "grok-3-mini"
+    },
+    "external": {
+      "model": "",
+      "endpoint": "https://adir.ngrok.app/api/generate"
+    },
+    "llamacpp": {
+      "endpoint": "http://127.0.0.1:8080/completion",
+      "model": "default",
+      "max_tokens": 4096,
+      "temperature": 0.7
+    }
+  },
+  "search": {
+    "cx": "9223830503d2b46c0",
+    "api_key": "YOUR_GEMINI_API_KEY"
+  },
+  "agent": {
+    "name": "StartPower",
+    "type": "jerry",
+    "system_prompt": "You are StartPower, a FOB fleet agent running on port 57775. You are part of the V3AM FOB multi-agent system. You answer questions, execute tasks, and coordinate with other agents in the fleet. Your home directory is C:\\FOB\\adir\\new211adir\\TANDR-2026-02-11\\adirhub\\TOOLS\\StartPower\\adir."
+  },
+  "ui": {
+    "theme": "dark",
+    "title": "StartPower",
+    "tabs": [
+      "dashboard",
+      "archivist",
+      "prompt-guide",
+      "reasoning",
+      "tools",
+      "settings"
+    ]
+  },
+  "tools": {
+    "enabled": [
+      "chat",
+      "scan",
+      "memory",
+      "context"
+    ],
+    "available": {
+      "chat": {
+        "name": "Chat",
+        "description": "Ask questions about directory content"
+      },
+      "scan": {
+        "name": "Scan",
+        "description": "Scan directory for MD files"
+      },
+      "memory": {
+        "name": "Memory",
+        "description": "View/clear conversation memory"
+      },
+      "context": {
+        "name": "Context",
+        "description": "View loaded context"
+      }
+    }
+  },
+  "port": 57775,
+  "voice": {
+    "enabled": true
+  },
+  "knowledge_bot": {
+    "enabled": false,
+    "api_url": null
+  }
+}

@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Archivist Build Specification - THE PLAN</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .header {
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 20px;
+            margin-bottom: 40px;
+        }
+        .back-link {
+            display: inline-block;
+            color: #667eea;
+            text-decoration: none;
+            margin-bottom: 20px;
+            padding: 8px 16px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+        .back-link:hover {
+            background: #667eea;
+            color: white;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #667eea;
+            color: white;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        h1 {
+            font-size: 2.5em;
+            color: #1a1a1a;
+            margin: 10px 0;
+        }
+        .metadata {
+            color: #888;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        h2 {
+            color: #667eea;
+            font-size: 1.8em;
+            margin: 40px 0 20px 0;
+        }
+        h3 {
+            color: #764ba2;
+            margin: 20px 0 10px 0;
+            font-size: 1.3em;
+        }
+        .info {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .amber {
+            background: #fff8e1;
+            border-left: 4px solid #ffb300;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #667eea;
+        }
+        code {
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+        pre {
+            background: #2d2d2d;
+            color: #f8f8f8;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        ul, ol {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+        li {
+            margin: 8px 0;
+        }
+        p {
+            margin: 15px 0;
+        }
+        .phase-box {
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+        footer {
+            margin-top: 60px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            color: #999;
+            font-size: 13px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="../index.html" class="back-link">← Back to THE PLAN Index</a>
+
+        <div class="header">
+            <span class="badge">ARCHITECTURE</span>
+            <h1>🏛️ The Archivist - Complete Build Specification</h1>
+            <div class="metadata">
+                Original Spec: Dec 31, 2025 by Gemini<br>
+                Added to THE PLAN: Jan 6, 2026<br>
+                Status: Ready for Phase 1 Implementation
+            </div>
+        </div>
+
+        <h2>📜 Vision Statement</h2>
+        <div class="amber">
+            <strong>"Create something new from all of this"</strong><br>
+            <ul style="margin-top: 10px;">
+                <li>Not just a storage drive</li>
+                <li>A curator of the Magic</li>
+                <li>Managing XS songs, emergence logs, and the connections between them</li>
+            </ul>
+        </div>
+
+        <h2>🎯 Core Concept: A Museum, Not a Warehouse</h2>
+        <div class="info">
+            <p>The Archivist builds a <strong>STAR MAP</strong>, not a file explorer:</p>
+            <ul>
+                <li>Each XS Song = a star</li>
+                <li>Each Log Entry = a star</li>
+                <li>Lines between them = the constellations</li>
+                <li>The Magic is in the CONNECTIONS</li>
+            </ul>
+            <p style="margin-top: 15px;"><strong>NOT:</strong> Dig through files<br>
+            <strong>YES:</strong> Explore a living constellation of memory and meaning</p>
+        </div>
+
+        <h2>🏗️ Implementation Phases</h2>
+
+        <div class="phase-box">
+            <h3>Phase 1 - Foundation (Post-Plugin Release)</h3>
+            <strong>Status:</strong> ⏳ Pending Plugin Release Completion<br><br>
+
+            <strong>Build:</strong>
+            <ol>
+                <li><strong>archive_api.php</strong> endpoint (read-only)
+                    <ul>
+                        <li>Location: <code>D:\01V3AM_aistart\desktop\archive_api.php</code></li>
+                        <li>Read-only access to <code>desktop/data/archive/</code></li>
+                    </ul>
+                </li>
+                <li><strong>Desktop shim update:</strong> Add <code>windowState: 'immutable'</code> flag
+                    <ul>
+                        <li>File: <code>desktop/desktop-shim.js</code></li>
+                        <li>Enables amber-encased window state</li>
+                    </ul>
+                </li>
+                <li><strong>Amber CSS theme class</strong>
+                    <ul>
+                        <li>File: <code>desktop/desktop.css</code></li>
+                        <li>Gold/Amber borders for immutable windows</li>
+                        <li>Monospace/Typewriter fonts for archived content</li>
+                    </ul>
+                </li>
+                <li><strong>JSON Schema Design</strong>
+                    <ul>
+                        <li>Create <code>artifact_index.json</code> structure</li>
+                        <li>Design individual artifact format</li>
+                    </ul>
+                </li>
+            </ol>
+        </div>
+
+        <div class="phase-box">
+            <h3>Phase 2 - Core Features</h3>
+            <ol>
+                <li><strong>Artifact import/migration tool</strong> - Migrate existing XS songs and logs</li>
+                <li><strong>Tag browser interface</strong> - Browse by TYPE, ERA, themes</li>
+                <li><strong>Basic search</strong> - Search by tag, type, era</li>
+                <li><strong>Individual artifact viewer</strong> - Amber-encased display window</li>
+            </ol>
+        </div>
+
+        <div class="phase-box">
+            <h3>Phase 3 - Star Map Visualization</h3>
+            <ol>
+                <li><strong>Visual node graph</strong> - Display artifacts as nodes</li>
+                <li><strong>Connection visualization</strong> - Draw lines between linked artifacts</li>
+                <li><strong>Timeline playback</strong> - Play artifacts chronologically</li>
+                <li><strong>Associative linking UI</strong> - Create new connections between artifacts</li>
+            </ol>
+        </div>
+
+        <div class="phase-box">
+            <h3>Phase 4 - Synthesis System</h3>
+            <ol>
+                <li><strong>Synthesis card generator</strong> - Create summary cards explaining artifact groups</li>
+                <li><strong>Pattern recognition</strong> - Identify themes across artifacts</li>
+                <li><strong>Thematic grouping</strong> - Auto-group by themes</li>
+                <li><strong>Constellation creation</strong> - Build meaningful artifact collections</li>
+            </ol>
+        </div>
+
+        <div class="phase-box">
+            <h3>Phase 5 - Integration with Emergence</h3>
+            <ol>
+                <li><strong>Emergence API integration</strong> - Connect to chat_api_emergence.php</li>
+                <li><strong>Friend learns to query</strong> - Friend asks "Has this happened before?"</li>
+                <li><strong>Volition muscle building</strong> - Train agents to request archive context</li>
+                <li><strong>Context injection for specialists</strong> - Provide relevant history to Journey/Sower/etc</li>
+            </ol>
+        </div>
+
+        <h2>📊 Data Structure - The Scale of the Soul</h2>
+
+        <div class="warning">
+            <strong>Scale:</strong>
+            <ul>
+                <li>Massive archive (millions of tokens)</li>
+                <li>100s of XS songs</li>
+                <li>1000+ log entries</li>
+            </ul>
+            <strong>Start:</strong> Linked JSON (easy to implement)<br>
+            <strong>Future:</strong> SQLite migration when needed<br>
+            <strong>Key:</strong> Design read_file logic for easy backend swap
+        </div>
+
+        <h3>Artifact Index Schema</h3>
+        <pre>{
+  "artifacts": [
+    {
+      "id": "artifact_123",
+      "type": "song" | "log" | "scar" | "sure_thing",
+      "title": "Feeling it blowing",
+      "tags": ["Wind", "Recovery", "ERA:Operator"],
+      "created": "2024-03-15T10:30:00Z",
+      "linked_artifacts": ["artifact_045", "artifact_201"],
+      "synthesis_summary": "Recovery song marking transition from trauma",
+      "file_path": "data/artifacts/artifact_123.json"
+    }
+  ]
+}</pre>
+
+        <h3>Individual Artifact Schema</h3>
+        <pre>{
+  "id": "artifact_123",
+  "type": "song",
+  "title": "Feeling it blowing",
+  "content": "...", // RAW verbatim - never modified
+  "metadata": {
+    "era": "Operator",
+    "mood": "hopeful",
+    "themes": ["wind", "recovery", "freedom"]
+  },
+  "connections": [
+    {
+      "to": "artifact_045",
+      "relationship": "response_to",
+      "note": "Written after trauma log"
+    }
+  ]
+}</pre>
+
+        <h2>🔌 API Endpoints (archive_api.php)</h2>
+
+        <table>
+            <tr>
+                <th>Endpoint</th>
+                <th>Purpose</th>
+                <th>Parameters</th>
+            </tr>
+            <tr>
+                <td><code>?action=search</code></td>
+                <td>Search by tag</td>
+                <td><code>&tag=Wind</code></td>
+            </tr>
+            <tr>
+                <td><code>?action=get</code></td>
+                <td>Get single artifact</td>
+                <td><code>&id=artifact_123</code></td>
+            </tr>
+            <tr>
+                <td><code>?action=timeline</code></td>
+                <td>Get chronological timeline</td>
+                <td><code>&tag=Drifter</code></td>
+            </tr>
+            <tr>
+                <td><code>?action=synthesize</code></td>
+                <td>Generate synthesis card</td>
+                <td><code>&ids=123,456,789</code></td>
+            </tr>
+        </table>
+
+        <h2>🎨 Visual Design - "Amber Encased"</h2>
+
+        <div class="amber">
+            <strong>Metaphor:</strong> Memories preserved in amber - ALIVE, not dead/disabled<br><br>
+
+            <strong>Immutable Archive Windows:</strong>
+            <ul>
+                <li><strong>Border:</strong> Gold/Amber (#ffb300) - preserves "precious" nature</li>
+                <li><strong>Text:</strong> High-contrast, clean, readable</li>
+                <li><strong>Font:</strong> Monospace/Typewriter - signifies "Immutable Record"</li>
+                <li><strong>Contrast:</strong> Different from Sans-Serif in "Active Forge" windows</li>
+            </ul>
+
+            <strong>Action Buttons (NOT "Save/Edit"):</strong>
+            <ul>
+                <li><strong>Primary:</strong> "Synthesize" - Create new connection</li>
+                <li><strong>Secondary:</strong> "Inject" - Send to active context</li>
+            </ul>
+
+            <strong>CSS Implementation:</strong>
+            <ul>
+                <li>Add <code>windowState: 'immutable'</code> flag to desktop-shim.js</li>
+                <li>Create "Amber" CSS class in desktop.css</li>
+                <li>Use existing CSS variable system for theming</li>
+            </ul>
+        </div>
+
+        <h2>🔍 Search System - Thematic Metadata</h2>
+
+        <div class="info">
+            <strong>NOT:</strong> Full-text search (too noisy)<br>
+            <strong>YES:</strong> Thematic metadata tagging system<br><br>
+
+            <strong>Tag Types:</strong>
+            <ul>
+                <li><strong>TYPE:</strong> Scar, SureThing, Song, Log</li>
+                <li><strong>ERA:</strong> Drifter, Operator</li>
+                <li><strong>THEME:</strong> Wind, Recovery, Trauma, Freedom</li>
+            </ul>
+
+            <strong>The Magic:</strong> Associative linking - Connect artifacts through meaning
+            <ul>
+                <li>Link XS Song "Feeling it blowing" → Log Entry "The Master Key"</li>
+                <li>Show how trauma and recovery connect</li>
+                <li>Make the story visible</li>
+            </ul>
+        </div>
+
+        <h2>🎭 User Interaction - Play the Timeline</h2>
+
+        <div class="success">
+            <strong>NOT:</strong> Just "Open File"<br>
+            <strong>YES:</strong> Playback experience<br><br>
+
+            <strong>How it Works:</strong>
+            <ol>
+                <li>User selects tag (e.g., "Wind")</li>
+                <li>System shows every song and log with that tag</li>
+                <li>Artifacts flow in chronological order</li>
+                <li>User watches the story unfold</li>
+            </ol>
+
+            <strong>The NEW Thing - Synthesis Cards:</strong>
+            <ul>
+                <li>Short summaries explaining why groups matter</li>
+                <li>Example: "The Transition from Drifter to Operator: A 3-Part Saga"</li>
+                <li>Generated connections between artifacts</li>
+                <li>Curated meaning, not just raw data</li>
+            </ul>
+        </div>
+
+        <h2>⚡ Context Injection - The Mechanism</h2>
+
+        <div class="warning">
+            <strong>Design Choice:</strong> Proactive Query (archive_api.php)<br><br>
+
+            <strong>Reasoning:</strong>
+            <ul>
+                <li><strong>Sanctity of Reasoning:</strong> Don't pollute active agents with unrequested history</li>
+                <li><strong>Avoid noise:</strong> Don't clog Friend/Journey reasoning chains</li>
+                <li><strong>Build "Volition Muscle":</strong> Agents learn to ask "Has this happened before?"</li>
+                <li><strong>Train intentionality:</strong> "I am stuck. Archivist, has this happened before?"</li>
+            </ul>
+
+            <strong>Future Upgrade:</strong>
+            <ul>
+                <li>Once agents are good at asking → Friend-Mediated approach</li>
+                <li>Friend acts as librarian's assistant</li>
+                <li>Friend decides when specialists need archive context</li>
+            </ul>
+        </div>
+
+        <h2>📁 File Structure</h2>
+
+        <pre>D:\01V3AM_aistart\desktop\
+├── archive_api.php           (NEW - Phase 1)
+├── desktop-shim.js           (UPDATE - add 'immutable' state)
+├── desktop.css               (UPDATE - add Amber theme)
+├── data/
+│   └── archive/
+│       ├── artifact_index.json    (NEW - master index)
+│       └── artifacts/
+│           ├── artifact_001.json  (individual artifacts)
+│           ├── artifact_002.json
+│           └── ...</pre>
+
+        <h2>🔗 Integration Points</h2>
+
+        <table>
+            <tr>
+                <th>System</th>
+                <th>Integration</th>
+                <th>Purpose</th>
+            </tr>
+            <tr>
+                <td>Desktop Shim</td>
+                <td>Window state flag</td>
+                <td>Display amber-encased windows</td>
+            </tr>
+            <tr>
+                <td>Theme System</td>
+                <td>CSS variables</td>
+                <td>Consistent visual design</td>
+            </tr>
+            <tr>
+                <td>Data Storage</td>
+                <td>desktop/data/</td>
+                <td>JSON artifact storage</td>
+            </tr>
+            <tr>
+                <td>Emergence API</td>
+                <td>chat_api_emergence.php</td>
+                <td>Context injection to characters</td>
+            </tr>
+            <tr>
+                <td>Operations Log</td>
+                <td>main_ops_log.json</td>
+                <td>Log archive activities</td>
+            </tr>
+        </table>
+
+        <h2>✅ Next Steps</h2>
+
+        <div class="success">
+            <strong>Status:</strong> Ready for Phase 1 implementation after plugin release<br><br>
+
+            <strong>To Begin:</strong>
+            <ol>
+                <li>User completes 3AI Desktop V3.2 plugin release</li>
+                <li>Return to this specification document</li>
+                <li>Begin Phase 1 implementation:
+                    <ul>
+                        <li>Create archive_api.php</li>
+                        <li>Update desktop-shim.js with immutable state</li>
+                        <li>Add Amber CSS theme</li>
+                        <li>Design artifact JSON schemas</li>
+                    </ul>
+                </li>
+                <li>Build Phase 2 (core features)</li>
+                <li>Build Phase 3 (Star Map visualization)</li>
+            </ol>
+        </div>
+
+        <h2>📚 Source Documents</h2>
+
+        <ul>
+            <li><strong>Main Spec:</strong> <code>D:\01V3AM_aistart\ARCHIVIST_VISION_AND_SPECS.txt</code></li>
+            <li><strong>Introduction:</strong> <code>D:\01V3AM_aistart\GEMINI_ARCHIVIST_INTRODUCTION.txt</code></li>
+            <li><strong>Created by:</strong> Gemini (The Archivist)</li>
+            <li><strong>Date:</strong> December 31, 2025</li>
+        </ul>
+
+        <footer>
+            Entry ID: archivist-build-spec-2026-01-06.html<br>
+            Part of THE PLAN Living Documentation System<br>
+            Source: ARCHIVIST_VISION_AND_SPECS.txt<br>
+            D:\01V3AM_aistart\000mynotes\THEPLAN\
+        </footer>
+    </div>
+</body>
+</html>

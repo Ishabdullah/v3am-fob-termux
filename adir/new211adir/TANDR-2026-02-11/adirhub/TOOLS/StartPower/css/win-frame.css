@@ -1,0 +1,177 @@
+/* ============================================================
+   win-frame.css — Standalone Window Chrome
+   Used by win-frame.js. Independent of Agent Four specifics.
+   Edit live — browser refresh applies instantly.
+   ============================================================ */
+
+/* ── Base window ── */
+.wf-window {
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-secondary, #111638);
+    border: 1px solid var(--accent, #00d9ff);
+    border-radius: 10px;
+    box-shadow:
+        0 8px 40px rgba(0,0,0,0.7),
+        0 0 0 1px rgba(0,217,255,0.12),
+        inset 0 1px 0 rgba(255,255,255,0.04);
+    overflow: visible;  /* must be visible for resize handles to bleed outside */
+    min-width: 180px;
+    min-height: 80px;
+}
+
+.wf-window.wf-dragging {
+    box-shadow:
+        0 20px 60px rgba(0,0,0,0.9),
+        0 0 0 2px var(--accent, #00d9ff),
+        0 0 40px rgba(0,217,255,0.2);
+    transition: none !important;
+}
+
+.wf-window.wf-resizing { transition: none !important; }
+
+/* ── Titlebar ── */
+.wf-titlebar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 8px;
+    background: var(--bg-tertiary, #161b42);
+    border-bottom: 1px solid rgba(0,217,255,0.2);
+    border-radius: 9px 9px 0 0;
+    cursor: grab;
+    user-select: none;
+    flex-shrink: 0;
+    min-height: 34px;
+}
+.wf-titlebar:active { cursor: grabbing; }
+
+.wf-title {
+    flex: 1;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    color: var(--accent, #00d9ff);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ── Titlebar buttons ── */
+.wf-btns {
+    display: flex;
+    gap: 3px;
+    flex-shrink: 0;
+}
+
+.wf-btn {
+    width: 22px;
+    height: 22px;
+    border: none;
+    border-radius: 5px;
+    background: rgba(255,255,255,0.07);
+    color: rgba(255,255,255,0.45);
+    font-size: 11px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    line-height: 1;
+    transition: background 0.15s, color 0.15s;
+    flex-shrink: 0;
+}
+.wf-btn:hover                { background: rgba(0,217,255,0.18); color: var(--accent,#00d9ff); }
+.wf-btn.wf-btn-mobile:hover  { background: rgba(100,200,100,0.2); color: #6ec96e; }
+.wf-btn.wf-btn-mobile.active { background: rgba(100,200,100,0.15); color: #6ec96e; }
+.wf-btn.wf-btn-copy:hover    { background: rgba(255,200,80,0.18); color: #ffc850; }
+.wf-btn.wf-btn-shot:hover    { background: rgba(180,100,255,0.2); color: #c87eff; }
+.wf-btn.wf-btn-min:hover     { background: rgba(255,255,255,0.1); color: #fff; }
+.wf-btn.wf-btn-close:hover   { background: rgba(255,82,82,0.25); color: #ff5252; }
+
+/* ── Content area ── */
+.wf-content {
+    flex: 1;
+    overflow-y: scroll;
+    overflow-x: auto;
+    border-radius: 0 0 9px 9px;
+    position: relative;
+}
+
+/* Mobile phone view mode */
+.wf-content.wf-mobile {
+    background: #1a1a2e;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 0;
+}
+.wf-content.wf-mobile > * {
+    width: 390px !important;
+    max-width: 100% !important;
+    background: var(--bg-primary, #0a0e27);
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+    overflow: auto;
+    flex-shrink: 0;
+}
+/* Mobile notch bar */
+.wf-content.wf-mobile::before {
+    content: '';
+    display: block;
+    width: 390px;
+    height: 10px;
+    background: #000;
+    border-radius: 20px 20px 0 0;
+    flex-shrink: 0;
+    margin-bottom: -2px;
+}
+
+/* Minimized */
+.wf-window.wf-minimized .wf-content { display: none; }
+.wf-window.wf-minimized .wf-resize-handle { display: none; }
+.wf-window.wf-minimized { border-radius: 10px; }
+.wf-window.wf-minimized .wf-titlebar { border-radius: 9px; border-bottom: none; }
+
+/* ── Resize handles — 8 directions ── */
+/*
+    Layout:
+    [nw][  n  ][ne]
+    [w ]       [e ]
+    [sw][  s  ][se]
+
+    Each handle bleeds outside the window boundary.
+    Pointer events only on the handle strips.
+*/
+
+.wf-resize-handle {
+    position: absolute;
+    z-index: 10;
+    /* transparent — just a hit zone */
+}
+
+/* North */
+.wf-rn  { top: -4px; left: 8px; right: 8px; height: 8px; cursor: n-resize; }
+/* South */
+.wf-rs  { bottom: -4px; left: 8px; right: 8px; height: 8px; cursor: s-resize; }
+/* East */
+.wf-re  { right: -4px; top: 8px; bottom: 8px; width: 8px; cursor: e-resize; }
+/* West */
+.wf-rw  { left: -4px; top: 8px; bottom: 8px; width: 8px; cursor: w-resize; }
+/* Corners */
+.wf-rne { top: -4px; right: -4px; width: 14px; height: 14px; cursor: ne-resize; border-radius: 0 8px 0 0; }
+.wf-rnw { top: -4px; left: -4px;  width: 14px; height: 14px; cursor: nw-resize; border-radius: 8px 0 0 0; }
+.wf-rse { bottom: -4px; right: -4px; width: 14px; height: 14px; cursor: se-resize; border-radius: 0 0 8px 0; }
+.wf-rsw { bottom: -4px; left: -4px;  width: 14px; height: 14px; cursor: sw-resize; border-radius: 0 0 0 8px; }
+
+/* Visual hint on hover — subtle glow on the edge */
+.wf-resize-handle:hover {
+    background: rgba(0,217,255,0.1);
+}
+
+/* Scrollbars inside content — always visible */
+.wf-content::-webkit-scrollbar { width: 6px; height: 6px; }
+.wf-content::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 3px; }
+.wf-content::-webkit-scrollbar-thumb { background: rgba(0,217,255,0.35); border-radius: 3px; }
+.wf-content::-webkit-scrollbar-thumb:hover { background: rgba(0,217,255,0.6); }

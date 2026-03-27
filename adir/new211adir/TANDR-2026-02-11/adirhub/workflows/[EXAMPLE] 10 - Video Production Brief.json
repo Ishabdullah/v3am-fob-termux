@@ -1,0 +1,40 @@
+{
+  "name": "[EXAMPLE] 10 - Video Production Brief",
+  "description": "Generate video production briefs and specs. Agentic Prompt: promptvideopal1. Agent: Randy (9201). Cycles: 3-5. Layer 2 prompt (usually paired with Layer 1).",
+  "nodes": [
+    {
+      "id": "trigger1",
+      "type": "trigger.manual",
+      "title": "Start Video Brief",
+      "x": 100,
+      "y": 100,
+      "data": {}
+    },
+    {
+      "id": "action1",
+      "type": "action.http",
+      "title": "Call Randy: Execute promptvideopal1",
+      "x": 350,
+      "y": 100,
+      "data": {
+        "method": "GET",
+        "url": "http://localhost:9201/agent/api/agent.php?action=chat&input=Execute_promptvideopal1_topic_Company_Culture_format_60_second_social",
+        "body": ""
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "trigger1",
+      "to": "action1",
+      "cond": null
+    }
+  ],
+  "vars": {
+    "prompt": "promptvideopal1",
+    "agent": "Randy (9201)",
+    "cycles_estimated": "3-5",
+    "layer": "Layer 2 (support prompt)",
+    "description": "Used after Layer 1 prompt approval. Output to video production services for filming/editing."
+  }
+}

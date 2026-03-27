@@ -1,0 +1,32 @@
+# 📋 CURRENT TASKS
+
+**Last Updated**: [DATE]
+**Agent**: [YOUR NAME]
+**Directory**: [DIRECTORY NAME]
+
+---
+
+## 🎯 IMMEDIATE (High Priority)
+- [ ] Task 1
+- [ ] Task 2
+- [ ] Task 3
+
+## 📋 MEDIUM PRIORITY
+- [ ] Task 4
+- [ ] Task 5
+
+## 🔬 LOWER PRIORITY
+- [ ] Task 6
+- [ ] Task 7
+
+---
+
+## 🟢 COMPLETED
+- [x] Task 0 - Completed [DATE]
+
+---
+
+## 📌 NOTES
+- Any relevant information
+- Dependencies
+- Blockers

@@ -1,0 +1,26 @@
+{
+  "name": "tandrbot-server",
+  "version": "1.0.0",
+  "description": "Production server for TANDRbot - handles concurrent connections without zombie connection issues",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "node server.js"
+  },
+  "keywords": [
+    "tandr",
+    "bot",
+    "chatbot",
+    "production",
+    "express"
+  ],
+  "author": "V3AM Team",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.22.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

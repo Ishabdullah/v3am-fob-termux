@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FOB Command Center</title>
+<link rel="icon" href="assets/logo.ico" type="image/x-icon">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', 'Consolas', monospace;
+    background: #06080f;
+    color: #c8d6e5;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      linear-gradient(rgba(0,217,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,217,255,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Header */
+  .header {
+    position: relative; z-index: 1;
+    display: flex; align-items: center; justify-content: center; gap: 18px;
+    padding: 20px 20px 14px;
+    border-bottom: 1px solid rgba(0,217,255,0.15);
+    background: linear-gradient(180deg, rgba(0,217,255,0.06) 0%, transparent 100%);
+  }
+  .header-logo {
+    width: 56px; height: 56px; border-radius: 12px;
+    object-fit: cover;
+    border: 1px solid rgba(0,217,255,0.2);
+    box-shadow: 0 0 20px rgba(0,217,255,0.15);
+  }
+  .header-text { text-align: left; }
+  .header h1 {
+    font-size: 2em; font-weight: 300;
+    letter-spacing: 8px; text-transform: uppercase;
+    color: #00d9ff;
+    text-shadow: 0 0 30px rgba(0,217,255,0.3);
+    margin-bottom: 2px; line-height: 1;
+  }
+  .header .subtitle { font-size: 0.82em; color: #556; letter-spacing: 3px; }
+
+  /* Tabs */
+  .tabs {
+    position: relative; z-index: 1;
+    display: flex; justify-content: center;
+    gap: 0;
+    background: rgba(0,0,0,0.3);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .tab {
+    padding: 12px 28px;
+    font-size: 0.85em;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #556;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.25s;
+    font-family: inherit;
+    background: none; border-top: none; border-left: none; border-right: none;
+  }
+  .tab:hover { color: #99a; background: rgba(255,255,255,0.02); }
+  .tab.active {
+    color: #00d9ff;
+    border-bottom-color: #00d9ff;
+    background: rgba(0,217,255,0.04);
+  }
+
+  /* Tab content */
+  .tab-content { display: none; position: relative; z-index: 1; }
+  .tab-content.active { display: block; }
+
+  /* ===== SERVICES TAB ===== */
+  .services-grid {
+    max-width: 1200px;
+    margin: 24px auto;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 16px;
+  }
+
+  .service-card {
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+  .service-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 3px;
+    background: var(--accent);
+    opacity: 0.6;
+  }
+  .service-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3), 0 0 15px var(--glow);
+    transform: translateY(-1px);
+  }
+
+  .service-card .svc-top {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 10px;
+  }
+  .service-card .svc-icon {
+    width: 42px; height: 42px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4em;
+    background: var(--icon-bg);
+    flex-shrink: 0;
+  }
+  .svc-icon img { width: 26px; height: 26px; object-fit: contain; }
+  .category-icon img { width: 20px; height: 20px; object-fit: contain; }
+  .card .icon img { width: 26px; height: 26px; object-fit: contain; }
+  .service-card .svc-title {
+    font-size: 1.05em; font-weight: 600; color: #e8e8e8;
+  }
+  .service-card .svc-port {
+    font-size: 0.75em; color: var(--accent);
+    font-family: 'Consolas', monospace;
+  }
+  .service-card .svc-desc {
+    font-size: 0.82em; color: #778; line-height: 1.5;
+    margin-bottom: 12px;
+  }
+  .service-card .svc-usage {
+    font-size: 0.75em; color: #556; line-height: 1.6;
+    background: rgba(0,0,0,0.2);
+    border-radius: 6px; padding: 10px 12px;
+    margin-bottom: 12px;
+  }
+  .service-card .svc-usage strong { color: #889; }
+
+  .svc-btn {
+    display: inline-block;
+    padding: 8px 20px;
+    background: var(--accent);
+    color: #06080f;
+    border: none; border-radius: 6px;
+    font-size: 0.82em; font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+  .svc-btn:hover { opacity: 0.85; transform: scale(1.02); }
+
+  .svc-status {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #334;
+    margin-left: 8px;
+    vertical-align: middle;
+    transition: background 0.3s;
+  }
+  .svc-status.up { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.5); }
+  .svc-status.down { background: #555; }
+
+  /* Deployments section */
+  .deployments {
+    max-width: 1200px;
+    margin: 8px auto 30px;
+    padding: 0 20px;
+  }
+  .deployments-header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 14px; padding-bottom: 10px;
+    border-bottom: 1px solid rgba(0,217,255,0.1);
+  }
+  .deployments-header h3 {
+    font-size: 1em; color: #00d9ff;
+    letter-spacing: 2px; text-transform: uppercase;
+    font-weight: 500;
+  }
+  .deployments-header .dep-hint {
+    font-size: 0.72em; color: #445;
+    margin-left: auto;
+    font-style: italic;
+  }
+  .dep-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+  }
+  .dep-card {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 16px;
+    background: rgba(0,217,255,0.03);
+    border: 1px solid rgba(0,217,255,0.1);
+    border-radius: 10px;
+    text-decoration: none; color: inherit;
+    transition: all 0.25s;
+    cursor: pointer;
+  }
+  .dep-card:hover {
+    background: rgba(0,217,255,0.07);
+    border-color: rgba(0,217,255,0.3);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(0,217,255,0.1);
+  }
+  .dep-card .dep-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: #334; flex-shrink: 0;
+    transition: background 0.3s;
+  }
+  .dep-card .dep-dot.up { background: #22c55e; box-shadow: 0 0 8px rgba(34,197,94,0.5); }
+  .dep-card .dep-dot.down { background: #555; }
+  .dep-card .dep-info { min-width: 0; }
+  .dep-card .dep-name {
+    font-size: 0.88em; font-weight: 600; color: #e0e0e0;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .dep-card .dep-port {
+    font-size: 0.72em; color: #00d9ff;
+    font-family: 'Consolas', monospace;
+  }
+  .dep-card .dep-type {
+    font-size: 0.65em; color: #556;
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+  .dep-divider {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    margin-bottom: 8px;
+  }
+
+  /* ===== FILES TAB ===== */
+  .search-bar {
+    max-width: 600px;
+    margin: 20px auto 10px;
+    padding: 0 20px;
+    position: relative;
+  }
+  .search-bar input {
+    width: 100%;
+    padding: 12px 20px 12px 44px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(0,217,255,0.15);
+    border-radius: 8px;
+    color: #e0e0e0;
+    font-size: 0.95em; font-family: inherit;
+    outline: none; transition: all 0.3s;
+  }
+  .search-bar input:focus {
+    border-color: rgba(0,217,255,0.5);
+    background: rgba(255,255,255,0.06);
+    box-shadow: 0 0 20px rgba(0,217,255,0.08);
+  }
+  .search-bar::before {
+    content: '\u26B2';
+    position: absolute; left: 34px; top: 50%;
+    transform: translateY(-50%); color: #445; font-size: 1.1em;
+  }
+  .file-stats {
+    text-align: center; font-size: 0.8em; color: #445;
+    margin: 8px 0 4px;
+  }
+  .file-stats .num { color: #00d9ff; font-weight: 600; }
+
+  .container {
+    position: relative; z-index: 1;
+    max-width: 1400px;
+    margin: 0 auto; padding: 10px 20px 30px;
+  }
+
+  .category { margin-bottom: 30px; }
+  .category-header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 12px; padding-bottom: 6px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .category-icon {
+    width: 32px; height: 32px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1em; flex-shrink: 0;
+  }
+  .category-header h2 {
+    font-size: 1em; font-weight: 500;
+    letter-spacing: 2px; text-transform: uppercase;
+  }
+  .category-header .count { font-size: 0.75em; color: #445; margin-left: 4px; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+  }
+
+  .card {
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 10px; padding: 14px;
+    cursor: pointer; transition: all 0.25s;
+    position: relative; overflow: hidden;
+    text-decoration: none; display: block; color: inherit;
+  }
+  .card::before {
+    content: ''; position: absolute;
+    top: 0; left: 0; right: 0; height: 2px;
+    background: var(--accent); opacity: 0;
+    transition: opacity 0.25s;
+  }
+  .card:hover {
+    background: rgba(255,255,255,0.05);
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3), 0 0 15px var(--glow);
+  }
+  .card:hover::before { opacity: 1; }
+  .card .icon { font-size: 1.4em; margin-bottom: 8px; }
+  .card .name { font-size: 0.85em; font-weight: 500; color: #e8e8e8; margin-bottom: 3px; word-break: break-word; }
+  .card .path { font-size: 0.65em; color: #445; line-height: 1.4; word-break: break-all; }
+
+  /* Category colors */
+  .cat-agents    { --accent: #00d9ff; --glow: rgba(0,217,255,0.1); }
+  .cat-bots      { --accent: #a855f7; --glow: rgba(168,85,247,0.1); }
+  .cat-tools     { --accent: #22c55e; --glow: rgba(34,197,94,0.1); }
+  .cat-hub       { --accent: #f59e0b; --glow: rgba(245,158,11,0.1); }
+  .cat-manager   { --accent: #ef4444; --glow: rgba(239,68,68,0.1); }
+  .cat-templates { --accent: #6366f1; --glow: rgba(99,102,241,0.1); }
+  .cat-sandbox   { --accent: #14b8a6; --glow: rgba(20,184,166,0.1); }
+  .cat-other     { --accent: #64748b; --glow: rgba(100,116,139,0.1); }
+
+  .cat-agents .category-icon    { background: rgba(0,217,255,0.12); color: #00d9ff; }
+  .cat-bots .category-icon      { background: rgba(168,85,247,0.12); color: #a855f7; }
+  .cat-tools .category-icon     { background: rgba(34,197,94,0.12); color: #22c55e; }
+  .cat-hub .category-icon       { background: rgba(245,158,11,0.12); color: #f59e0b; }
+  .cat-manager .category-icon   { background: rgba(239,68,68,0.12); color: #ef4444; }
+  .cat-templates .category-icon { background: rgba(99,102,241,0.12); color: #6366f1; }
+  .cat-sandbox .category-icon   { background: rgba(20,184,166,0.12); color: #14b8a6; }
+  .cat-other .category-icon     { background: rgba(100,116,139,0.12); color: #64748b; }
+
+  .cat-agents .card    { --accent: #00d9ff; --glow: rgba(0,217,255,0.1); }
+  .cat-bots .card      { --accent: #a855f7; --glow: rgba(168,85,247,0.1); }
+  .cat-tools .card     { --accent: #22c55e; --glow: rgba(34,197,94,0.1); }
+  .cat-hub .card       { --accent: #f59e0b; --glow: rgba(245,158,11,0.1); }
+  .cat-manager .card   { --accent: #ef4444; --glow: rgba(239,68,68,0.1); }
+  .cat-templates .card { --accent: #6366f1; --glow: rgba(99,102,241,0.1); }
+  .cat-sandbox .card   { --accent: #14b8a6; --glow: rgba(20,184,166,0.1); }
+  .cat-other .card     { --accent: #64748b; --glow: rgba(100,116,139,0.1); }
+
+  .empty { text-align: center; padding: 60px 20px; color: #334; }
+  .empty .big { font-size: 3em; margin-bottom: 16px; }
+
+  .hidden { display: none !important; }
+
+  @media (max-width: 700px) {
+    .header h1 { font-size: 1.6em; letter-spacing: 4px; }
+    .services-grid { grid-template-columns: 1fr; }
+    .grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+    .tab { padding: 10px 16px; font-size: 0.78em; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <img src="assets/logo.jpg" alt="FOB" class="header-logo" />
+  <div class="header-text">
+    <h1>FOB</h1>
+    <div class="subtitle">Command Center</div>
+  </div>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+  <button class="tab active" data-tab="services">Services</button>
+  <button class="tab" data-tab="files">All Files</button>
+</div>
+
+<!-- ===== SERVICES TAB ===== -->
+<div class="tab-content active" id="tab-services">
+
+  <div class="services-grid">
+
+    <!-- 0. Getting Started -->
+    <div class="service-card" style="--accent:#e8e8e8; --glow:rgba(255,255,255,0.1); --icon-bg:rgba(255,255,255,0.08);">
+      <div class="svc-top">
+        <div class="svc-icon"><img src="file:///F:/Claude/future_space_quantum_icon_pack_50/png/notes.png" alt=""></div>
+        <div>
+          <div class="svc-title">Getting Started</div>
+          <div class="svc-port" style="color:#889;">New here? Start with this.</div>
+        </div>
+      </div>
+      <div class="svc-desc">How to use FOB, set up API keys, configure models, shut down services, and troubleshoot common issues. Written for first-time users.</div>
+      <div class="svc-usage">
+        <strong>Covers:</strong> Starting &amp; stopping, API key setup (Gemini, Claude, Ollama), where configs live, port reference, voice setup, and common fixes.
+      </div>
+      <a class="svc-btn" href="help.html" target="_blank" style="background:#e8e8e8; color:#06080f;">Read Guide</a>
+    </div>
+
+    <!-- 1. ADIR Hub -->
+    <div class="service-card" style="--accent:#f59e0b; --glow:rgba(245,158,11,0.15); --icon-bg:rgba(245,158,11,0.12);">
+      <div class="svc-top">
+        <div class="svc-icon"><img src="file:///F:/Claude/future_space_quantum_icon_pack_50/png/network.png" alt=""></div>
+        <div>
+          <div class="svc-title">ADIR Hub <span class="svc-status" data-port="9303"></span></div>
+          <div class="svc-port">127.0.0.1:9303</div>
+        </div>
+      </div>
+      <div class="svc-desc">Central command dashboard. Browse all services, view system status, access admin panel and ADIR navigation files.</div>
+      <div class="svc-usage">
+        <strong>Quick start:</strong> This is your home base. The hub links to every running service and shows the ADIR file system. Use the admin panel to manage tools and monitor status.
+      </div>
+      <a class="svc-btn" href="http://127.0.0.1:9303/" target="_blank" style="background:#f59e0b;">Open Hub</a>
+    </div>
+
+    <!-- 2. Agent-Dropper -->
+    <div class="service-card" style="--accent:#22c55e; --glow:rgba(34,197,94,0.15); --icon-bg:rgba(34,197,94,0.12);">
+      <div class="svc-top">
+        <div class="svc-icon"><img src="file:///F:/Claude/future_space_quantum_icon_pack_50/png/rocket.png" alt=""></div>
+        <div>
+          <div class="svc-title">Agent-Dropper v2 <span class="svc-status" data-port="9210"></span></div>
+          <div class="svc-port">127.0.0.1:9210</div>
+        </div>
+      </div>
+      <div class="svc-desc">Deploy new agents from templates. Pick a template, set a name and port, and drop a fully configured agent into the apps directory.</div>
+      <div class="svc-usage">
+        <strong>To deploy:</strong> Select a template (Jerry or Social), name your agent, pick a port (11111+), click Deploy. The agent gets its own server, config, and ADIR folder.
+      </div>
+      <a class="svc-btn" href="http://127.0.0.1:9210/" target="_blank" style="background:#22c55e;">Open Dropper</a>
+    </div>
+
+    <!-- 3. KB-Maker -->
+    <div class="service-card" style="--accent:#6366f1; --glow:rgba(99,102,241,0.15); --icon-bg:rgba(99,102,241,0.12);">
+      <div class="svc-top">
+        <div class="svc-icon"><img src="file:///F:/Claude/future_space_quantum_icon_pack_50/png/database.png" alt=""></div>
+        <div>
+          <div class="svc-title">KB-Maker v2 <span class="svc-status" data-port="9220"></span></div>
+          <div class="svc-port">127.0.0.1:9220</div>
+        </div>
+      </div>
+      <div class="svc-desc">Build knowledge bots from markdown files. Upload your docs, configure a system prompt, and get a bot that answers from your knowledge base.</div>
+      <div class="svc-usage">
+        <strong>To build a bot:</strong> Add .md files to the knowledge folder, set the system prompt and LLM model, then deploy. The bot reads all knowledge files as context for every response.
+      </div>
+      <a class="svc-btn" href="http://127.0.0.1:9220/" target="_blank" style="background:#6366f1;">Open KB-Maker</a>
+    </div>
+
+    <!-- 4. Agent1 -->
+    <div class="service-card" style="--accent:#00d9ff; --glow:rgba(0,217,255,0.15); --icon-bg:rgba(0,217,255,0.12);">
+      <div class="svc-top">
+        <div class="svc-icon"><img src="file:///F:/Claude/future_space_quantum_icon_pack_50/png/robot.png" alt=""></div>
+        <div>
+          <div class="svc-title">Agent One <span class="svc-status" data-port="11111"></span></div>
+          <div class="svc-port">127.0.0.1:11111</div>
+        </div>
+      </div>
+      <div class="svc-desc">General-purpose Jerry agent with voice, file tools, shell commands, and ADIR navigation. Chat interface with HTML rendering and iframe embedding.</div>
+      <div class="svc-usage">
+        <strong>Voice:</strong> Click the mic to talk. Agent responds with TTS.<br>
+        <strong>Tools:</strong> Ask it to scan files, run commands, read docs, or create SOT files in its adir folder.
+      </div>
+      <a class="svc-btn" href="http://127.0.0.1:11111/" target="_blank" style="background:#00d9ff;">Open Agent1</a>
+    </div>
+
+    <!-- 5. GGBOT -->
+    <div class="service-card" style="--accent:#a855f7; --glow:rgba(168,85,247,0.15); --icon-bg:rgba(168,85,247,0.12);">
+      <div class="svc-top">
+        <div class="svc-icon"><img src="file:///F:/Claude/future_space_quantum_icon_pack_50/png/ai_core.png" alt=""></div>
+        <div>
+          <div class="svc-title">GGBOT <span class="svc-status" data-port="10336"></span></div>
+          <div class="svc-port">127.0.0.1:10336</div>
+        </div>
+      </div>
+      <div class="svc-desc">Knowledge bot loaded with business data — services, pricing, FAQ, contact info. Voice-enabled with full STT/TTS. Great for customer-facing demos.</div>
+      <div class="svc-usage">
+        <strong>Knowledge lives in:</strong> data/knowledge/*.md files. Edit those to change what GGBOT knows. Add new .md files and restart to expand its knowledge.
+      </div>
+      <a class="svc-btn" href="http://127.0.0.1:10336/" target="_blank" style="background:#a855f7;">Open GGBOT</a>
+    </div>
+
+  </div>
+
+  <div class="dep-divider"></div>
+
+  <!-- Your Deployments -->
+  <div class="deployments">
+    <div class="deployments-header">
+      <h3>Your Deployments</h3>
+      <span class="dep-hint">Agents &amp; bots deployed via Agent-Dropper appear here</span>
+    </div>
+    <div class="dep-grid">
+      <a class="dep-card" href="http://127.0.0.1:11112/" target="_blank">
+        <span class="dep-dot svc-status" data-port="11112"></span>
+        <div class="dep-info">
+          <div class="dep-name">Agent Two</div>
+          <div class="dep-port">:11112</div>
+          <div class="dep-type">Jerry Agent</div>
+        </div>
+      </a>
+      <a class="dep-card" href="http://127.0.0.1:11113/" target="_blank">
+        <span class="dep-dot svc-status" data-port="11113"></span>
+        <div class="dep-info">
+          <div class="dep-name">Agent Four</div>
+          <div class="dep-port">:11113</div>
+          <div class="dep-type">Jerry Agent</div>
+        </div>
+      </a>
+      <a class="dep-card" href="http://127.0.0.1:11114/" target="_blank">
+        <span class="dep-dot svc-status" data-port="11114"></span>
+        <div class="dep-info">
+          <div class="dep-name">Bot1</div>
+          <div class="dep-port">:11114</div>
+          <div class="dep-type">Knowledge Bot</div>
+        </div>
+      </a>
+      <a class="dep-card" href="http://127.0.0.1:10108/" target="_blank">
+        <span class="dep-dot svc-status" data-port="10108"></span>
+        <div class="dep-info">
+          <div class="dep-name">ParserBot</div>
+          <div class="dep-port">:10108</div>
+          <div class="dep-type">Parser</div>
+        </div>
+      </a>
+      <a class="dep-card" href="http://127.0.0.1:8086/" target="_blank">
+        <span class="dep-dot svc-status" data-port="8086"></span>
+        <div class="dep-info">
+          <div class="dep-name">TANDRmgr-lab</div>
+          <div class="dep-port">:8086</div>
+          <div class="dep-type">Switchboard</div>
+        </div>
+      </a>
+      <a class="dep-card" href="http://127.0.0.1:8091/" target="_blank">
+        <span class="dep-dot svc-status" data-port="8091"></span>
+        <div class="dep-info">
+          <div class="dep-name">Memory Bot</div>
+          <div class="dep-port">:8091</div>
+          <div class="dep-type">Context Service</div>
+        </div>
+      </a>
+      <a class="dep-card" href="http://127.0.0.1:11434/api/tags" target="_blank">
+        <span class="dep-dot svc-status" data-port="11434"></span>
+        <div class="dep-info">
+          <div class="dep-name">Ollama</div>
+          <div class="dep-port">:11434</div>
+          <div class="dep-type">Local LLM</div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===== FILES TAB ===== -->
+<div class="tab-content" id="tab-files">
+  <div class="search-bar">
+    <input type="text" id="search" placeholder="Search files..." autocomplete="off" />
+  </div>
+  <div class="file-stats">
+    <span class="num" id="totalFiles">-</span> files across
+    <span class="num" id="totalCats">-</span> categories
+  </div>
+  <div class="container" id="container"></div>
+</div>
+
+<script src="scan.js"></script>
+<script>
+(function() {
+  // ===== TAB SWITCHING =====
+  document.querySelectorAll('.tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+      document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
+      tab.classList.add('active');
+      document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+    });
+  });
+
+  // ===== HEALTH CHECK =====
+  document.querySelectorAll('.svc-status[data-port]').forEach(function(dot) {
+    var port = dot.dataset.port;
+    fetch('http://127.0.0.1:' + port + '/', { mode: 'no-cors', cache: 'no-store' })
+      .then(function() { dot.classList.add('up'); })
+      .catch(function() { dot.classList.add('down'); });
+  });
+
+  // ===== FILES TAB =====
+  var BASE = 'C:\\FOB\\adir\\new211adir\\TANDR-2026-02-11\\';
+  var IPATH = 'file:///F:/Claude/future_space_quantum_icon_pack_50/png/';
+  function ico(name) { return '<img src="' + IPATH + name + '.png" alt="">'; }
+
+  var RULES = [
+    { test: /apps[\\\/]Agent/i,                    cat: 'Agents',    icon: ico('robot'),    cls: 'cat-agents' },
+    { test: /apps[\\\/]Bot|TOOLS[\\\/]GGBOT|TOOLS[\\\/]Parser/i, cat: 'Bots', icon: ico('ai_core'), cls: 'cat-bots' },
+    { test: /apps[\\\/]TANDRmgr/i,                 cat: 'Manager',   icon: ico('radar'),    cls: 'cat-manager' },
+    { test: /TOOLS[\\\/]KB-Maker|TOOLS[\\\/]Agent-Dropper/i, cat: 'Tools', icon: ico('cpu'), cls: 'cat-tools' },
+    { test: /TEMPLATE/i,                            cat: 'Templates', icon: ico('file'),     cls: 'cat-templates' },
+    { test: /adirhub[\\\/]admin|adirhub[\\\/]adir|ADIRHUB/i, cat: 'Hub', icon: ico('network'), cls: 'cat-hub' },
+    { test: /stretch/i,                             cat: 'Sandbox',   icon: ico('beaker'),   cls: 'cat-sandbox' },
+  ];
+  var DEFAULT_CAT = { cat: 'Other', icon: ico('folder'), cls: 'cat-other' };
+
+  function classify(f) {
+    for (var i = 0; i < RULES.length; i++) { if (RULES[i].test.test(f)) return RULES[i]; }
+    return DEFAULT_CAT;
+  }
+  function displayName(f) {
+    var parts = f.replace(/\\/g, '/').split('/');
+    var name = parts.pop();
+    var parent = parts.pop() || '';
+    return (name === 'index.html' || name === 'dashboard.html') ? parent + '/' + name : name;
+  }
+  function shortPath(f) {
+    var p = f;
+    if (p.indexOf(BASE) === 0) p = p.substring(BASE.length);
+    else if (p.indexOf('C:\\FOB\\') === 0) p = p.substring(7);
+    return p.replace(/\\/g, '/');
+  }
+  function fileIcon(n) {
+    if (n.indexOf('index') >= 0)     return ico('home');
+    if (n.indexOf('dashboard') >= 0) return ico('star_map');
+    if (n.indexOf('editor') >= 0)    return ico('code');
+    if (n.indexOf('viewer') >= 0)    return ico('camera');
+    if (n.indexOf('remote') >= 0)    return ico('satellite');
+    if (n.indexOf('browser') >= 0)   return ico('browser');
+    return ico('file');
+  }
+
+  function render(files, filter) {
+    var container = document.getElementById('container');
+    var lf = (filter || '').toLowerCase();
+    var filtered = files.filter(function(f) { return !lf || f.toLowerCase().indexOf(lf) >= 0; });
+
+    var groups = {};
+    filtered.forEach(function(f) {
+      var r = classify(f);
+      if (!groups[r.cat]) groups[r.cat] = { icon: r.icon, cls: r.cls, cat: r.cat, files: [] };
+      groups[r.cat].files.push(f);
+    });
+
+    var ORDER = ['Agents','Manager','Bots','Tools','Hub','Templates','Sandbox','Other'];
+    var sorted = ORDER.filter(function(c) { return groups[c]; }).map(function(c) { return groups[c]; });
+
+    if (!sorted.length) {
+      container.innerHTML = '<div class="empty"><div class="big">\u{1F50D}</div>No files match.</div>';
+      return;
+    }
+
+    var html = '';
+    sorted.forEach(function(g) {
+      html += '<div class="category ' + g.cls + '"><div class="category-header">';
+      html += '<div class="category-icon">' + g.icon + '</div>';
+      html += '<h2>' + g.cat + ' <span class="count">(' + g.files.length + ')</span></h2></div>';
+      html += '<div class="grid">';
+      g.files.forEach(function(f) {
+        var n = displayName(f);
+        var url = 'file:///' + f.replace(/\\/g, '/');
+        html += '<a class="card" href="' + url + '" target="_blank" title="' + f.replace(/"/g, '&quot;') + '">';
+        html += '<div class="icon">' + fileIcon(n.toLowerCase()) + '</div>';
+        html += '<div class="name">' + n.replace(/</g, '&lt;') + '</div>';
+        html += '<div class="path">' + shortPath(f).replace(/</g, '&lt;') + '</div></a>';
+      });
+      html += '</div></div>';
+    });
+    container.innerHTML = html;
+    document.getElementById('totalFiles').textContent = filtered.length;
+    document.getElementById('totalCats').textContent = sorted.length;
+  }
+
+  // Init files tab
+  if (typeof window.FOB_FILES !== 'undefined' && window.FOB_FILES.length) {
+    var files = window.FOB_FILES.filter(function(f) {
+      return f.indexOf('node_modules') < 0 && f.indexOf('BACKUP-20260317') < 0;
+    });
+    render(files, '');
+    document.getElementById('search').addEventListener('input', function() {
+      render(files, this.value);
+    });
+  } else {
+    document.getElementById('container').innerHTML =
+      '<div class="empty"><div class="big">\u26A0\uFE0F</div>No scan data.<br><small style="color:#445">Run Launcher.bat to scan.</small></div>';
+  }
+})();
+</script>
+</body>
+</html>

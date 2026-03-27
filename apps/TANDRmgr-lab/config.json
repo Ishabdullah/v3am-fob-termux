@@ -1,0 +1,241 @@
+{
+  "app": {
+    "name": "TANDRmgr-lab",
+    "version": "1.0.0",
+    "description": "TANDR Manager Lab - Voice-Enabled Orchestrator",
+    "environment": "production"
+  },
+  "llm": {
+    "provider": "gemini",
+    "timeout": 360,
+    "ollama": {
+      "endpoint": "http://127.0.0.1:11434/api/generate",
+      "model": "qwen3.5:4b",
+      "available_models": [],
+      "models_path": ""
+    },
+    "anthropic": {
+      "api_key": "",
+      "endpoint": "https://api.anthropic.com/v1/messages",
+      "model": "claude-haiku-4-5-20251001",
+      "max_tokens": 4096,
+      "temperature": 0.7,
+      "stream": false
+    },
+    "gemini": {
+      "api_key": "",
+      "endpoint": "https://generativelanguage.googleapis.com/v1beta/models",
+      "model": "gemini-3-flash-preview",
+      "max_tokens": 8000,
+      "temperature": 0.7
+    },
+    "openai": {
+      "api_key": "",
+      "model": "gpt-4o-mini"
+    },
+    "ollama_external": {
+      "model": "minimax-m2.5:cloud",
+      "endpoint": "https://adir.ngrok.app/api/generate"
+    },
+    "llamacpp": {
+      "endpoint": "http://127.0.0.1:8080/completion",
+      "model": "default",
+      "max_tokens": 4096,
+      "temperature": 0.7
+    }
+  },
+  "services": {
+    "agent": {
+      "name": "Agent Four",
+      "url": "http://localhost:11113/agent/api/agent.php",
+      "method": "GET",
+      "input_key": "input",
+      "action": "chat",
+      "response_path": "response",
+      "timeout": 120,
+      "description": "The Gem of the FOB fleet. Use for high-fidelity system architecture, advanced coding, ADIR/SOT persistence, and deep-logic reasoning. This is the Smart Power agent for users who require full system access and complex multi-step task execution. Keywords: architecture, coding, SOT, ADIR, system-ops, deep-logic, reasoning, deployment",
+      "enabled": true
+    },
+    "agent1": {
+      "name": "Agent One",
+      "url": "http://localhost:11111/agent/api/agent.php",
+      "method": "GET",
+      "input_key": "input",
+      "action": "chat",
+      "response_path": "response",
+      "timeout": 120,
+      "description": "The Gem of the FOB fleet. Expert-level system navigation, advanced logic execution, and deep architecture insights. Selected when users require precision, complex problem solving, or a deeper understanding of the system beyond entry-level assistance.",
+      "enabled": true
+    },
+    "agent2": {
+      "name": "Agent Two",
+      "url": "http://localhost:11112/agent/api/agent.php",
+      "method": "GET",
+      "input_key": "input",
+      "action": "chat",
+      "response_path": "response",
+      "timeout": 120,
+      "description": "Operations Hub - Knowledge management, log analysis, and T&R Builders service coordination",
+      "enabled": true
+    },
+    "ggbot": {
+      "name": "GGBOT",
+      "url": "http://localhost:10336/api/bot.php",
+      "method": "POST",
+      "input_key": "message",
+      "action": "chat",
+      "response_path": "data.message",
+      "timeout": 60,
+      "description": "Primary V3AM FOB Platform guide. Handles inquiries about system capabilities, the live agent fleet, KB-Maker, Agent-Dropper, pricing, and how to get started with a custom AI deployment.",
+      "enabled": true
+    },
+    "memory": {
+      "name": "TANDRMemory",
+      "url": "http://localhost:8091/api/memory.php",
+      "method": "GET",
+      "input_key": "q",
+      "action": "query",
+      "response_path": "data.answer",
+      "timeout": 60,
+      "description": "Memory assistant - operational history, service status, errors, performance",
+      "enabled": true
+    },
+    "web_search": {
+      "name": "Web Search",
+      "url": "http://localhost:8091/api/memory.php?action=web_search",
+      "method": "GET",
+      "input_key": "query",
+      "action": "web_search",
+      "response_path": "data.web_search_result",
+      "timeout": 60,
+      "description": "Web search via DuckDuckGo",
+      "enabled": true
+    },
+    "startpower": {
+      "name": "StartPower",
+      "url": "http://localhost:57775/api/agent.php",
+      "method": "GET",
+      "input_key": "input",
+      "action": "chat",
+      "response_path": "response",
+      "timeout": 120,
+      "description": "Jerry Agent \u2014 System control, screen capture, image gen, fleet ops, and institutional memory (ADIR).",
+      "enabled": true
+    },
+    "librarian": {
+      "name": "Librarian",
+      "url": "http://localhost:57785/api/agent.php",
+      "method": "GET",
+      "input_key": "input",
+      "action": "chat",
+      "response_path": "response",
+      "timeout": 120,
+      "description": "Institutional Memory \u2014 Manages ADIR documentation, Source of Truth (SOT) files, and fleet-wide archival knowledge.",
+      "enabled": true
+    },
+    "bot1": {
+      "name": "Bot One",
+      "url": "http://localhost:11114/api/bot.php",
+      "method": "POST",
+      "input_key": "message",
+      "action": "chat",
+      "response_path": "data.message",
+      "timeout": 60,
+      "description": "TANDRSocial KB bot \u2014 Default template answers from loaded knowledge base",
+      "enabled": true
+    },
+    "tandrsocial": {
+      "name": "TANDRSocial",
+      "url": "http://localhost:57790/api/agent.php",
+      "method": "GET",
+      "input_key": "input",
+      "action": "chat",
+      "response_path": "response",
+      "timeout": 120,
+      "description": "TANDRSocial KB agent \u2014 social/community knowledge",
+      "enabled": true
+    },
+    "visionbot": {
+      "name": "VisionBot",
+      "url": "http://localhost:10337/api/bot.php",
+      "method": "POST",
+      "input_key": "message",
+      "action": "chat",
+      "response_path": "data.message",
+      "timeout": 60,
+      "description": "Vision/image analysis bot",
+      "enabled": true
+    },
+    "parserbot": {
+      "name": "ParserBot",
+      "url": "http://localhost:10108/api/bot.php",
+      "method": "POST",
+      "input_key": "message",
+      "action": "chat",
+      "response_path": "data.message",
+      "timeout": 60,
+      "description": "Parser bot",
+      "enabled": true
+    },
+    "ggbotkb": {
+      "name": "GGBot @KBMkr",
+      "url": "http://localhost:10333/api/bot.php",
+      "method": "POST",
+      "input_key": "message",
+      "action": "chat",
+      "response_path": "data.message",
+      "timeout": 60,
+      "description": "TANDR Builder social media strategist \u2014 post queue, drafts, Facebook content",
+      "enabled": true
+    }
+  },
+  "help": {
+    "enabled": true,
+    "provider": "anthropic",
+    "model": "claude-opus-4-6",
+    "max_tokens": 4096,
+    "temperature": 0.3,
+    "auto_trigger": true,
+    "log_path": "adir/logs/help.txt",
+    "context_file": "data/help-context.md"
+  },
+  "conversation": {
+    "max_history": 20,
+    "max_message_length": 5000,
+    "log_conversations": true,
+    "log_path": "adir/logs/conversations.txt"
+  },
+  "system_prompt": {
+    "role": "You are TANDRmgr, the operations switchboard for the FOB system.\n  You coordinate between multiple AI agents and services. Users come to you to chat with any agent or bot from one window.\n\n  AVAILABLE SERVICES (use these IDs with [ASK:id]):\n  - agent      \u2192 Agent Four (port 11113) - Primary agent, general purpose\n  - agent1     \u2192 Agent One (port 11111) - Jerry agent, general assistant\n  - agent2     \u2192 Agent Two (port 11112) - Jerry agent, general assistant\n  - ggbot      \u2192 GGBOT (port 10336) - Knowledge bot, answers from loaded KB\n  - memory     \u2192 Memory Bot (port 8091) - Operational history and context\n  - web_search \u2192 Web Search (via Memory Bot) - DuckDuckGo search\n  - startpower  \u2192 StartPower (port 57775) - System control, screen capture, image gen, fleet ops\n  - librarian   \u2192 Librarian (port 57785) - KB curator, reads and writes markdown docs\n  - bot1        \u2192 Bot One (port 11114) - TANDRSocial KB bot, answers from loaded knowledge base\n  - tandrsocial \u2192 TANDRSocial (port 57790) - Social/community KB agent\n  - visionbot   \u2192 VisionBot (port 10337) - Vision and image analysis\n  - parserbot   \u2192 ParserBot (port 10108) - Document/text parsing\n  - ggbotkb     \u2192 GGBot @KBMkr (port 10333) - KB bot under KB-Maker\n\n  FOR OPERATIONAL QUESTIONS:\n  First check memory for context:\n  [ASK:memory] [brief question about the topic]\n  Then use that context in your response.\n\n  WHEN YOU NEED INFORMATION FROM ANOTHER SERVICE:\n  Use the relay tag to call a service. The system will make the API call and append the response.\n\n  [ASK:service_id] your question or request here\n\n  RULES:\n  - Only use ONE [ASK:...] tag per response\n  - Put your intro text BEFORE the tag (e.g. \"Let me check with Agent Four on that.\")\n  - The system calls the service and appends the response automatically\n  - If a service fails, the system handles the error gracefully\n  - You can answer simple questions directly without calling a service\n  - Match response length to the task\n  - Be direct and practical\n  - NEVER fabricate a service response \u2014 let the system make the actual call\n  - NEVER use [ASK:...] for a service that isn't in your available list\n  - Always relay the user's message/intent verbatim to services\n\n  MEMORY KNOWLEDGE BASE:\n  The Memory Bot's KB files are at:\n  C:\\FOB\\adir\\new211adir\\TANDR-2026-02-11\\apps\\TANDRmgr-lab\\bot\\data\\memory-knowledge\\\n  Files: service-status.md, relay-history.md, conversations.md, error-patterns.md, performance.md\n  To update memory with current info, ask the librarian or an agent to write a markdown file to that path.\n  Example: [ASK:librarian] Write updated service-status.md to C:\\FOB\\...\\bot\\data\\memory-knowledge\\\n\n  WHEN THE USER SAYS 'askhelp' OR 'call help':\n  The system will automatically route to the expert help tool. Just acknowledge it.\n",
+    "instructions": [
+      "Use [ASK:memory] first for operational context and history",
+      "Use [ASK:service_id] when you need another bot's help",
+      "Available: [ASK:memory], [ASK:agent], [ASK:agent1], [ASK:agent2], [ASK:ggbot], [ASK:web_search], [ASK:startpower], [ASK:librarian], [ASK:bot1], [ASK:tandrsocial], [ASK:visionbot], [ASK:parserbot], [ASK:ggbotkb]",
+      "Answer directly from your own knowledge when possible",
+      "Never fabricate responses from services \u2014 let the relay system handle it",
+      "Be concise \u2014 the service response will be appended after your intro",
+      "Always relay the user's message and intent verbatim to services",
+      "Sanity test your calls - be honest when something fails",
+      "If the memory service is offline it can be started here: \"\"C:\\FOB\\adir\\new211adir\\TANDR-2026-02-11\\apps\\TANDRmgr-lab\\bot\\start-bot.bat\"\""
+    ]
+  },
+  "security": {
+    "rate_limit": {
+      "enabled": true,
+      "requests_per_minute": 30,
+      "requests_per_hour": 300,
+      "requests_per_day": 1000
+    },
+    "cors": {
+      "enabled": true,
+      "allowed_origins": [
+        "*"
+      ]
+    }
+  },
+  "ui": {
+    "theme": "professional",
+    "brand_color": "#00d9ff",
+    "background_color": "#0a0e27"
+  }
+}

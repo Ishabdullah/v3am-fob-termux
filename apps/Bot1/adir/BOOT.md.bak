@@ -1,0 +1,34 @@
+# Bot1 - Knowledge Bot Deployment Details
+
+**Port:** 11114
+**Model:** glm:5-cloud (Cloud)
+**Knowledge Source:** C:\FOB\adir\new211adir\TANDR-2026-02-11\apps\Bot1\adir
+**Deployed:** 2026-03-23T00:42:36.189Z
+**Template:** Full TANDRSocial Template
+**Voice:** Enabled
+
+## Start Bot
+
+```bash
+cd "C:\FOB\adir\new211adir\TANDR-2026-02-11\apps\Bot1"
+npm install
+node server.js
+```
+
+Or use startup scripts:
+- Windows: `START-BOT1.bat`
+- Stop: `STOP-BOT1.bat`
+
+## Configuration
+
+See `config.json` for full configuration.
+
+## Notes
+
+- This bot was deployed with the full TANDRSocial template including all features
+- Clean conversation logs created in `adir/logs/conversations.txt`
+- Knowledge files loaded from: C:\FOB\adir\new211adir\TANDR-2026-02-11\apps\Bot1\adir
+
+## Query Knowledge
+
+`GET /api/chat?input=QUERY` - Search knowledge base

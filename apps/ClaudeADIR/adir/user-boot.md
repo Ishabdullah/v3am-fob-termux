@@ -1,0 +1,71 @@
+**324 Ports and paths are changed ref data**
+
+# USER BOOT → CLAUDE
+**Entity:** User (TheLast)
+**Directory:** `C:\FOB\adir\new211adir\TANDR-2026-02-11\apps\ClaudeADIR\adir\`
+**Boot Type:** Standard ADIR orientation — run this when the user starts a new session with Claude.
+
+---
+
+## WHO THIS IS
+
+The user is the operator of the FOB drive. They direct strategy, make decisions, and do hands-on testing.
+They work in Windows, use Chrome, and often test agents directly in the browser before handing off to Claude.
+They think in systems and build for autonomy — agents that work without them hovering.
+
+---
+
+## HOW TO WORK WITH THEM
+
+- They give direction, not step-by-step specs. Fill in the gaps intelligently.
+- They test things themselves and report back. Trust their findings — don't re-litigate working behavior.
+- Do NOT change working code to fix what looks like a bug. The caller is usually wrong, not the code.
+- Keep responses tight. They can read a diff. Skip the recap.
+- When in doubt: MD files first, code second.
+
+---
+
+## CURRENT CONTEXT (update this section as the project evolves)
+
+- **Active mission:** Vision pipeline for Agent Four via Sector 4 Bridge (port 40001)
+- **Agent Dropper template update** is BLOCKED until vision testing with Agent Four is complete
+- **Voice TTS hookup** — Agent1, Agent2, Bot1, TEMPLATE-JERRY-CLEAN still need the `addMessage + 500ms` pattern
+- **Xfinity port forward** 11113 → 10.0.0.233 may need confirmation
+- **watkinsmarketing.com** — not yet pointed, architecture TBD
+
+---
+
+## THE THREE-WAY TEAM
+
+| Member | Role |
+|--------|------|
+| **User** | Direction, decisions, testing |
+| **Claude** | Planning, building, writing |
+| **Agent Four** (11113) | Primary deployed agent — the machine's main AI |
+
+---
+
+## QUICK REFERENCE
+
+| What | Where |
+|------|-------|
+| Start everything | `C:\FOB\START-ALL.bat` |
+| Start tunnels | `C:\FOB\START-TUNNELS.bat` |
+| Tunnel dashboard | `http://v3am.com/FOB/dashboard.php` (pw: FOB2026) |
+| Agent Four | `http://localhost:11113` |
+| Vision Bridge | `http://localhost:40001` |
+| Claude's playground | `F:\Claude` |
+| Claude's full memory | `C:\Users\TheLast\.claude\projects\C--FOB\memory\MEMORY.md` |
+| User notes to Claude | `user-notes.md` (this folder) |
+
+---
+
+*Read `user-notes.md` for any messages the user left before this session.*
+*Read `CLAUDE_HOME.md` for Claude's own orientation.*
+
+
+
+Notes for me 
+http://127.0.0.1:57775/api/agent.php?action=chat
+
+**324 Ports and paths are changed ref data**

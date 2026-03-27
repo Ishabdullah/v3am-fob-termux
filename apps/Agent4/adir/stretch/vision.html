@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Vision Bridge | Sector 4</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0a0a1a; color: #00d4ff; font-family: 'Courier New', monospace; padding: 16px; }
+    h2 { color: #0f0; border-bottom: 1px solid #0f0; padding-bottom: 8px; margin-bottom: 12px; font-size: 14px; }
+    #status { font-size: 12px; color: #888; margin-bottom: 10px; }
+    #status.online { color: #0f0; }
+    #status.offline { color: #f44; }
+    .controls { margin-bottom: 12px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    button {
+      background: #1a1a3a; color: #0f0; border: 1px solid #0f0;
+      padding: 5px 14px; cursor: pointer; font-family: 'Courier New', monospace;
+      font-size: 12px;
+    }
+    button:hover { background: #0f0; color: #000; }
+    button.danger { color: #f44; border-color: #f44; }
+    button.danger:hover { background: #f44; color: #000; }
+    #type-input {
+      background: #111; border: 1px solid #00d4ff; color: #e0e0e0;
+      padding: 5px 10px; font-family: 'Courier New', monospace; font-size: 12px; width: 220px;
+    }
+    #screen-wrap {
+      position: relative; display: inline-block;
+      border: 1px solid #00d4ff; cursor: crosshair; max-width: 100%;
+    }
+    #screen { display: block; max-width: 100%; height: auto; }
+    #crosshair {
+      position: absolute; pointer-events: none;
+      border: 1px solid rgba(255,170,0,0.6); width: 20px; height: 20px;
+      transform: translate(-50%, -50%); display: none;
+    }
+    #coords { color: #ffaa00; font-size: 11px; margin-top: 6px; }
+    #log {
+      background: #0d0d1a; border: 1px solid #333; padding: 10px;
+      margin-top: 14px; height: 140px; overflow-y: auto; font-size: 11px; color: #aaa;
+    }
+    .log-ok { color: #0f0; }
+    .log-err { color: #f44; }
+    .log-info { color: #888; }
+    .url-bar {
+      display: flex; gap: 8px; align-items: center;
+      margin-bottom: 10px; flex-wrap: wrap;
+    }
+    #bridge-url {
+      background: #111; border: 1px solid #0f0; color: #0f0;
+      padding: 5px 10px; font-family: 'Courier New', monospace;
+      font-size: 12px; flex: 1; min-width: 260px;
+    }
+    .url-label { font-size: 11px; color: #555; white-space: nowrap; }
+  </style>
+</head>
+<body>
+  <h2>[ SECTOR 4 VISION BRIDGE | PORT 40001 ]</h2>
+
+  <div class="url-bar">
+    <span class="url-label">BRIDGE URL:</span>
+    <input id="bridge-url" type="text" value="http://127.0.0.1:40001" />
+    <button onclick="applyUrl()">[ CONNECT ]</button>
+    <button onclick="refresh()">[ REFRESH ]</button>
+  </div>
+
+  <div id="status">Checking bridge...</div>
+
+  <div class="controls">
+    <button onclick="refresh()">[ SCREENSHOT ]</button>
+    <button onclick="startLive()" id="live-btn">[ LIVE ON ]</button>
+    <button onclick="stopLive()" class="danger">[ STOP ]</button>
+    <input id="type-input" type="text" placeholder="Type text to send..." />
+    <button onclick="sendType()">[ SEND TYPE ]</button>
+  </div>
+
+  <div id="screen-wrap">
+    <img id="screen" src="" alt="No screenshot yet" />
+    <div id="crosshair"></div>
+  </div>
+  <div id="coords">Hover image to see coordinates | Click to send click command</div>
+
+  <div id="log"></div>
+
+  <script>
+    let BASE = document.getElementById('bridge-url').value.replace(/\/$/, '');
+    let liveInterval = null;
+
+    function applyUrl() {
+      BASE = document.getElementById('bridge-url').value.replace(/\/$/, '');
+      log('Bridge URL set to: ' + BASE, 'log-info');
+      checkHealth();
+      refresh();
+    }
+
+    // Allow Enter key in URL bar to connect
+    document.getElementById('bridge-url').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') applyUrl();
+    });
+
+    function log(msg, cls = 'log-info') {
+      const el = document.getElementById('log');
+      el.innerHTML += `<div class="${cls}">[${new Date().toLocaleTimeString()}] ${msg}</div>`;
+      el.scrollTop = el.scrollHeight;
+    }
+
+    async function checkHealth() {
+      try {
+        const r = await fetch(BASE + '/health');
+        const d = await r.json();
+        const el = document.getElementById('status');
+        el.textContent = `BRIDGE ONLINE | ${d.bridge} | Port ${d.port}`;
+        el.className = 'online';
+        log('Bridge online', 'log-ok');
+      } catch(e) {
+        const el = document.getElementById('status');
+        el.textContent = 'BRIDGE OFFLINE — run start_bridge.bat';
+        el.className = 'offline';
+        log('Bridge offline: ' + e.message, 'log-err');
+      }
+    }
+
+    function refresh() {
+      const img = document.getElementById('screen');
+      img.src = BASE + '/screenshot?t=' + Date.now();
+      img.onload = () => log('Screenshot updated', 'log-ok');
+      img.onerror = () => log('Screenshot failed', 'log-err');
+    }
+
+    function startLive() {
+      if (liveInterval) return;
+      liveInterval = setInterval(refresh, 2000);
+      document.getElementById('live-btn').textContent = '[ LIVE ON ]';
+      log('Live mode started (2s)', 'log-ok');
+    }
+
+    function stopLive() {
+      clearInterval(liveInterval);
+      liveInterval = null;
+      document.getElementById('live-btn').textContent = '[ LIVE ON ]';
+      log('Live mode stopped', 'log-info');
+    }
+
+    function sendType() {
+      const text = document.getElementById('type-input').value;
+      if (!text) return;
+      fetch(`${BASE}/type?text=${encodeURIComponent(text)}`)
+        .then(r => r.json())
+        .then(d => log(`Typed: "${text}"`, 'log-ok'))
+        .catch(e => log('Type error: ' + e.message, 'log-err'));
+    }
+
+    const screenImg = document.getElementById('screen');
+    const crosshair = document.getElementById('crosshair');
+
+    screenImg.addEventListener('mousemove', function(evt) {
+      const rect = this.getBoundingClientRect();
+      const scaleX = this.naturalWidth / rect.width;
+      const scaleY = this.naturalHeight / rect.height;
+      const x = Math.round((evt.clientX - rect.left) * scaleX);
+      const y = Math.round((evt.clientY - rect.top) * scaleY);
+      document.getElementById('coords').textContent = `X: ${x}  Y: ${y}`;
+      crosshair.style.display = 'block';
+      crosshair.style.left = (evt.clientX - rect.left) + 'px';
+      crosshair.style.top = (evt.clientY - rect.top) + 'px';
+    });
+
+    screenImg.addEventListener('mouseleave', function() {
+      crosshair.style.display = 'none';
+    });
+
+    screenImg.addEventListener('click', function(evt) {
+      const rect = this.getBoundingClientRect();
+      const scaleX = this.naturalWidth / rect.width;
+      const scaleY = this.naturalHeight / rect.height;
+      const x = Math.round((evt.clientX - rect.left) * scaleX);
+      const y = Math.round((evt.clientY - rect.top) * scaleY);
+      log(`Sending click → (${x}, ${y})`, 'log-info');
+      fetch(`${BASE}/click?x=${x}&y=${y}`)
+        .then(r => r.json())
+        .then(d => log(`Clicked (${x}, ${y})`, 'log-ok'))
+        .catch(e => log('Click error: ' + e.message, 'log-err'));
+    });
+
+    checkHealth();
+    refresh();
+  </script>
+</body>
+</html>

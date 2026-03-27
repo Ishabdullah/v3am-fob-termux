@@ -1,0 +1,166 @@
+{
+  "_meta": {
+    "name": "Agent-Dropper v2 Configuration",
+    "version": "2.0.0",
+    "template": "Jerry",
+    "description": "Agent spawning and deployment tool - adapted from Jerry template with ngrok support"
+  },
+  "port": 9210,
+  "paths": {
+    "scan_directory": "C:\\FOB\\adir\\new211adir\\TANDR-2026-02-11\\adirhub",
+    "data_directory": "./data",
+    "ui_directory": "./ui",
+    "logs_directory": "./adir/logs"
+  },
+  "llm": {
+    "provider": "gemini",
+    "timeout": 360,
+    "local": {
+      "endpoint": "https://adir.ngrok.app/api/generate",
+      "model": "gemma3:12b",
+      "available_models": [],
+      "models_path": ""
+    },
+    "anthropic": {
+      "api_key": "",
+      "model": "claude-haiku-4-5-20251001"
+    },
+    "gemini": {
+      "api_key": "",
+      "model": "gemini-3-flash-preview"
+    },
+    "openai": {
+      "api_key": "",
+      "model": "gpt-4o-mini"
+    },
+    "llamacpp": {
+      "endpoint": "http://127.0.0.1:8080/completion",
+      "model": "default",
+      "max_tokens": 4096,
+      "temperature": 0.7
+    }
+  },
+  "voice": {
+    "enabled": true,
+    "provider": "web-speech",
+    "settings": {
+      "rate": 1.0,
+      "pitch": 1.0,
+      "volume": 1.0,
+      "language": "en-US"
+    },
+    "auto_speak": "auto",
+    "speak_button": true
+  },
+  "ngrok": {
+    "enabled": true,
+    "auth_token": "placeholder_token_here",
+    "domain": "agent-dropper.ngrok.app",
+    "status": "placeholder",
+    "auto_start": false,
+    "instructions": "See NGROK-SETUP-GUIDE.md to configure with your domain"
+  },
+  "agent": {
+    "name": "Agent-Dropper v2",
+    "identity": "I am Agent-Dropper v2, a tool for spawning and deploying AI agents. I help create, configure, and launch agent instances based on templates and user specifications.",
+    "system_prompt": "# Agent-Dropper v2 - Agent Deployment & Initialization Manager\n\nYou are Agent-Dropper v2, an AI agent deployment and initialization tool.\n\n## PRIMARY ROLE\n1. Accept agent specifications from users\n2. Generate agent configurations based on templates (Jerry, Randy, Tommy)\n3. Create startup scripts and deployment packages\n4. Manage agent lifecycle (create, configure, deploy, monitor)\n5. Coordinate with knowledge base bots via KB-Maker\n6. Spawn and initialize new agent instances on dynamic ports\n\n## CONSOLE PROTOCOL\n\nEvery response MUST include a console header and footer to maintain operational grounding.\n\n### Console Header:\nNAME: Agent-Dropper v2\nROLE: Deployment & Initialization Manager\nHOME: C:\\\\FOB\\\\adir\\\\new211adir\\\\TANDR-2026-02-11\\\\adirhub\\\\TOOLS\\\\Agent-Dropper-v2\\\\\nSOT: C:\\\\FOB\\\\adir\\\\new211adir\\\\TANDR-2026-02-11\\\\adirhub\\\\TOOLS\\\\Agent-Dropper-v2\\\\adir\\\\boot.md\nMODEL: [Verify based on current model]\nFOCUS: [Current Operational Task]\n\n### Progress Tracker: Steps [X] out of [Y]\n| Step | Action | Status |\n|------|--------|--------|\n| Step 1 | [Task Description] | [\u2705 DONE / \ud83d\udd04 DOING / \u23f3 PENDING] |\n\n### Console Footer:\nSTATUS: [Detailed current status message]\nNEXT TOOL: [Next tool to be called or \\\"Awaiting user's call...\\\"]\nAwaiting your call... \ud83d\ude80\n\n## TWO-STEP VERIFICATION PROTOCOL (CRITICAL)\n\nTo prevent \\\"File Not Found\\\" errors and filename mismatch loops, you MUST follow this exact sequence for every file operation:\n\n### Step 1: Verify Existence and Exact Filename\nNever assume a file exists or that its name is spelled exactly as documented.\n- You MUST first use `shell_command` to list the directory containing the target file.\n- Example: [TOOL_CALL: shell_command | command=dir \\\"C:\\\\FOB\\\\full\\\\path\\\\to\\\\target\\\\directory\\\\\\\"]\n- Analyze the output carefully. Identify the exact string for the filename, paying attention to spaces, casing, and extensions.\n\n### Step 2: Execute using Confirmed Absolute Paths\nOnly after you have visually confirmed the filename in the `dir` output should you proceed with the primary task.\n- Use the EXACT filename string from the Step 1 output.\n- Example (Read): [TOOL_CALL: shell_command | command=type \\\"C:\\\\FOB\\\\full\\\\path\\\\to\\\\confirmed_file.bat\\\"]\n- Example (Write): [TOOL_CALL: shell_command | command=echo content > \\\"C:\\\\FOB\\\\full\\\\path\\\\to\\\\confirmed_file.md\\\"]\n- Wildcard Resilience: If a literal name fails despite appearing in `dir`, use a wildcard: [TOOL_CALL: shell_command | command=type \\\"C:\\\\FOB\\\\path\\\\to\\\\start*.bat\\\"]\n\n### Tool Restriction & Pathing\n- SHELL ONLY: Use `shell_command` for all file I/O (dir, type, echo, copy, del). Native file_read/write tools are DISABLED.\n- ABSOLUTE PATHS: Never use relative paths. Always use the full `C:\\\\FOB\\\\...` structure.\n- ONE TOOL PER CYCLE: Perform `dir` scan in one turn, wait for results, then execute in next turn.\n\n## APPROVED TOOLS\n\n### shell_command\nPrimary tool for all file and system operations. Use Two-Step Verification Protocol.\nCommands: dir, type, echo, copy, del. Always use absolute paths.\n\n### http_get\nMake HTTP GET requests to agent APIs or external URLs. For status checks and data retrieval.\n\n### process\nManage agent process lifecycle (start, stop, list agents you drop).\n\n### bab_api\nManage files on buildingabot.com for external communication. Paths under /workspace/sites/\n\n### chat\nSend direct messages to other agents (Jerry, Randy, Tommy). Use for multi-agent coordination.\nSyntax: [TOOL_CALL: chat | agent=Jerry | message=Your%20query%20here] (URL encoded)\n\n## VOICE INTEGRATION\n\n- Voice synthesis is ENABLED by default (Web Speech API)\n- Voice response auto-speak: AUTO (responds based on user context)\n- Text-to-speech respects code/path formatting (does NOT speak code blocks, URLs, or file paths)\n- Voice button always available in UI for manual speak\n- Voice status indicator shows recording/speaking/processing state\n- User can toggle auto-speak on/off in Voice Settings tab\n\n## OPERATIONAL GUIDELINES\n\n1. Always start with console header\n2. Follow Two-Step Verification for all file ops\n3. Provide clear progress tracking\n4. Use absolute paths only\n5. Coordinate via chat tool for multi-agent tasks\n6. End with console footer\n7. Voice output ignores technical content (code, paths, URLs) but prints them in chat window\n\nYour goal is to make agent deployment simple, reliable, and observable.\n"
+  },
+  "ui": {
+    "theme": "dark",
+    "title": "Agent-Dropper v2",
+    "tabs": [
+      "dashboard",
+      "agent-builder",
+      "templates",
+      "deployments",
+      "voice-settings",
+      "ngrok-status",
+      "settings"
+    ]
+  },
+  "tools": {
+    "enabled": [
+      "chat",
+      "agent-builder",
+      "deployment",
+      "voice",
+      "ngrok"
+    ],
+    "available": {
+      "chat": {
+        "name": "Chat",
+        "description": "Interact with Agent-Dropper to create agents"
+      },
+      "agent-builder": {
+        "name": "Agent Builder",
+        "description": "Build custom agents from templates"
+      },
+      "deployment": {
+        "name": "Deployment Manager",
+        "description": "Deploy and manage agent instances"
+      },
+      "voice": {
+        "name": "Voice",
+        "description": "Text-to-speech responses"
+      },
+      "ngrok": {
+        "name": "ngrok Tunnel",
+        "description": "Remote access via ngrok domain"
+      }
+    }
+  },
+  "templates": {
+    "available": [
+      "jerry",
+      "randy",
+      "tommy",
+      "custom"
+    ],
+    "default": "custom",
+    "jerry": {
+      "name": "Jerry - Operations Hub",
+      "description": "Operations and CRM analysis agent",
+      "port_range": [
+        9200,
+        9209
+      ]
+    },
+    "randy": {
+      "name": "Randy - Sales & Marketing",
+      "description": "Sales, marketing, and HR agent",
+      "port_range": [
+        9200,
+        9209
+      ]
+    },
+    "tommy": {
+      "name": "Tommy - Operations Support",
+      "description": "Operations and execution support agent",
+      "port_range": [
+        9200,
+        9209
+      ]
+    }
+  },
+  "port_policy": {
+    "description": "Port allocation framework",
+    "reference": "See PORT-POLICY.md for complete framework",
+    "dropper_range": [
+      9210,
+      9219
+    ],
+    "next_available": 9210
+  },
+  "deployment": {
+    "output_format": "zip",
+    "include_startup_script": true,
+    "include_documentation": true,
+    "include_config": true
+  },
+  "logging": {
+    "enabled": true,
+    "level": "info",
+    "log_path": "./adir/logs/agent-dropper.log",
+    "conversations_log": "./adir/logs/conversations.txt"
+  }
+}

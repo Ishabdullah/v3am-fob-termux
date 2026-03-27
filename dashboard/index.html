@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>V3AM FOB</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ── Header ────────────────────────────────────────────────────────── -->
+  <header id="header">
+    <div class="brand">V3AM <span class="brand-accent">FOB</span></div>
+    <span id="fleet-summary" title="Running / Total">…/…</span>
+    <nav id="endpoint-tabs"></nav>
+    <div class="header-btns">
+      <button class="icon-btn" id="toggle-rack"  title="Toggle server rack">⚡</button>
+      <button class="icon-btn" id="toggle-logs"  title="Toggle log viewer">📋</button>
+      <button class="icon-btn" id="toggle-fullscreen" title="Toggle fullscreen">⛶</button>
+      <button class="icon-btn" id="open-settings" title="Settings">⚙</button>
+    </div>
+  </header>
+
+  <!-- ── Main layout ───────────────────────────────────────────────────── -->
+  <div id="layout">
+
+    <!-- ── Server Rack ──────────────────────────────────────────────── -->
+    <section id="rack-panel" style="height: var(--rack-h);">
+      <div class="panel-header">
+        <span class="panel-title">SERVER RACK</span>
+        <span id="rack-counts"></span>
+      </div>
+      <div id="rack-scroll"></div>
+    </section>
+
+    <!-- ── Log Viewer ───────────────────────────────────────────────── -->
+    <section id="log-panel" style="height: var(--log-h);">
+      <div class="panel-header">
+        <span class="panel-title">LOGS</span>
+        <div id="log-tabs"></div>
+        <button class="icon-btn small" id="clear-log" title="Clear">✕</button>
+      </div>
+      <div id="log-output"></div>
+    </section>
+
+    <!-- ── Main iframe ──────────────────────────────────────────────── -->
+    <div id="iframe-wrap">
+      <iframe id="main-frame" src="about:blank" allowfullscreen
+        sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads">
+      </iframe>
+    </div>
+
+  </div>
+
+  <!-- ── Settings modal ────────────────────────────────────────────────── -->
+  <div id="settings-overlay" class="hidden">
+    <div id="settings-modal">
+      <div class="settings-header">
+        <span class="panel-title">SETTINGS</span>
+        <button class="icon-btn small" id="close-settings">✕</button>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">ENDPOINT TABS</div>
+        <div class="settings-hint">Tabs shown in the top nav. Click to load in the iframe, ↗ opens in browser.</div>
+        <div id="endpoint-editor"></div>
+        <button class="settings-add-btn" id="add-endpoint">+ Add Tab</button>
+      </div>
+
+      <div class="settings-section settings-section-border">
+        <div class="settings-section-title">APPEARANCE</div>
+
+        <div class="appearance-row">
+          <label class="appearance-label">Font Size</label>
+          <input type="range" id="skin-fontsize" min="10" max="24" step="1" value="13" class="appearance-slider">
+          <span class="appearance-val" id="skin-fontsize-val">13px</span>
+        </div>
+
+        <div class="appearance-row">
+          <label class="appearance-label">Text Color</label>
+          <input type="color" id="skin-textcolor" value="#e0e8ff" class="appearance-color">
+          <div class="color-presets" style="display:flex;gap:4px;margin-left:6px;">
+            <span class="color-chip" style="width:18px;height:18px;border-radius:3px;cursor:pointer;background:#e0e8ff;border:1px solid #444;" data-color="#e0e8ff" title="Default"></span>
+            <span class="color-chip" style="width:18px;height:18px;border-radius:3px;cursor:pointer;background:#00d9ff;border:1px solid #444;" data-color="#00d9ff" title="Cyan"></span>
+            <span class="color-chip" style="width:18px;height:18px;border-radius:3px;cursor:pointer;background:#00ff88;border:1px solid #444;" data-color="#00ff88" title="Green"></span>
+            <span class="color-chip" style="width:18px;height:18px;border-radius:3px;cursor:pointer;background:#ffaa00;border:1px solid #444;" data-color="#ffaa00" title="Amber"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section settings-section-border">
+        <div class="settings-section-title">SERVICE START MODE</div>
+        <div class="settings-hint">Auto — starts on launch. Manual — click Start to launch.</div>
+        <div id="service-start-list"></div>
+      </div>
+
+      <div class="settings-section settings-section-border">
+        <div class="settings-section-title">CONTROL API</div>
+        <div class="settings-hint">Port 9399 — local only.</div>
+        <div class="api-base-url">
+          <code id="api-base">http://127.0.0.1:9399</code>
+          <button class="icon-btn small" id="copy-base-url" title="Copy">⎘</button>
+        </div>
+        <div class="api-endpoints-list">
+          <div class="api-row"><span class="api-method get">GET</span><code>/status</code><span class="api-desc">Full fleet status</span></div>
+          <div class="api-row"><span class="api-method post">POST</span><code>/restart/:id</code><span class="api-desc">Kill + respawn a service</span></div>
+          <div class="api-row"><span class="api-method post">POST</span><code>/start/:id</code><span class="api-desc">Start a downed service</span></div>
+          <div class="api-row"><span class="api-method post">POST</span><code>/stop/:id</code><span class="api-desc">Stop a service</span></div>
+          <div class="api-row"><span class="api-method get">GET</span><code>/logs/:id</code><span class="api-desc">Get service logs</span></div>
+          <div class="api-row"><span class="api-method get">GET</span><code>/events</code><span class="api-desc">SSE live updates</span></div>
+        </div>
+      </div>
+
+      <div class="settings-footer">
+        <button class="icon-btn" id="settings-cancel">Cancel</button>
+        <button class="icon-btn settings-save-btn" id="settings-save">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Zoom HUD ───────────────────────────────────────────────────────── -->
+  <div id="zoom-hud"></div>
+
+  <script src="app.js"></script>
+
+  <footer style="display:none">
+    <a href="https://www.perplexity.ai/computer" target="_blank" rel="noopener noreferrer">Created with Perplexity Computer</a>
+  </footer>
+</body>
+</html>

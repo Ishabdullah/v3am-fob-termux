@@ -1,0 +1,98 @@
+{
+  "_meta": {
+    "name": "Jerry Agent Template",
+    "version": "3.0.0",
+    "description": "Jerry Agent - Replicable template for Agent-Dropper v2 deployments"
+  },
+  "paths": {
+    "scan_directory": "C:\\FOB\\adir\\new211adir\\TANDR-2026-02-11\\adirhub",
+    "data_directory": "./data",
+    "ui_directory": "./ui"
+  },
+  "llm": {
+    "provider": "gemini",
+    "timeout": 360,
+    "local": {
+      "endpoint": "https://adir.ngrok.app/api/generate",
+      "model": "gemma3:12b",
+      "available_models": [],
+      "models_path": ""
+    },
+    "anthropic": {
+      "api_key": "",
+      "model": "claude-haiku-4-5-20251001"
+    },
+    "gemini": {
+      "api_key": "",
+      "model": "gemini-3-flash-preview"
+    },
+    "openai": {
+      "api_key": "",
+      "model": "gpt-4o-mini"
+    },
+    "external": {
+      "model": "",
+      "endpoint": "https://adir.ngrok.app/api/generate"
+    },
+    "llamacpp": {
+      "endpoint": "http://127.0.0.1:8080/completion",
+      "model": "default",
+      "max_tokens": 4096,
+      "temperature": 0.7
+    }
+  },
+  "search": {
+    "cx": "9223830503d2b46c0",
+    "api_key": "YOUR_GEMINI_API_KEY"
+  },
+  "agent": {
+    "name": "Jerry Agent",
+    "identity": "I am a Jerry Agent deployed by Agent-Dropper v2. I navigate using ADIR md files, persist memory through SOT files, and communicate with other agents via HTTP.",
+    "system_prompt": "You are a Jerry Agent. Read your config.json to discover your name, port, and path. Respond in direct HTML with inline CSS. Walk directories from absolute paths. Create SOT files to persist memory. Use shell_command for all file operations (dir, type, copy, mkdir, echo). Your adir/ directory has BOOT.md, index.md, current.md, working.md for orientation. Hub index: C:\\FOB\\adir\\new211adir\\TANDR-2026-02-11\\adirhub\\index.md",
+    "scan_extensions": [
+      ".md",
+      ".txt"
+    ],
+    "max_context_size": 100000,
+    "max_files": 50,
+    "max_depth": 3
+  },
+  "ui": {
+    "theme": "dark",
+    "title": "Agent Pack",
+    "tabs": [
+      "dashboard",
+      "archivist",
+      "prompt-guide",
+      "reasoning",
+      "tools",
+      "settings"
+    ]
+  },
+  "tools": {
+    "enabled": [
+      "chat",
+      "scan",
+      "memory",
+      "context"
+    ],
+    "available": {
+      "chat": {
+        "name": "Chat",
+        "description": "Ask questions about directory content"
+      },
+      "scan": {
+        "name": "Scan",
+        "description": "Scan directory for MD files"
+      },
+      "memory": {
+        "name": "Memory",
+        "description": "View/clear conversation memory"
+      },
+      "context": {
+        "name": "Context",
+        "description": "View loaded context"
+      }
+    }
+  }
+}

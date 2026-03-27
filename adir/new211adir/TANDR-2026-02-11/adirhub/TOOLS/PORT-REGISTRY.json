@@ -1,0 +1,206 @@
+{
+    "version": "1.0",
+    "description": "TANDR Port Registry - Track all active ports and tool assignments",
+    "last_updated": "2026-02-26T00:00:00Z",
+    "ports": {
+        "8081": {
+            "service": "TANDRbot",
+            "description": "Field assistant chatbot for reps, owners, estimators",
+            "status": "active",
+            "type": "core",
+            "owner": "TANDR System",
+            "ngrok": null,
+            "created": "2026-01-15T00:00:00Z"
+        },
+        "8085": {
+            "service": "TANDRmgr",
+            "description": "TANDR Manager - orchestration service",
+            "status": "active",
+            "type": "core",
+            "owner": "TANDR System",
+            "ngrok": null,
+            "created": "2026-01-15T00:00:00Z"
+        },
+        "8086": {
+            "service": "TANDRmgr-lab",
+            "description": "TANDR Manager Lab - development and testing",
+            "status": "active",
+            "type": "core",
+            "owner": "TANDR System",
+            "ngrok": {
+                "domain": "tandrv.ngrok.app",
+                "status": "active",
+                "enabled": true,
+                "tunnel_url": "https://tandrv.ngrok.app"
+            },
+            "created": "2026-01-15T00:00:00Z"
+        },
+        "8087": {
+            "service": "3AI Mobile Instance 1",
+            "description": "3AI Mobile - Customer facing interface",
+            "status": "active",
+            "type": "core",
+            "owner": "TANDR System",
+            "ngrok": {
+                "domain": "tandrm.ngrok.app",
+                "status": "active",
+                "enabled": true,
+                "tunnel_url": "https://tandrm.ngrok.app"
+            },
+            "created": "2026-01-15T00:00:00Z"
+        },
+        "8088": {
+            "service": "3AI Mobile Instance 2",
+            "description": "3AI Mobile - Owner CRM interface",
+            "status": "active",
+            "type": "core",
+            "owner": "TANDR System",
+            "ngrok": null,
+            "created": "2026-01-15T00:00:00Z"
+        },
+        "9200": {
+            "service": "Jerry/TANDRCRM",
+            "description": "Operations hub agent - CRM analysis and knowledge management",
+            "status": "active",
+            "type": "fixed-agent",
+            "owner": "TANDR System",
+            "ngrok": null,
+            "created": "2026-01-15T00:00:00Z"
+        },
+        "9201": {
+            "service": "Randy Agent",
+            "description": "Sales and marketing agent",
+            "status": "active",
+            "type": "fixed-agent",
+            "owner": "TANDR System",
+            "ngrok": null,
+            "created": "2026-01-15T00:00:00Z"
+        },
+        "9202": {
+            "service": "Tommy Agent",
+            "description": "Operations and execution support agent",
+            "status": "active",
+            "type": "fixed-agent",
+            "owner": "TANDR System",
+            "ngrok": null,
+            "created": "2026-01-15T00:00:00Z"
+        },
+        "9210": {
+            "service": "Agent-Dropper-v2",
+            "description": "Agent spawning and deployment tool (Jerry template)",
+            "status": "starting",
+            "type": "dynamic",
+            "owner": "TANDR Tools",
+            "ngrok": {
+                "domain": "agent-dropper.ngrok.app",
+                "status": "placeholder",
+                "enabled": false,
+                "auth_token": "placeholder_token_here",
+                "instructions": "Run NGROK-SETUP-GUIDE.md section 'Agent-Dropper Setup' to configure"
+            },
+            "config_file": "C:/FOB/adir/new211adir/TANDR-2026-02-11/adirhub/TOOLS/Agent-Dropper-v2/config.json",
+            "created": "2026-02-26T00:00:00Z"
+        },
+        "9220": {
+            "service": "KB-Maker-v2",
+            "description": "Knowledge base bot factory (TANDRSocial template)",
+            "status": "starting",
+            "type": "dynamic",
+            "owner": "TANDR Tools",
+            "ngrok": {
+                "domain": "kb-maker.ngrok.app",
+                "status": "placeholder",
+                "enabled": false,
+                "auth_token": "placeholder_token_here",
+                "instructions": "Run NGROK-SETUP-GUIDE.md section 'KB-Maker Setup' to configure"
+            },
+            "config_file": "C:/FOB/adir/new211adir/TANDR-2026-02-11/adirhub/TOOLS/KB-Maker-v2/config.json",
+            "created": "2026-02-26T00:00:00Z"
+        },
+        "9204": {
+            "service": "Atlas Controller",
+            "description": "Indexing and coordination service",
+            "status": "active",
+            "type": "core",
+            "owner": "TANDR System",
+            "ngrok": null,
+            "created": "2026-01-15T00:00:00Z"
+        },
+        "9303": {
+            "service": "ADIR Hub",
+            "description": "Central dashboard and monitoring",
+            "status": "active",
+            "type": "core",
+            "owner": "TANDR System",
+            "ngrok": null,
+            "created": "2026-01-15T00:00:00Z"
+        },
+        "9304": {
+            "service": "1CRM Dashboard",
+            "description": "Mini dashboard for CRM operations",
+            "status": "active",
+            "type": "core",
+            "owner": "TANDR System",
+            "ngrok": null,
+            "created": "2026-01-15T00:00:00Z"
+        },
+        "11434": {
+            "service": "Ollama",
+            "description": "Local LLM provider (gemma, llama, etc.)",
+            "status": "active",
+            "type": "external",
+            "owner": "System",
+            "ngrok": null,
+            "created": "2026-01-15T00:00:00Z"
+        }
+    },
+    "ranges": {
+        "8081-8099": {
+            "purpose": "Core Services",
+            "allocation": "fixed",
+            "available": 0
+        },
+        "8100-8199": {
+            "purpose": "Service Variants",
+            "allocation": "dynamic",
+            "available": 100,
+            "in_use": 1,
+            "allocated": []
+        },
+        "9200-9209": {
+            "purpose": "Jerry/TANDRCRM Agents",
+            "allocation": "fixed",
+            "available": 0
+        },
+        "9210-9219": {
+            "purpose": "Agent-Dropper Instances",
+            "allocation": "dynamic",
+            "available": 9,
+            "in_use": 1,
+            "allocated": [
+                9210
+            ]
+        },
+        "9220-9229": {
+            "purpose": "KB-Maker Instances",
+            "allocation": "dynamic",
+            "available": 9,
+            "in_use": 1,
+            "allocated": [
+                9220
+            ]
+        },
+        "9300-9399": {
+            "purpose": "Hub & Coordination",
+            "allocation": "fixed",
+            "available": 0
+        }
+    },
+    "notes": [
+        "Port 9210: Agent-Dropper - awaiting ngrok domain configuration",
+        "Port 9220: KB-Maker - awaiting ngrok domain configuration",
+        "Port 80: WordPress Lab (XAMPP Apache) - added 2026-02-26",
+        "Port 3306: MySQL (XAMPP) - database for WordPress",
+        "All ngrok domains are placeholders until user configures them"
+    ]
+}

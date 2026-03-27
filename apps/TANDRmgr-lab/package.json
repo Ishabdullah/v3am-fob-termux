@@ -1,0 +1,15 @@
+{
+  "name": "tandrmgr",
+  "version": "1.0.0",
+  "description": "TANDR Manager - API Orchestrator with chat relay and help system",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.22.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

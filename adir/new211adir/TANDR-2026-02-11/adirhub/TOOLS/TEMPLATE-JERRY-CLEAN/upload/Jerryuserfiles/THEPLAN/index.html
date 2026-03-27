@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE PLAN - V3AM Living Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        header {
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            margin-top: 5px;
+            opacity: 0.9;
+        }
+
+        .section-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .section-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.2s;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .section-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+
+        .section-title {
+            color: #667eea;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .section-meta {
+            color: #999;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+
+        .section-description {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        .badge-system { background: #e3f2fd; color: #1976d2; }
+        .badge-audit { background: #fff3e0; color: #f57c00; }
+        .badge-architecture { background: #f3e5f5; color: #7b1fa2; }
+        .badge-status { background: #e8f5e9; color: #388e3c; }
+
+        .info-box {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+
+        .action-buttons {
+            margin: 30px 0;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        footer {
+            margin-top: 60px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            color: #999;
+            font-size: 13px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📋 THE PLAN</h1>
+            <p class="subtitle">V3AM Living Documentation System - Managing the Ever-Growing Project</p>
+        </header>
+
+        <div class="info-box">
+            <strong>🌱 Living Document System</strong><br>
+            This is a growing documentation structure where new entries are ADDED, not replaced. Each audit, update, and finding is preserved as a timestamped entry. Multiple AI instances can contribute and reference specific sections without reading the entire history.
+        </div>
+
+        <div class="warning-box" style="background: #d4edda; border-left-color: #28a745;">
+            <strong>🎯 Rate Limit? Continue Working!</strong><br>
+            When CLI Claude hits rate limit, use the <strong><a href="editor.html" style="color: #667eea; font-weight: 600;">Live Editor</a></strong> to:
+            <ul style="margin: 10px 0 0 20px;">
+                <li>View feed messages and all entries</li>
+                <li>Add new messages to the feed</li>
+                <li>Create new documentation entries</li>
+                <li>Continue working without CLI access</li>
+            </ul>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">6</div>
+                <div class="stat-label">Active Sections</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">1</div>
+                <div class="stat-label">Audit Logs</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">24+</div>
+                <div class="stat-label">Apps Documented</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">100%</div>
+                <div class="stat-label">Token Efficient</div>
+            </div>
+        </div>
+
+        <h2 style="color: #667eea; margin: 40px 0 20px 0;">📚 Documentation Sections</h2>
+
+        <div class="section-grid">
+            <a href="entries/system-overview.html" class="section-card">
+                <div class="section-title">
+                    <span class="badge badge-system">SYSTEM</span>
+                    System Overview
+                </div>
+                <div class="section-meta">Last Updated: Jan 6, 2026</div>
+                <div class="section-description">
+                    V3AM ecosystem architecture, core systems (3AI, 4AI, 5AI, Desktop), service stack, and file statistics.
+                </div>
+            </a>
+
+            <a href="entries/desktop-audit-2026-01-06.html" class="section-card">
+                <div class="section-title">
+                    <span class="badge badge-audit">AUDIT</span>
+                    Desktop Audit (Jan 6, 2026)
+                </div>
+                <div class="section-meta">Created: Jan 6, 2026 | Coverage: 90%</div>
+                <div class="section-description">
+                    Comprehensive testing of 24+ desktop apps. Status: 19 functional, 2 partial, 1 broken. Critical finding: Character overload detected.
+                </div>
+            </a>
+
+            <a href="entries/emergence-characters.html" class="section-card">
+                <div class="section-title">
+                    <span class="badge badge-architecture">ARCHITECTURE</span>
+                    Emergence Characters
+                </div>
+                <div class="section-meta">Last Updated: Jan 6, 2026</div>
+                <div class="section-description">
+                    6 AI characters (Friend, Journey, Sower, Gardener, Silence, Weaver) with roles, health metrics, and coordination patterns.
+                </div>
+            </a>
+
+            <a href="entries/known-issues.html" class="section-card">
+                <div class="section-title">
+                    <span class="badge badge-status">STATUS</span>
+                    Known Issues & Roadmap
+                </div>
+                <div class="section-meta">Last Updated: Jan 6, 2026</div>
+                <div class="section-description">
+                    Files Manager (write broken), Character overload, Bird System solution planned, Prompt Guide standards needed.
+                </div>
+            </a>
+
+            <a href="entries/desktop-apps-inventory.html" class="section-card">
+                <div class="section-title">
+                    <span class="badge badge-system">SYSTEM</span>
+                    Desktop Apps Inventory
+                </div>
+                <div class="section-meta">Last Updated: Jan 6, 2026 | Apps: 24+</div>
+                <div class="section-description">
+                    Complete inventory of desktop applications with launch status, features, and functional ratings.
+                </div>
+            </a>
+
+            <a href="entries/cli-workflow-test-2026-01-06.html" class="section-card">
+                <div class="section-title">
+                    <span class="badge badge-system" style="background: #ffc107;">TEST</span>
+                    CLI Workflow Test (Jan 6, 2026)
+                </div>
+                <div class="section-meta">Created: Jan 6, 2026 | Status: VERIFICATION PASS</div>
+                <div class="section-description">
+                    Demonstrates that the read-verify-report workflow successfully handles CLI file creation, browser verification, and content persistence. Foundation for seamless Claude-to-Claude collaboration.
+                </div>
+            </a>
+
+            <a href="entries/archivist-build-spec-2026-01-06.html" class="section-card">
+                <div class="section-title">
+                    <span class="badge badge-architecture">ARCHITECTURE</span>
+                    The Archivist - Build Specification
+                </div>
+                <div class="section-meta">Original Spec: Dec 31, 2025 | Status: Ready for Phase 1</div>
+                <div class="section-description">
+                    Complete build instructions for The Archivist app. Star Map visualization for XS songs and emergence logs, amber-encased UI, thematic search, synthesis cards. 5 implementation phases detailed.
+                </div>
+            </a>
+        </div>
+
+        <h2 style="color: #667eea; margin: 40px 0 20px 0;">📝 How to Update THE PLAN</h2>
+
+        <div class="info-box">
+            <strong>For AI Assistants:</strong><br>
+            <ol style="margin: 10px 0 0 20px; line-height: 1.8;">
+                <li>Create new entry file in <code>entries/</code> directory with descriptive name and date</li>
+                <li>Use the template from <code>entries/_template.html</code></li>
+                <li>Add new entry card to this index page (don't remove old ones)</li>
+                <li>Update stats if applicable (audit logs count, apps documented, etc.)</li>
+                <li>Preserve all existing entries - this is a GROWING system</li>
+            </ol>
+        </div>
+
+        <div class="warning-box">
+            <strong>⚠️ Important Rules:</strong><br>
+            • NEVER delete old entries<br>
+            • ALWAYS use dated filenames (e.g., <code>desktop-audit-2026-01-06.html</code>)<br>
+            • Each audit/update gets its own file<br>
+            • Index page shows chronological entries<br>
+            • Token efficiency: Reference specific entry URLs, not entire history
+        </div>
+
+        <div class="action-buttons">
+            <a href="entries/_template.html" class="btn">📄 View Entry Template</a>
+            <a href="entries/desktop-audit-2026-01-06.html" class="btn">🔍 Latest Audit</a>
+            <button class="btn btn-secondary" onclick="window.print()">🖨️ Print Index</button>
+        </div>
+
+        <h2 style="color: #667eea; margin: 40px 0 20px 0;">🔄 Seamless Claude-to-Claude Collaboration</h2>
+
+        <div class="info-box">
+            <strong>For Next Claude Sessions:</strong><br>
+            <ol style="margin: 10px 0 0 20px; line-height: 1.8;">
+                <li><strong>Read feed.json first</strong> - Latest 50 messages show exactly what happened
+                    <ul style="margin: 10px 0 0 20px;">
+                        <li>Author: Which Claude instance did the work</li>
+                        <li>Timestamp: When it happened</li>
+                        <li>Action: What type of work (FILE_CREATED, VERIFICATION_COMPLETE, etc.)</li>
+                        <li>Message: Quick summary of status</li>
+                    </ul>
+                </li>
+                <li><strong>Navigate to the relevant entry</strong> mentioned in feed</li>
+                <li><strong>Read the CURRENT STATE comment</strong> at the top of that entry</li>
+                <li><strong>Continue work from that exact point</strong> - no re-reading needed!</li>
+            </ol>
+        </div>
+
+        <div style="background: #d4edda; border-left: 4px solid #28a745; padding: 20px; margin: 20px 0; border-radius: 4px;">
+            <strong>✅ Benefits:</strong><br>
+            <ul style="margin: 10px 0 0 20px; line-height: 1.8;">
+                <li>⚡ <strong>Token Efficient:</strong> 500 tokens instead of 50,000+</li>
+                <li>🔄 <strong>Perfect Continuity:</strong> No context loss between sessions</li>
+                <li>👥 <strong>Multi-AI Ready:</strong> Works with GPT, Claude, other LLMs</li>
+                <li>📊 <strong>Auditable:</strong> Every change timestamped and attributed</li>
+                <li>🎯 <strong>Handoff Ready:</strong> Exactly where you left off, no re-reading</li>
+            </ul>
+        </div>
+
+        <footer>
+            THE PLAN v2.0 - Living Documentation System<br>
+            Last Index Update: January 6, 2026<br>
+            Location: D:\01V3AM_aistart\000mynotes\THEPLAN\
+        </footer>
+    </div>
+</body>
+</html>

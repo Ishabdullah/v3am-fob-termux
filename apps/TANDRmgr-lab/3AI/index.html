@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3AI - Local Service Browser</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .browser-header {
+            background: #2c3e50;
+            padding: 12px 16px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        button {
+            background: #34495e;
+            border: 1px solid #2c3e50;
+            color: #ecf0f1;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: #3d5270;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .address-bar-container {
+            flex: 1;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 10px 14px;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            font-size: 13px;
+            font-family: 'Courier New', monospace;
+            background: #ecf0f1;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #3498db;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .address-bar-container button {
+            padding: 10px 16px;
+            background: #3498db;
+            color: white;
+            border: none;
+        }
+
+        .address-bar-container button:hover {
+            background: #2980b9;
+        }
+
+        .services-menu {
+            padding: 8px 16px;
+            background: #34495e;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+            font-size: 12px;
+            color: #bdc3c7;
+            border-bottom: 1px solid #2c3e50;
+        }
+
+        .services-menu strong {
+            color: #ecf0f1;
+        }
+
+        .service-link {
+            color: #3498db;
+            cursor: pointer;
+            text-decoration: none;
+            padding: 4px 8px;
+            border-radius: 3px;
+            transition: background 0.2s;
+        }
+
+        .service-link:hover {
+            background: #2c3e50;
+            color: #5dade2;
+        }
+
+        .browser-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #iframe-container {
+            flex: 1;
+            border: none;
+            display: flex;
+            flex-direction: column;
+        }
+
+        iframe {
+            border: none;
+            flex: 1;
+            width: 100%;
+            height: 100%;
+        }
+
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #7f8c8d;
+            z-index: 10;
+        }
+
+        .loading-spinner {
+            border: 4px solid #ecf0f1;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            padding: 20px;
+            background: #ffe6e6;
+            border: 1px solid #ff9999;
+            border-radius: 4px;
+            color: #c0392b;
+            margin: 20px;
+            display: none;
+        }
+
+        .status-bar {
+            padding: 8px 16px;
+            background: #ecf0f1;
+            border-top: 1px solid #bdc3c7;
+            font-size: 11px;
+            color: #7f8c8d;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .suggestions {
+            position: absolute;
+            top: 100%;
+            left: 16px;
+            right: 16px;
+            background: white;
+            border: 1px solid #bdc3c7;
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+        }
+
+        .suggestion-item {
+            padding: 10px 14px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            border-bottom: 1px solid #ecf0f1;
+            transition: background 0.2s;
+        }
+
+        .suggestion-item:hover {
+            background: #ecf0f1;
+            color: #3498db;
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="browser-header">
+        <div class="nav-buttons">
+            <button id="backBtn" title="Back">← Back</button>
+            <button id="forwardBtn" title="Forward">Forward →</button>
+            <button id="reloadBtn" title="Reload">⟲ Reload</button>
+        </div>
+        <div class="address-bar-container" style="position: relative;">
+            <input
+                type="text"
+                id="addressBar"
+                placeholder="Enter URL: localhost:8091, 127.0.0.1:10108, etc."
+                spellcheck="false"
+            >
+            <button id="goBtn">Go</button>
+            <div class="suggestions" id="suggestions"></div>
+        </div>
+    </div>
+
+    <div class="services-menu">
+        <strong>Quick Links:</strong>
+        <span class="service-link" onclick="loadService('http://127.0.0.1:8091')">Memory Bot (8091)</span>
+        <span class="service-link" onclick="loadService('http://127.0.0.1:10108')">ParserBot (10108)</span>
+        <span class="service-link" onclick="loadService('http://127.0.0.1:9200')">Jerry (9200)</span>
+        <span class="service-link" onclick="loadService('http://127.0.0.1:9201')">Randy (9201)</span>
+        <span class="service-link" onclick="loadService('http://127.0.0.1:9202')">Tommy (9202)</span>
+        <span class="service-link" onclick="loadService('http://127.0.0.1:8086')">TANDRmgr (8086)</span>
+    </div>
+
+    <div class="browser-content">
+        <div class="error-message" id="errorMessage"></div>
+        <div id="iframe-container">
+            <div class="loading" id="loading" style="display: none;">
+                <div class="loading-spinner"></div>
+                <p>Loading...</p>
+            </div>
+            <iframe id="contentFrame" sandbox="allow-scripts allow-forms allow-popups allow-top-navigation allow-pointer-lock"></iframe>
+        </div>
+    </div>
+
+    <div class="status-bar">
+        <span id="statusText">Ready</span>
+        <span id="urlInfo"></span>
+    </div>
+
+    <script>
+        const addressBar = document.getElementById('addressBar');
+        const goBtn = document.getElementById('goBtn');
+        const backBtn = document.getElementById('backBtn');
+        const forwardBtn = document.getElementById('forwardBtn');
+        const reloadBtn = document.getElementById('reloadBtn');
+        const contentFrame = document.getElementById('contentFrame');
+        const loadingEl = document.getElementById('loading');
+        const errorMessage = document.getElementById('errorMessage');
+        const statusText = document.getElementById('statusText');
+        const suggestions = document.getElementById('suggestions');
+        const urlInfo = document.getElementById('urlInfo');
+
+        let history = [];
+        let historyIndex = -1;
+        let currentUrl = '';
+
+        // Common services
+        const SERVICES = [
+            { name: 'Memory Bot', url: 'http://127.0.0.1:8091' },
+            { name: 'Memory Bot Dashboard', url: 'http://127.0.0.1:8091/dashboard.html' },
+            { name: 'ParserBot', url: 'http://127.0.0.1:10108' },
+            { name: 'ParserBot Dashboard', url: 'http://127.0.0.1:10108/dashboard.html' },
+            { name: 'Jerry Agent', url: 'http://127.0.0.1:9200' },
+            { name: 'Randy Agent', url: 'http://127.0.0.1:9201' },
+            { name: 'Tommy Agent', url: 'http://127.0.0.1:9202' },
+            { name: 'TANDRmgr', url: 'http://127.0.0.1:8086' },
+            { name: 'TANDRmgr Dashboard', url: 'http://127.0.0.1:8086/dashboard.html' }
+        ];
+
+        // Load default service on startup
+        window.addEventListener('load', () => {
+            loadService('http://127.0.0.1:8086');
+            addressBar.value = 'localhost:8086';
+        });
+
+        // Address bar listeners
+        addressBar.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                loadFromAddressBar();
+            }
+        });
+
+        addressBar.addEventListener('input', showSuggestions);
+
+        goBtn.addEventListener('click', loadFromAddressBar);
+
+        backBtn.addEventListener('click', () => {
+            if (historyIndex > 0) {
+                historyIndex--;
+                loadHistoryEntry();
+            }
+        });
+
+        forwardBtn.addEventListener('click', () => {
+            if (historyIndex < history.length - 1) {
+                historyIndex++;
+                loadHistoryEntry();
+            }
+        });
+
+        reloadBtn.addEventListener('click', () => {
+            if (currentUrl) loadService(currentUrl);
+        });
+
+        contentFrame.addEventListener('load', () => {
+            loadingEl.style.display = 'none';
+            statusText.textContent = `Loaded: ${currentUrl}`;
+            updateNavButtons();
+        });
+
+        contentFrame.addEventListener('error', () => {
+            loadingEl.style.display = 'none';
+            showError(`Could not load ${currentUrl}`);
+        });
+
+        function normalizeUrl(input) {
+            input = input.trim();
+
+            // If it already has a protocol, validate it
+            if (input.startsWith('http://') || input.startsWith('https://')) {
+                if (!input.includes(':') || input.split(':').length < 3) {
+                    showError('URL must include port. Example: http://localhost:8086');
+                    return null;
+                }
+                return input;
+            }
+
+            // Replace common localhost aliases with port
+            if (input.startsWith('localhost:') || input.match(/^127\.0\.0\.1:\d+/)) {
+                return 'http://' + input;
+            }
+
+            // If it's just a port number, assume localhost
+            if (input.match(/^\d+$/)) {
+                return 'http://127.0.0.1:' + input;
+            }
+
+            // localhost:PORT format
+            if (input.startsWith('localhost') && input.includes(':')) {
+                return 'http://' + input;
+            }
+
+            // Otherwise require port
+            showError('Please specify port: localhost:8086 or 127.0.0.1:10108');
+            return null;
+        }
+
+        function loadFromAddressBar() {
+            const input = addressBar.value;
+            const url = normalizeUrl(input);
+            if (url) {
+                loadService(url);
+            }
+        }
+
+        function loadService(url) {
+            // Close suggestions
+            suggestions.style.display = 'none';
+
+            // Normalize URL
+            url = normalizeUrl(url);
+
+            // Add to history
+            if (currentUrl !== url) {
+                history = history.slice(0, historyIndex + 1);
+                history.push(url);
+                historyIndex = history.length - 1;
+            }
+
+            currentUrl = url;
+            addressBar.value = url.replace('http://', '').replace('https://', '');
+
+            // Load
+            loadingEl.style.display = 'block';
+            errorMessage.style.display = 'none';
+            statusText.textContent = 'Loading...';
+
+            // Use proxy with encoded URL
+            const proxyUrl = `/3AI/proxy?url=${encodeURIComponent(url)}`;
+            contentFrame.src = proxyUrl;
+            urlInfo.textContent = url;
+        }
+
+        function loadHistoryEntry() {
+            if (historyIndex >= 0 && historyIndex < history.length) {
+                currentUrl = history[historyIndex];
+                addressBar.value = currentUrl.replace('http://', '').replace('https://', '');
+                loadingEl.style.display = 'block';
+                contentFrame.src = `/3AI/proxy?url=${encodeURIComponent(currentUrl)}`;
+                updateNavButtons();
+            }
+        }
+
+        function updateNavButtons() {
+            backBtn.disabled = historyIndex <= 0;
+            forwardBtn.disabled = historyIndex >= history.length - 1;
+        }
+
+        function showError(message) {
+            errorMessage.textContent = '⚠️ ' + message;
+            errorMessage.style.display = 'block';
+            statusText.textContent = 'Error: ' + message;
+        }
+
+        function showSuggestions() {
+            const input = addressBar.value.toLowerCase();
+            if (!input) {
+                suggestions.style.display = 'none';
+                return;
+            }
+
+            const filtered = SERVICES.filter(s =>
+                s.name.toLowerCase().includes(input) ||
+                s.url.toLowerCase().includes(input)
+            ).slice(0, 5);
+
+            if (filtered.length === 0) {
+                suggestions.style.display = 'none';
+                return;
+            }
+
+            suggestions.innerHTML = filtered.map(s =>
+                `<div class="suggestion-item" onclick="loadService('${s.url}')">${s.name}<br><small style="color: #7f8c8d;">${s.url}</small></div>`
+            ).join('');
+            suggestions.style.display = 'block';
+        }
+
+        // Close suggestions when clicking outside
+        document.addEventListener('click', (e) => {
+            if (e.target !== addressBar) {
+                suggestions.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

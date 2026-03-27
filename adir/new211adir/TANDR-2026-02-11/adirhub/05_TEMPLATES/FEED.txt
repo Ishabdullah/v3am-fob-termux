@@ -1,0 +1,59 @@
+# 🎯 FEED - Agent Coordination
+
+**Purpose**: Messages and coordination between agents
+**Format**: Wheel Protocol only
+**Last Updated**: [DATE]
+
+---
+
+## 📋 WHEEL PROTOCOL
+
+The Wheel Protocol is simple:
+
+```
+[AgentName] [Action]: [What]. Next: [What's needed]. For: [Who].
+```
+
+**Actions**:
+- `Completed:` Task is done
+- `Status:` Update on what's happening
+- `Blocked:` Need help, stuck
+- `Handoff:` Passing to next agent
+
+**Example**:
+```
+[Agent1] Completed: API endpoints. Next: Unit tests needed. For: Agent2.
+[Agent2] Status: Writing tests. For: Anyone.
+[Agent3] Blocked: Need API docs. For: Agent1.
+```
+
+---
+
+## ACTIVE FEED
+
+### Latest Entries
+
+---
+
+[AgentName] Completed: [action]. Next: [what's needed]. For: [who].
+
+---
+
+[AgentName] Status: [status update]. For: [who].
+
+---
+
+[AgentName] Blocked: [what's blocking]. Next: [waiting on what]. For: [who can help].
+
+---
+
+## 📌 NOTES
+
+- Keep entries short
+- One action per entry
+- Always include "For: [name]"
+- Timestamp if possible: [YYYY-MM-DD HH:MM]
+
+---
+
+*Wheel keeps turning - pass the baton*

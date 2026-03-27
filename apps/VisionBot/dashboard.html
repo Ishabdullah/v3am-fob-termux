@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TANDRSocial Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #00d9ff;
+            --secondary: #0a0e27;
+            --background: #0f1419;
+            --surface: #1a1f2e;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --border: #2a2f3e;
+            --success: #00ff88;
+            --warning: #ffaa00;
+            --error: #ff3366;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--background) 0%, var(--secondary) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 2em;
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: var(--primary);
+            margin-bottom: 0.5em;
+            font-size: 2em;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 2em;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5em;
+            margin-bottom: 2em;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5em;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .card h2 {
+            color: var(--primary);
+            font-size: 1.3em;
+            margin-bottom: 1em;
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+        }
+
+        .card h3 {
+            color: var(--text-primary);
+            font-size: 1.1em;
+            margin: 1em 0 0.5em 0;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--success);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5em 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: var(--text-secondary);
+        }
+
+        .info-value {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            background: var(--background);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1em;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            resize: vertical;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .button {
+            background: var(--primary);
+            color: var(--secondary);
+            border: none;
+            padding: 0.7em 1.5em;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 217, 255, 0.4);
+        }
+
+        .button:active {
+            transform: translateY(0);
+        }
+
+        .button-secondary {
+            background: var(--surface);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+
+        .button-danger {
+            background: var(--error);
+            color: white;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1em;
+            margin-top: 1em;
+        }
+
+        .file-list {
+            list-style: none;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8em;
+            margin: 0.5em 0;
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .file-item:hover {
+            border-color: var(--primary);
+            transform: translateX(5px);
+        }
+
+        .file-name {
+            color: var(--text-primary);
+        }
+
+        .file-size {
+            color: var(--text-secondary);
+            font-size: 0.9em;
+        }
+
+        .log-viewer {
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1em;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            line-height: 1.6;
+        }
+
+        .log-viewer::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .log-viewer::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        .success-message {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid var(--success);
+            color: var(--success);
+            padding: 1em;
+            border-radius: 8px;
+            margin-top: 1em;
+            display: none;
+        }
+
+        .error-message {
+            background: rgba(255, 51, 102, 0.1);
+            border: 1px solid var(--error);
+            color: var(--error);
+            padding: 1em;
+            border-radius: 8px;
+            margin-top: 1em;
+            display: none;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 1em;
+            margin-bottom: 1em;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .tab {
+            padding: 0.8em 1.5em;
+            background: transparent;
+            color: var(--text-secondary);
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.2s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 1em;
+            flex-wrap: wrap;
+        }
+
+        .quick-action {
+            padding: 0.6em 1.2em;
+            background: var(--surface);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .quick-action:hover {
+            background: var(--primary);
+            color: var(--secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <h1>📱 TANDRSocial Dashboard</h1>
+        <p class="subtitle">Social Media Content Management Control Panel</p>
+
+        <!-- Status Overview -->
+        <div class="grid">
+            <div class="card">
+                <h2><span class="status-dot"></span> System Status</h2>
+                <div id="systemStatus">
+                    <div class="info-row">
+                        <span class="info-label">Status:</span>
+                        <span class="info-value" id="botStatus">Loading...</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">LLM Provider:</span>
+                        <span class="info-value" id="llmProvider">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Model:</span>
+                        <span class="info-value" id="llmModel">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Conversations Today:</span>
+                        <span class="info-value" id="conversationsToday">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Knowledge Files:</span>
+                        <span class="info-value" id="knowledgeFiles">-</span>
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button class="button button-secondary" onclick="refreshStatus()">🔄 Refresh</button>
+                    <button class="button" onclick="reloadConfig()">⚡ Reload Config</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>⚡ Quick Actions</h2>
+                <div class="quick-actions">
+                    <button class="quick-action" onclick="openChat()">💬 Open Chat</button>
+                    <button class="quick-action" onclick="viewLogs()">📊 View Logs</button>
+                    <button class="quick-action" onclick="testAPI()">🧪 Test API</button>
+                    <button class="quick-action" onclick="clearLogs()">🗑️ Clear Logs</button>
+                </div>
+                <h3>Links</h3>
+                <div class="info-row">
+                    <span class="info-label">Chat UI:</span>
+                    <a href="index.html" target="_blank" style="color: var(--primary)">Open →</a>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">API Status:</span>
+                    <a href="api/bot.php?action=status" target="_blank" style="color: var(--primary)">Test →</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Tabs -->
+        <div class="card">
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('systemPrompt')">🤖 System Prompt</button>
+                <button class="tab" onclick="switchTab('knowledge')">📚 Knowledge Base</button>
+                <button class="tab" onclick="switchTab('conversations')">💬 Conversations</button>
+                <button class="tab" onclick="switchTab('facebook')">📘 Facebook Settings</button>
+                <button class="tab" onclick="switchTab('config')">⚙️ Configuration</button>
+            </div>
+
+            <!-- System Prompt Tab -->
+            <div id="systemPrompt" class="tab-content active">
+                <h3>Edit System Prompt</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1em;">
+                    This prompt defines the bot's personality and behavior. Changes take effect immediately after refresh.
+                </p>
+                <textarea id="promptEditor" placeholder="Loading..."></textarea>
+                <div class="button-group">
+                    <button class="button" onclick="saveSystemPrompt()">💾 Save Prompt</button>
+                    <button class="button button-secondary" onclick="loadSystemPrompt()">🔄 Reload</button>
+                    <button class="button button-danger" onclick="resetSystemPrompt()">↩️ Reset to Default</button>
+                </div>
+                <div id="promptSuccess" class="success-message"></div>
+                <div id="promptError" class="error-message"></div>
+            </div>
+
+            <!-- Knowledge Base Tab -->
+            <div id="knowledge" class="tab-content">
+                <h3>Knowledge Base Files</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1em;">
+                    Click a file to edit in MD Viewer integration (coming soon) or edit directly below.
+                </p>
+                <ul class="file-list" id="knowledgeFileList">
+                    <li>Loading...</li>
+                </ul>
+                <h3>Edit Selected File</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 0.5em;">
+                    Selected: <strong id="selectedFile">None</strong>
+                </p>
+                <textarea id="knowledgeEditor" placeholder="Select a file to edit..."></textarea>
+                <div class="button-group">
+                    <button class="button" onclick="saveKnowledgeFile()">💾 Save File</button>
+                    <button class="button button-secondary" onclick="refreshKnowledge()">🔄 Refresh List</button>
+                </div>
+                <div id="knowledgeSuccess" class="success-message"></div>
+                <div id="knowledgeError" class="error-message"></div>
+            </div>
+
+            <!-- Conversations Tab -->
+            <div id="conversations" class="tab-content">
+                <h3>Recent Conversations</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1em;">
+                    View recent chat logs and conversation history.
+                </p>
+                <div class="log-viewer" id="conversationsLog">
+                    Loading...
+                </div>
+                <div class="button-group">
+                    <button class="button button-secondary" onclick="refreshConversations()">🔄 Refresh</button>
+                    <button class="button button-secondary" onclick="viewSecurityLogs()">🔒 Security Logs</button>
+                    <button class="button button-secondary" onclick="viewErrorLogs()">⚠️ Error Logs</button>
+                </div>
+            </div>
+
+            <!-- Facebook Settings Tab -->
+            <div id="facebook" class="tab-content">
+                <h3>📘 Facebook Graph API Settings</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5em;">
+                    Configure your Facebook page connection. Use Graph Explorer for temporary tokens.
+                </p>
+
+                <!-- Current Settings Display -->
+                <div style="background: var(--background); padding: 1em; border-radius: 8px; margin-bottom: 1.5em;">
+                    <div class="info-row">
+                        <span class="info-label">Current Page ID:</span>
+                        <span class="info-value" id="currentPageId">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Token Status:</span>
+                        <span class="info-value" id="tokenStatus">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Token Expiry:</span>
+                        <span class="info-value" style="color: var(--warning);">~1-2 hours (Graph Explorer)</span>
+                    </div>
+                </div>
+
+                <!-- Update Settings Form -->
+                <div style="margin-bottom: 1.5em;">
+                    <label style="display: block; color: var(--text-primary); margin-bottom: 0.5em; font-weight: 600;">
+                        Facebook Page ID
+                    </label>
+                    <input
+                        type="text"
+                        id="pageIdInput"
+                        placeholder="562248976966814"
+                        style="width: 100%; padding: 0.8em; background: var(--background); border: 1px solid var(--border); border-radius: 6px; color: var(--text-primary); font-size: 1em; margin-bottom: 0.5em;"
+                    >
+                    <p style="color: var(--text-secondary); font-size: 0.9em; margin-bottom: 1.5em;">
+                        Find your Page ID: Go to your Facebook page → About → Page ID
+                    </p>
+
+                    <label style="display: block; color: var(--text-primary); margin-bottom: 0.5em; font-weight: 600;">
+                        Access Token
+                    </label>
+                    <div style="position: relative;">
+                        <input
+                            type="password"
+                            id="accessTokenInput"
+                            placeholder="EAAbc123..."
+                            style="width: 100%; padding: 0.8em; padding-right: 3em; background: var(--background); border: 1px solid var(--border); border-radius: 6px; color: var(--text-primary); font-size: 1em; margin-bottom: 0.5em;"
+                        >
+                        <button
+                            onclick="toggleTokenVisibility()"
+                            style="position: absolute; right: 0.5em; top: 0.8em; background: transparent; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1.2em;"
+                            title="Show/Hide Token"
+                        >
+                            👁️
+                        </button>
+                    </div>
+                    <p style="color: var(--text-secondary); font-size: 0.9em; margin-bottom: 0.5em;">
+                        <strong>⚠️ Use Graph Explorer tokens (expire in 1-2 hours)</strong>
+                    </p>
+                </div>
+
+                <!-- Graph Explorer Link -->
+                <div style="background: rgba(0, 217, 255, 0.1); border: 1px solid var(--primary); padding: 1em; border-radius: 8px; margin-bottom: 1.5em;">
+                    <h4 style="color: var(--primary); margin-bottom: 0.5em;">🔗 Get Token from Graph Explorer</h4>
+                    <ol style="color: var(--text-secondary); margin-left: 1.5em; line-height: 1.8;">
+                        <li>Open <a href="https://developers.facebook.com/tools/explorer/" target="_blank" style="color: var(--primary);">Facebook Graph Explorer</a></li>
+                        <li>Select your Facebook Page (T & R Builder LLC)</li>
+                        <li>Click "Generate Access Token"</li>
+                        <li>Add permissions:
+                            <ul style="margin-left: 1.5em; margin-top: 0.3em;">
+                                <li><code>pages_read_engagement</code></li>
+                                <li><code>pages_manage_posts</code></li>
+                                <li><code>read_insights</code></li>
+                            </ul>
+                        </li>
+                        <li>Copy the token and paste above</li>
+                    </ol>
+                    <p style="color: var(--warning); margin-top: 1em; font-weight: 600;">
+                        ⏰ Token expires in ~1-2 hours. Get a new one when needed!
+                    </p>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="button-group">
+                    <button class="button" onclick="saveFacebookSettings()">💾 Save Settings</button>
+                    <button class="button button-secondary" onclick="loadFacebookSettings()">🔄 Reload</button>
+                    <button class="button" onclick="testFacebookConnection()">🧪 Test Connection</button>
+                    <button class="button button-secondary" onclick="window.open('https://developers.facebook.com/tools/explorer/', '_blank')">🔗 Open Graph Explorer</button>
+                </div>
+                <div id="facebookSuccess" class="success-message"></div>
+                <div id="facebookError" class="error-message"></div>
+
+                <!-- Recent Activity -->
+                <div style="margin-top: 2em;">
+                    <h3>Recent Graph API Activity</h3>
+                    <div class="log-viewer" id="graphApiLog" style="max-height: 200px;">
+                        No recent activity
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configuration Tab -->
+            <div id="config" class="tab-content">
+                <h3>Configuration Settings</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1em;">
+                    Edit config.json settings. Be careful - invalid JSON will break the bot!
+                </p>
+                <textarea id="configEditor" style="min-height: 300px;" placeholder="Loading..."></textarea>
+                <div class="button-group">
+                    <button class="button" onclick="saveConfig()">💾 Save Config</button>
+                    <button class="button button-secondary" onclick="loadConfig()">🔄 Reload</button>
+                    <button class="button" onclick="validateConfig()">✓ Validate JSON</button>
+                </div>
+                <div id="configSuccess" class="success-message"></div>
+                <div id="configError" class="error-message"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API Base URL
+        const API_BASE = 'api/bot.php';
+
+        // Load status on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            refreshStatus();
+            loadSystemPrompt();
+            loadKnowledgeFiles();
+            loadConfig();
+            loadFacebookSettings();
+        });
+
+        // Tab switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+
+            // Load content when switching tabs
+            if (tabName === 'conversations') {
+                refreshConversations();
+            }
+        }
+
+        // Refresh system status
+        async function refreshStatus() {
+            try {
+                const response = await fetch(`${API_BASE}?action=status`);
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('botStatus').textContent = data.data.status;
+                    document.getElementById('llmProvider').textContent = data.data.llm.provider;
+                    document.getElementById('llmModel').textContent = data.data.llm.model;
+                    document.getElementById('conversationsToday').textContent = data.data.conversations.today;
+                    document.getElementById('knowledgeFiles').textContent = data.data.knowledge.files;
+                }
+            } catch (error) {
+                console.error('Failed to load status:', error);
+            }
+        }
+
+        // Reload configuration
+        async function reloadConfig() {
+            try {
+                const response = await fetch(`${API_BASE}?action=reload`, { method: 'POST' });
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('Configuration reloaded successfully!');
+                    refreshStatus();
+                } else {
+                    alert('Failed to reload: ' + data.error);
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        // Load system prompt
+        async function loadSystemPrompt() {
+            try {
+                const response = await fetch(`${API_BASE}?action=get_prompt`);
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('promptEditor').value = data.data.prompt;
+                }
+            } catch (error) {
+                console.error('Failed to load prompt:', error);
+            }
+        }
+
+        // Save system prompt
+        async function saveSystemPrompt() {
+            const prompt = document.getElementById('promptEditor').value;
+
+            try {
+                const response = await fetch(`${API_BASE}?action=update_prompt`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: prompt })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage('promptSuccess', 'System prompt saved successfully!');
+                } else {
+                    showMessage('promptError', 'Failed to save: ' + data.error);
+                }
+            } catch (error) {
+                showMessage('promptError', 'Error: ' + error.message);
+            }
+        }
+
+        // Reset system prompt
+        function resetSystemPrompt() {
+            if (confirm('Reset system prompt to default?')) {
+                document.getElementById('promptEditor').value = `You are the TANDRBuilder AI assistant, helping customers with their construction projects. You provide helpful, accurate information about TANDRBuilder's services based on the knowledge base provided. You are professional, friendly, and enthusiastic about construction.`;
+                saveSystemPrompt();
+            }
+        }
+
+        // Load knowledge files
+        async function loadKnowledgeFiles() {
+            try {
+                const response = await fetch(`${API_BASE}?action=knowledge`);
+                const data = await response.json();
+
+                if (data.success) {
+                    const fileList = document.getElementById('knowledgeFileList');
+                    fileList.innerHTML = '';
+
+                    data.data.files.forEach(file => {
+                        const li = document.createElement('li');
+                        li.className = 'file-item';
+                        li.onclick = () => loadKnowledgeFile(file.name);
+
+                        li.innerHTML = `
+                            <span class="file-name">📄 ${file.name}</span>
+                            <span class="file-size">${(file.size / 1024).toFixed(1)} KB</span>
+                        `;
+
+                        fileList.appendChild(li);
+                    });
+                }
+            } catch (error) {
+                console.error('Failed to load knowledge files:', error);
+            }
+        }
+
+        // Load specific knowledge file
+        async function loadKnowledgeFile(filename) {
+            try {
+                const response = await fetch(`${API_BASE}?action=get_knowledge&file=${filename}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('selectedFile').textContent = filename;
+                    document.getElementById('knowledgeEditor').value = data.data.content;
+                    document.getElementById('knowledgeEditor').dataset.filename = filename;
+                }
+            } catch (error) {
+                showMessage('knowledgeError', 'Error loading file: ' + error.message);
+            }
+        }
+
+        // Save knowledge file
+        async function saveKnowledgeFile() {
+            const filename = document.getElementById('knowledgeEditor').dataset.filename;
+            const content = document.getElementById('knowledgeEditor').value;
+
+            if (!filename) {
+                showMessage('knowledgeError', 'No file selected!');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}?action=update_knowledge`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ file: filename, content: content })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage('knowledgeSuccess', 'Knowledge file saved successfully!');
+                    loadKnowledgeFiles();
+                } else {
+                    showMessage('knowledgeError', 'Failed to save: ' + data.error);
+                }
+            } catch (error) {
+                showMessage('knowledgeError', 'Error: ' + error.message);
+            }
+        }
+
+        // Refresh knowledge list
+        function refreshKnowledge() {
+            loadKnowledgeFiles();
+        }
+
+        // Load conversations log
+        async function refreshConversations() {
+            try {
+                const response = await fetch(`${API_BASE}?action=get_logs&type=conversations`);
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('conversationsLog').textContent = data.data.content || 'No conversations yet.';
+                }
+            } catch (error) {
+                document.getElementById('conversationsLog').textContent = 'Error loading logs: ' + error.message;
+            }
+        }
+
+        // View security logs
+        async function viewSecurityLogs() {
+            try {
+                const response = await fetch(`${API_BASE}?action=get_logs&type=security`);
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('conversationsLog').textContent = data.data.content || 'No security logs.';
+                }
+            } catch (error) {
+                document.getElementById('conversationsLog').textContent = 'Error loading logs: ' + error.message;
+            }
+        }
+
+        // View error logs
+        async function viewErrorLogs() {
+            try {
+                const response = await fetch(`${API_BASE}?action=get_logs&type=errors`);
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('conversationsLog').textContent = data.data.content || 'No errors logged.';
+                }
+            } catch (error) {
+                document.getElementById('conversationsLog').textContent = 'Error loading logs: ' + error.message;
+            }
+        }
+
+        // Load config
+        async function loadConfig() {
+            try {
+                const response = await fetch(`${API_BASE}?action=get_config`);
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('configEditor').value = JSON.stringify(data.data.config, null, 2);
+                }
+            } catch (error) {
+                console.error('Failed to load config:', error);
+            }
+        }
+
+        // Save config
+        async function saveConfig() {
+            const configText = document.getElementById('configEditor').value;
+
+            try {
+                const config = JSON.parse(configText);
+
+                const response = await fetch(`${API_BASE}?action=update_config`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ config: config })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage('configSuccess', 'Configuration saved successfully!');
+                } else {
+                    showMessage('configError', 'Failed to save: ' + data.error);
+                }
+            } catch (error) {
+                showMessage('configError', 'Invalid JSON: ' + error.message);
+            }
+        }
+
+        // Validate config JSON
+        function validateConfig() {
+            const configText = document.getElementById('configEditor').value;
+
+            try {
+                JSON.parse(configText);
+                showMessage('configSuccess', 'JSON is valid!');
+            } catch (error) {
+                showMessage('configError', 'Invalid JSON: ' + error.message);
+            }
+        }
+
+        // Utility functions
+        function showMessage(elementId, message) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.style.display = 'block';
+
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 5000);
+        }
+
+        function openChat() {
+            window.open('index.html', '_blank');
+        }
+
+        function viewLogs() {
+            switchTab('conversations');
+            document.querySelectorAll('.tab')[2].click();
+        }
+
+        async function testAPI() {
+            const result = await fetch(`${API_BASE}?action=status`);
+            const data = await result.json();
+            alert(JSON.stringify(data, null, 2));
+        }
+
+        async function clearLogs() {
+            if (confirm('Clear all logs? This cannot be undone!')) {
+                // Implement log clearing
+                alert('Log clearing not yet implemented');
+            }
+        }
+
+        // Facebook Settings Functions
+        async function loadFacebookSettings() {
+            try {
+                const response = await fetch(`${API_BASE}?action=get_config`);
+                const data = await response.json();
+
+                if (data.success && data.data.facebook_graph_api) {
+                    const fbConfig = data.data.facebook_graph_api;
+
+                    // Update display
+                    document.getElementById('currentPageId').textContent = fbConfig.page_id || 'Not set';
+                    document.getElementById('tokenStatus').textContent = fbConfig.access_token && fbConfig.access_token.length > 20
+                        ? '✅ Token configured (' + fbConfig.access_token.substring(0, 10) + '...)'
+                        : '❌ No token';
+
+                    // Update inputs
+                    document.getElementById('pageIdInput').value = fbConfig.page_id || '';
+                    document.getElementById('accessTokenInput').value = fbConfig.access_token || '';
+                }
+            } catch (error) {
+                console.error('Error loading Facebook settings:', error);
+            }
+        }
+
+        async function saveFacebookSettings() {
+            try {
+                const pageId = document.getElementById('pageIdInput').value.trim();
+                const accessToken = document.getElementById('accessTokenInput').value.trim();
+
+                if (!pageId) {
+                    showMessage('facebookError', 'Please enter a Page ID');
+                    return;
+                }
+
+                if (!accessToken) {
+                    showMessage('facebookError', 'Please enter an Access Token');
+                    return;
+                }
+
+                // Update config
+                const response = await fetch(`${API_BASE}?action=get_config`);
+                const data = await response.json();
+
+                if (data.success) {
+                    const config = data.data;
+                    config.facebook_graph_api.page_id = pageId;
+                    config.facebook_graph_api.access_token = accessToken;
+
+                    const saveResponse = await fetch(`${API_BASE}?action=save_config`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ config })
+                    });
+
+                    const saveData = await saveResponse.json();
+
+                    if (saveData.success) {
+                        showMessage('facebookSuccess', '✅ Facebook settings saved! Token will expire in 1-2 hours.');
+                        loadFacebookSettings();
+                    } else {
+                        showMessage('facebookError', 'Failed to save: ' + saveData.error);
+                    }
+                }
+            } catch (error) {
+                showMessage('facebookError', 'Error: ' + error.message);
+            }
+        }
+
+        async function testFacebookConnection() {
+            try {
+                showMessage('facebookSuccess', '🔄 Testing connection...');
+
+                const response = await fetch('api/graph-api.php?test=graph');
+                const text = await response.text();
+
+                try {
+                    const data = JSON.parse(text);
+                    if (data.success) {
+                        showMessage('facebookSuccess', '✅ Connection successful! Token is valid.');
+                    } else {
+                        showMessage('facebookError', '❌ Connection failed: ' + (data.error || 'Unknown error'));
+                    }
+                } catch (e) {
+                    showMessage('facebookError', '❌ Connection failed. Check token and page ID.');
+                }
+            } catch (error) {
+                showMessage('facebookError', 'Error: ' + error.message);
+            }
+        }
+
+        function toggleTokenVisibility() {
+            const tokenInput = document.getElementById('accessTokenInput');
+            const button = event.target;
+
+            if (tokenInput.type === 'password') {
+                tokenInput.type = 'text';
+                button.textContent = '🙈';
+            } else {
+                tokenInput.type = 'password';
+                button.textContent = '👁️';
+            }
+        }
+    </script>
+</body>
+</html>

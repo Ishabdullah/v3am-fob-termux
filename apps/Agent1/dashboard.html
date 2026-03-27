@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Agent-Pack Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{--bg:#0f111a;--card:#1a1f2b;--text:#e8e8f0;--muted:#a6a6b3;--accent:#4cc9f0}
+    *{box-sizing:border-box} 
+    body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,Segoe UI,Arial,sans-serif}
+    header{padding:14px 20px;border-bottom:1px solid #2a2a2a;display:flex;align-items:center;gap:12px;position:sticky;top:0;background:#0b0b12;z-index:2}
+    h1{font-size:18px;margin:0}
+    .container{display:grid;grid-template-columns:1fr 420px;gap:14px;padding:14px}
+    .panel{background:var(--card);border-radius:8px;padding:14px;box-shadow:0 1px 0 rgba(255,255,255,.05)}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+    .card{border:1px solid #2a2a2a;border-radius:8px;padding:12px;background:#141824;min-height:110px}
+    .card h3{margin:0 0 6px 0;font-size:14px}
+    .tag{display:inline-block;background:#2b2f3a;color:#fff;font-size:11px;padding:2px 6px;border-radius:999px;margin-right:6px}
+    .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .btn{padding:6px 10px;border-radius:6px;border:1px solid #3a3a46;background:#2b2b38;color:#e8e8e8;cursor:pointer}
+    .btn.secondary{background:#1f1f2e}
+    .anchors{height:100%;overflow:auto}
+    pre{white-space:pre-wrap;background:#0e0f14;border-radius:6px;padding:8px;overflow:auto;border:1px solid #2a2a2a}
+    code{font-family: ui-monospace,SFMono-Regular,Monaco,Consolas,monospace}
+    .section{margin-bottom:12px}
+    @media (max-width: 980px){
+      .container{grid-template-columns:1fr}
+      .dashboard{flex-direction:column}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div style="display:flex;align-items:baseline;gap:8px">
+      <h1>Agent-Pack Dashboard</h1>
+      <span class="tag">Onboarding Map</span>
+    </div>
+    <div style="margin-left:auto;color:var(--muted);font-size:12px">Map-driven bootstrap for new agents</div>
+  </header>
+  <main class="container" aria-label="Agent-Pack dashboard">
+    <section class="panel" id="summary">
+      <div class="section"><strong>Scope</strong>: agent-pack root + upload subtree</div>
+      <div class="section"><strong>Cadence</strong>: working.md, current.md, PROMPT anchors</div>
+      <div class="section"><button class="btn" id="downloadJson">Download Heatmap JSON</button></div>
+      <div class="section" style="font-size:12px;color:#bbb;">Note: This is a lightweight, human-friendly dashboard for quick onboarding and maintenance tasks.</div>
+    </section>
+
+    <section class="panel dashboard" style="display:flex;flex-direction:column;gap:12px;min-height:420px">
+      <div class="section" style="font-weight:600">Nodes</div>
+      <div class="grid" id="nodesGrid"></div>
+    </section>
+
+    <section class="panel" style="min-height:420px">
+      <div class="section" style="font-weight:600;margin-bottom:6px">Anchor Preview</div>
+      <div id="anchorPreview" class="anchors" style="height:320px;border:1px solid #2a2a2a;border-radius:6px;padding:8px;background:#0b0b12"></div>
+    </section>
+  </main>
+
+  <script>
+    // Heatmap data (agent-pack scope) — manual snapshot to drive the dashboard.
+    const DATA = [
+      {
+        path: 'root',
+        label: 'agent-pack (root)',
+        hasWorking: true,
+        hasCurrent: true,
+        hasPromptLike: false,
+        primaryPromptRef: null,
+        excerpt: 'Root onboarding, links to upload prompt anchors, and three-file cadence.'
+      },
+      {
+        path: 'upload',
+        label: 'upload (Prompts)',
+        hasWorking: false,
+        hasCurrent: false,
+        hasPromptLike: true,
+        primaryPromptRef: 'OSS20B-SITEWEAVER-PROMPT.md',
+        excerpt: 'Major prompt families under upload (OSS20B-, LOG-TO-, CONTEXT-CHUNKING, SITEWEAVER-related, 3AI prompts).'
+      },
+      {
+        path: 'upload/siteweaver',
+        label: 'Site Weaver (SiteWeaver)',
+        hasWorking: false,
+        hasCurrent: false,
+        hasPromptLike: true,
+        primaryPromptRef: 'LOG-TO-SITEWEAVER-PROMPT.md',
+        excerpt: 'Site Weaver prompt anchors including LOG-TO-SITEWEAVER-PROMPT.md and CONTEXT-CHUNKING prompts.'
+      },
+      {
+        path: 'upload/3ai',
+        label: '3AI (Prompt Flows)',
+        hasWorking: false,
+        hasCurrent: false,
+        hasPromptLike: true,
+        primaryPromptRef: 'PROMPT-FLOW-MAP.md',
+        excerpt: '3AI prompt flow map and desktop prompts for routing/orchestration.'
+      },
+      {
+        path: 'upload/OSS20B-SITEWEAVER-PROMPT.md',
+        label: 'OSS20B-SITEWEAVER-PROMPT.md',
+        hasWorking: false,
+        hasCurrent: false,
+        hasPromptLike: true,
+        primaryPromptRef: 'OSS20B-SITEWEAVER-PROMPT.md',
+        excerpt: 'OSS20B: NO-TOOLS prompt rules for site generation.'
+      },
+      {
+        path: 'upload/LOG-TO-SITEWEAVER-PROMPT.md',
+        label: 'LOG-TO-SITEWEAVER-PROMPT.md',
+        hasWorking: false,
+        hasCurrent: false,
+        hasPromptLike: true,
+        primaryPromptRef: 'LOG-TO-SITEWEAVER-PROMPT.md',
+        excerpt: 'Site Weaver fragment generation flow and HTML fragment guidance.'
+      },
+      {
+        path: 'upload/siteweaver/prompt-excerpts',
+        label: 'SiteWeaver Anchor Excerpts',
+        hasWorking: false,
+        hasCurrent: false,
+        hasPromptLike: true,
+        primaryPromptRef: null,
+        excerpt: 'Embedded excerpts from LOG-TO-SITEWEAVER-PROMPT.md and CONTEXT-CHUNKING-PROMPT.md.'
+      }
+    ];
+
+    // Populate nodes
+    const grid = document.getElementById('nodesGrid');
+    DATA.forEach((n,i)=>{
+      const c = document.createElement('div'); c.className='card';
+      c.innerHTML = `
+        <div style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${n.label}</div>
+        <div class="row" style="margin-top:6px;gap:6px;flex-wrap:wrap">
+          <span class="tag">Working: ${n.hasWorking ? 'Yes' : 'No'}</span>
+          <span class="tag">Current: ${n.hasCurrent ? 'Yes' : 'No'}</span>
+          <span class="tag">Prompts: ${n.hasPromptLike ? 'Present' : 'None'}</span>
+        </div>
+        <div style="font-size:12px;color:#bbb;margin-top:6px">${n.excerpt}</div>
+      `;
+      c.style.cursor='pointer';
+      c.addEventListener('click',()=>showAnchor(n));
+      grid.appendChild(c);
+    });
+
+    function showAnchor(n){
+      const panel = document.getElementById('anchorPreview');
+      // Lightweight previews for known anchors
+      const map = {
+        'root': `PROMPT ANCHOR: Agent-Pack Onboarding
+${""}This root anchor provides breadcrumbs and a high-level map for onboarding any agent entering the agent-pack workspace. It links to the primary prompt guidance scattered under the upload subtree and establishes a consistent three-file cadence (working.md, current.md, and a prompt anchor) as the baseline for navigation.
+
+Scope and breadcrumbs:
+- Base: D:\\01V3AM_aistart\\COMMAND-CENTER\\apps\\agent-pack
+- Source of truth prompts: D:\\01V3AM_aistart\\COMMAND-CENTER\\apps\\agent-pack\\upload
+- Primary prompt anchors exist in SITEWEAVER and 3AI subsystems, plus OSS20B prompts under the Site Weaver ecosystem
+
+Incorporated prompt cues from existing files:
+> You MUST create HTML FRAGMENTS, not full documents. (From LOG-TO-SITEWEAVER-PROMPT.md)
+> I need you to convert a large piece of content (chat log, document, research notes, etc.) into a structured website suitable for the 3AI Desktop Site Weaver system. (From CONTEXT-CHUNKING-PROMPT.md)
+> The 3AI Desktop is a multi-layer prompt orchestration system... (From 3AI-DESKTOP-PROMPT-FLOW-MAP.md)
+> IMPORTANT: You do NOT have access to web search, browser tools, or external APIs. You must generate all content directly from your training data... (From OSS20B-SITEWEAVER-PROMPT.md)
+
+Next steps:
+- Add PROMPT.md anchors into major subdirectories under upload (SITEWEAVER, 3AI, OSS20B) and in the root
+- Create lightweight scaffolds for directories missing working.md/current.md if they represent functional subsystems
+- Generate a machine-friendly heatmap (JSON) describing presence/absence of the trio and primary anchors`,
+        'upload': `PROMPT ANCHOR: Upload Subtree
+
+This anchor maps major prompt families under agent-pack/upload.
+
+Primary prompt families present: OSS20B-SITEWEAVER-PROMPT.md, LOG-TO-SITEWEAVER-PROMPT.md, CONTEXT-CHUNKING-PROMPT.md, CONTEXT-CHUNKING-QUICK-REFERENCE.md, CONTEXT-CHUNKING-EXAMPLE.md, SITEWEAVER-related prompts, 3AI prompt maps (PROMPT-FLOW-MAP.md, PROMPT_GUIDE_DESIGN.md).`,
+        'Site Weaver (SiteWeaver)': `PROMPT ANCHOR: Site Weaver
+
+Scope: Site Weaver prompt guidance for building Site Weaver pages from logs/docs.
+Primary prompts anchored: LOG-TO-SITEWEAVER-PROMPT.md, CONTEXT-CHUNKING-PROMPT.md, CONTEXT-CHUNKING-QUICK-REFERENCE.md, CONTEXT-CHUNKING-EXAMPLE.md`,
+        '3AI (Prompt Flows)': `PROMPT ANCHOR: 3AI Prompts
+Scope: 3AI Desktop prompts and flow maps for routing.
+Primary anchors: PROMPT-FLOW-MAP.md, 3AI-DESKTOP-PROMPT-FLOW-MAP.md, 3AI-DESKTOP-USER-PROMPT-GUIDE.md`,
+        'OSS20B-SITEWEAVER-PROMPT.md': `OSS20B Site Weaver Prompt
+Excerpt: You MUST create HTML FRAGMENTS, not full documents.`,
+        'LOG-TO-SITEWEAVER-PROMPT.md': `LOG-TO-SITEWEAVER-PROMPT.md excerpt: HTML fragments, not full documents.`,
+        'PROMPT-FLOW-MAP.md (3AI)': `PROMPT-FLOW-MAP.md excerpt: Level 4: AI Provider Selection (Fallback Chain).`
+      };
+      panel.innerHTML = `<pre>${map[n.path] ?? (n.excerpt)}</pre>`;
+    }
+
+    // Download heatmap JSON
+    document.getElementById('downloadJson').addEventListener('click', ()=>{
+      const heat = {generatedAt: new Date().toISOString(), entries: DATA};
+      const blob = new Blob([JSON.stringify(heat, null, 2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'dashboard_heatmap.json';
+      document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    });
+
+    // Initialize preview with root
+    showAnchor(DATA[0]);
+  </script>
+</body>
+</html>

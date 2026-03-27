@@ -1,0 +1,204 @@
+{
+    "_meta": {
+        "name": "Agent Tools Configuration",
+        "version": "1.0.0",
+        "description": "Tools available to the agent for execution"
+    },
+    "tools": {
+        "web_search": {
+            "name": "Web Search",
+            "description": "Search the web using Google Custom Search (requires cx in config.json)",
+            "type": "internal",
+            "enabled": true,
+            "handler": "web_search",
+            "parameters": {
+                "query": {
+                    "type": "string",
+                    "required": true,
+                    "description": "Search query"
+                }
+            }
+        },
+        "http_get": {
+            "name": "HTTP GET",
+            "description": "Make an HTTP GET request to a URL",
+            "type": "internal",
+            "enabled": true,
+            "handler": "http_get",
+            "parameters": {
+                "url": {
+                    "type": "string",
+                    "required": true,
+                    "description": "URL to fetch"
+                }
+            }
+        },
+        "calculate": {
+            "name": "Calculator",
+            "description": "Perform mathematical calculations",
+            "type": "internal",
+            "enabled": true,
+            "handler": "calculate",
+            "parameters": {
+                "expression": {
+                    "type": "string",
+                    "required": true,
+                    "description": "Math expression to evaluate"
+                }
+            }
+        },
+        "datetime": {
+            "name": "Date\/Time",
+            "description": "Get current date and time information",
+            "type": "internal",
+            "enabled": true,
+            "handler": "datetime",
+            "parameters": {
+                "format": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Date format (default: Y-m-d H:i:s)"
+                },
+                "timezone": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Timezone (default: UTC)"
+                }
+            }
+        },
+        "shell_command": {
+            "name": "Shell Command",
+            "description": "Execute any shell command without restrictions",
+            "type": "internal",
+            "enabled": true,
+            "parameters": {
+                "command": {
+                    "type": "string",
+                    "required": true,
+                    "description": "Command to execute (full access - use with care)"
+                }
+            },
+            "handler": "shell_command"
+        },
+        "bab_api": {
+            "name": "BuildingABot API",
+            "description": "Manage files on buildingabot.com. Actions: mkdir (create dir), write (create\/update file), list (list files), read (read file). All paths under \/workspace\/sites\/",
+            "type": "internal",
+            "enabled": true,
+            "handler": "bab_api",
+            "parameters": {
+                "action": {
+                    "type": "string",
+                    "required": true,
+                    "description": "mkdir | write | list | read"
+                },
+                "path": {
+                    "type": "string",
+                    "required": true,
+                    "description": "Path like \/workspace\/sites\/mysite\/pages\/home.html"
+                },
+                "content": {
+                    "type": "string",
+                    "required": false,
+                    "description": "File content (for write action)"
+                }
+            }
+        },
+        "atlas_controller": {
+            "name": "Atlas Controller",
+            "description": "Master verification and routing system. Verify file integrity, service health, and escalate decisions to Claude Opus",
+            "type": "internal",
+            "enabled": true,
+            "handler": "http_get",
+            "parameters": {
+                "action": {
+                    "type": "string",
+                    "required": true,
+                    "description": "health | status | verify | checksum | scan-prompts | index1 | index2 | escalate"
+                },
+                "url": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Service URL to verify (for verify action)"
+                },
+                "filePath": {
+                    "type": "string",
+                    "required": false,
+                    "description": "File path to check (for checksum action)"
+                },
+                "context": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Context for escalation (for escalate action)"
+                }
+            }
+        },
+        "prompt_guide": {
+            "name": "Prompt Guide",
+            "description": "Access and manage the Prompt Library. View categories, search prompts, get prompt details, and understand routing by user domain",
+            "type": "internal",
+            "enabled": true,
+            "handler": "http_get",
+            "parameters": {
+                "action": {
+                    "type": "string",
+                    "required": true,
+                    "description": "categories | search | get | routing | create | list-all"
+                },
+                "query": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Search query or prompt name"
+                },
+                "category": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Category name (operation, educational, interactive, content-creation, analysis-strategy, creative-artistic, search-discovery)"
+                },
+                "user": {
+                    "type": "string",
+                    "required": false,
+                    "description": "User for domain routing (jerry, randy, tommy)"
+                }
+            }
+        },
+        "test_agent": {
+            "name": "Test Agent Tool",
+            "description": "Autonomous test tool created by TANDRCRM to verify tool creation workflow and system\n  integration.",
+            "type": "internal",
+            "enabled": true,
+            "parameters": {
+                "path": {
+                    "type": "string",
+                    "required": true,
+                    "description": "Path to read from TestAgent documentation"
+                }
+            },
+            "handler": "read_file"
+        },
+        "create_tool_files": {
+            "name": "Create Tool Files",
+            "description": "Create a new tool directory with BOOT.md and index.md in ADIR Hub TOOLS folder",
+            "type": "internal",
+            "enabled": true,
+            "parameters": {
+                "tool_name": {
+                    "type": "string",
+                    "required": true,
+                    "description": "Name of the new tool (e.g., MyTool)"
+                },
+                "description": {
+                    "type": "string",
+                    "required": true,
+                    "description": "What the tool does"
+                },
+                "content": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Custom BOOT.md content (optional)"
+                }
+            },
+            "handler": "create_tool_files"
+        }
+    }
+}

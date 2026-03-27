@@ -1,0 +1,317 @@
+# ADIR EXAMPLES - Real Scenarios
+
+**Purpose**: See Adir in action
+**Read After**: 03_WORKFLOW.txt
+
+---
+
+## SCENARIO 1: Agent Enters Unorganized Drive for First Time
+
+### Agent arrives, sees directory
+```
+C:\MyDrive\
+  (no adir/ yet)
+```
+
+### Agent's actions:
+```
+Step 1: Create adir/
+  mkdir adir
+  mkdir adir/05_TEMPLATES
+  mkdir adir/LOGS
+  touch adir/LOGS/action_log.txt
+
+Step 2: Copy files (you provide these)
+  Copy 01_README.txt to adir/
+  Copy 02_STRUCTURE.txt to adir/
+  Copy 03_WORKFLOW.txt to adir/
+  Copy 04_EXAMPLES.txt to adir/
+  Copy entire 05_TEMPLATES/ folder to adir/
+
+Step 3: Read instructions
+  Read adir/01_README.txt
+  Read adir/02_STRUCTURE.txt
+  Read adir/03_WORKFLOW.txt
+  Read adir/04_EXAMPLES.txt
+
+Step 4: Copy first coordination file
+  Copy 05_TEMPLATES/CURRENT.txt → adir/CURRENT.txt
+  Edit with initial tasks
+
+Step 5: Start working
+  Read adir/CURRENT.txt
+  Begin work
+  Update files as you go
+  Log actions
+```
+
+---
+
+## SCENARIO 2: Agent Navigates to New Directory
+
+### Agent is working in C:\MyDrive\adir\
+```
+Working on tasks, updating CURRENT.txt, etc.
+Decides: "I need to check /Projects/Backend/"
+```
+
+### Agent navigates:
+```
+Step 1: Go to new directory
+  cd /Projects/Backend/
+
+Step 2: Check for adir/
+  ls
+  No adir/ found
+
+Step 3: Create adir/ here
+  mkdir adir
+  mkdir adir/05_TEMPLATES
+  mkdir adir/LOGS
+  touch adir/LOGS/action_log.txt
+
+Step 4: Copy from root
+  Copy 01-04 files from C:\MyDrive\adir\ to here
+  Copy 05_TEMPLATES/ from C:\MyDrive\adir\ to here
+
+Step 5: Copy first coordination file
+  Copy 05_TEMPLATES/CURRENT.txt → adir/CURRENT.txt
+
+Step 6: Start working in this directory
+  Read adir/CURRENT.txt for this directory's tasks
+  Work independently here
+```
+
+### Result:
+```
+C:\MyDrive\
+├── adir/                     ← Root (master log grows)
+└── Projects/
+    └── Backend/
+        └── adir/             ← NEW: Fresh coordination center
+```
+
+Both adir/ instances exist independently but log everything.
+
+---
+
+## SCENARIO 3: Agent Gets Interrupted and Returns
+
+### Before interruption:
+```
+Agent is working on Task X
+Status: 60% complete
+Last action logged: 14:30 Started writing tests
+```
+
+### Agent gets interrupted, restarts:
+
+```
+Step 1: Re-enter directory
+  cd /Projects/Backend/
+
+Step 2: Read SESSION.txt first
+  Opens adir/SESSION.txt
+  Sees: "Working on Task X, 60% complete, tests half-done"
+
+Step 3: Read CURRENT.txt
+  Sees: Task X marked [in progress], 60%
+
+Step 4: Read WORKING.txt
+  Sees: Technical decisions made, architecture notes
+
+Step 5: Read LOGS/action_log.txt
+  Sees last 3 actions:
+    14:15 Started writing tests
+    14:20 Wrote test cases 1-5
+    14:30 Session interrupted
+
+Step 6: Resume
+  Knows exactly where to pick up
+  No lost context
+  No re-reading of unrelated files
+```
+
+Result: Instant recovery, full context.
+
+---
+
+## SCENARIO 4: Agent Coordination (Wheel Protocol)
+
+### Two agents working on same project
+
+#### Agent1 finishes a task:
+```
+Opens: adir/FEED.txt
+Adds: [Agent1] Completed: API endpoints. Next: Unit tests. For: Agent2.
+```
+
+#### Agent2 arrives:
+```
+Opens: adir/FEED.txt
+Reads: [Agent1] Completed: API endpoints. Next: Unit tests. For: Agent2.
+Knows: Task handed off, tests needed
+Opens: adir/CURRENT.txt
+Adds to IMMEDIATE: "[ ] Write unit tests for API"
+Adds to log: [YYYY-MM-DD HH:MM] Agent2 Claimed unit test task
+```
+
+#### Agent2 finishes:
+```
+Opens: adir/CURRENT.txt
+Marks tests complete [x]
+Opens: adir/FEED.txt
+Adds: [Agent2] Completed: Unit tests. Next: Integration tests. For: Agent3.
+```
+
+Result: Clear hand-off, no context lost, each agent knows what's next.
+
+---
+
+## SCENARIO 5: Read-Only Agent (Can Still Navigate)
+
+### Agent has read-only access
+```
+Can: Read all adir/ files
+Can: Understand task structure
+Can: Understand project context
+Can: Navigate existing paths
+Can't: Create new adir/ directories
+Can't: Update files
+```
+
+### Read-only workflow:
+```
+Step 1: Navigate to C:\MyDrive\
+Step 2: Read adir/CURRENT.txt → Sees all tasks
+Step 3: Read adir/WORKING.txt → Understands context
+Step 4: Read adir/FEED.txt → Sees messages
+Step 5: Read adir/LOGS/action_log.txt → Understands history
+Step 6: Reports findings (via external channel)
+
+Result: Can understand entire project state
+        Can navigate without building new stops
+        Can contribute through documented insights
+```
+
+This is useful for:
+- Read-only access to analyze projects
+- Agents that can research but not change state
+- External audits of project status
+
+---
+
+## SCENARIO 6: Building a Map Over Time
+
+### Day 1 - Agent starts at root
+```
+C:\
+└── adir/
+```
+Logs 10 actions about setting up.
+
+### Day 2 - Agent explores /Projects/
+```
+C:\
+├── adir/               ← Updated with Day 1 actions
+└── Projects/
+    └── adir/           ← NEW
+```
+Creates new coordination.
+Logs 5 actions about Project setup.
+
+### Day 3 - Agent explores /Data/Exports/
+```
+C:\
+├── adir/               ← Master log grows
+├── Projects/
+│   └── adir/
+└── Data/
+    └── Exports/
+        └── adir/       ← NEW
+```
+Creates new coordination.
+Logs 3 actions about data exploration.
+
+### Final Result:
+```
+Master action_log.txt at root shows full journey:
+[02:01 09:00] Agent1 Started session
+[02:01 10:00] Agent1 Created adir/ at root
+[02:01 14:00] Agent1 Navigated to Projects/
+[02:01 14:05] Agent1 Created adir/ in Projects/
+[02:01 15:30] Agent1 Completed project analysis
+[02:02 09:00] Agent1 Started new session
+[02:02 10:00] Agent1 Navigated to Data/Exports/
+[02:02 10:05] Agent1 Created adir/ in Data/Exports/
+[02:02 12:00] Agent1 Completed data review
+```
+
+The log tells the complete story of drive exploration.
+```
+
+---
+
+## 🎯 KEY PATTERNS
+
+### Pattern 1: New Directory
+```
+1. Check for adir/
+2. If not found → Create it
+3. Copy 01-04 files
+4. Copy 05_TEMPLATES/
+5. Create coordination files from templates
+6. Start working
+```
+
+### Pattern 2: Returning to Known Directory
+```
+1. Read CURRENT.txt
+2. Read WORKING.txt
+3. Read SESSION.txt (if exists)
+4. Resume work
+```
+
+### Pattern 3: Agent Handoff
+```
+Agent1:
+  Update CURRENT.txt
+  Post in FEED.txt: [Agent1] Completed: X. Next: Y. For: Agent2.
+  Update SESSION.txt
+
+Agent2:
+  Read FEED.txt
+  See handoff message
+  Read SESSION.txt for context
+  Continue from where Agent1 left
+```
+
+### Pattern 4: Read-Only Access
+```
+1. Navigate to any directory with adir/
+2. Read all coordination files
+3. Understand entire project state
+4. Can't update, but can report findings
+```
+
+---
+
+## 💡 SUCCESS TIPS
+
+✅ Always read files in ARRIVAL order
+✅ Update CURRENT.txt every time tasks change
+✅ Keep FEED.txt entries short and clear
+✅ Log every action with timestamps
+✅ Use SESSION.txt for complex projects
+✅ Don't skip LOGS/action_log.txt for recovery
+
+---
+
+*Examples complete. You now understand Adir!*
+
+Next steps:
+1. Go back to root
+2. Check if CURRENT.txt exists
+3. If not, copy from 05_TEMPLATES/CURRENT.txt
+4. Read your CURRENT.txt
+5. Start working!

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Image Analysis Diagnostics</title>
+    <style>
+        body {
+            font-family: monospace;
+            background: #1a1a2e;
+            color: #eee;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .card {
+            background: #16213e;
+            border: 1px solid #333;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+        h1 { color: #e94560; }
+        h2 { color: #fbbf24; margin-top: 25px; }
+        .ok { color: #4ade80; }
+        .warning { color: #fbbf24; }
+        .error { color: #ef4444; }
+        .info { color: #aaa; }
+        pre {
+            background: #0f3460;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        button {
+            padding: 10px 20px;
+            background: #e94560;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-family: monospace;
+        }
+        button:hover { background: #ff6b6b; }
+        .metric {
+            margin: 10px 0;
+            padding: 10px;
+            border-left: 3px solid #666;
+        }
+        .metric.ok { border-left-color: #4ade80; }
+        .metric.warning { border-left-color: #fbbf24; }
+        .metric.error { border-left-color: #ef4444; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Image Analysis Diagnostics</h1>
+
+    <div class="card">
+        <h2>Quick Checks</h2>
+        <button onclick="checkDiagnostics()">📊 Get PHP Limits</button>
+        <button onclick="testUploadSize()">📤 Test Upload (small)</button>
+        <button onclick="testUploadLarge()">🔥 Test Upload (large)</button>
+        <button onclick="clearLogs()">🗑️ Clear Logs</button>
+        <span id="loading" style="display:none; color: #aaa; margin-left: 10px;">Loading...</span>
+    </div>
+
+    <div class="card">
+        <h2>PHP Configuration</h2>
+        <div id="php-config"></div>
+    </div>
+
+    <div class="card">
+        <h2>Upload Log (last 10 entries)</h2>
+        <pre id="upload-log"><span class="info">No logs yet</span></pre>
+    </div>
+
+    <div class="card">
+        <h2>Debug Log (last 10 entries)</h2>
+        <pre id="debug-log"><span class="info">No logs yet</span></pre>
+    </div>
+
+    <div class="card">
+        <h2>Troubleshooting Guide</h2>
+        <ul>
+            <li><strong>post_max_size error:</strong> Your image + overhead exceeds the limit. Increase in php.ini or use smaller image.</li>
+            <li><strong>Connection refused:</strong> PHP process crashed. Check upload log for errors.</li>
+            <li><strong>Connection reset:</strong> Request was too large or took too long. Check file size < post_max_size.</li>
+            <li><strong>Memory exhausted:</strong> Increase memory_limit in php.ini to 512M or 1G.</li>
+            <li><strong>Timeout:</strong> Increase max_execution_time to 360+ seconds.</li>
+        </ul>
+    </div>
+
+    <script>
+        let API_BASE = '/api/agent.php';
+
+        // Auto-detect correct API path
+        if (window.location.pathname.includes('/agent/')) {
+            let match = window.location.pathname.match(/.*\/agent\//);
+            if (match) {
+                API_BASE = match[0] + 'api/agent.php';
+            }
+        }
+
+        console.log('API_BASE:', API_BASE);
+
+        async function checkDiagnostics() {
+            document.getElementById('loading').style.display = 'inline';
+            try {
+                const response = await fetch(API_BASE + '?action=diagnostics');
+                const data = await response.json();
+                displayDiagnostics(data);
+                loadLogs();
+            } catch (e) {
+                document.getElementById('php-config').innerHTML =
+                    '<div class="error">❌ Failed to fetch: ' + e.message + '</div>';
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        function displayDiagnostics(data) {
+            let html = '<div>';
+
+            // PHP Version
+            html += '<div class="metric ok"><strong>PHP Version:</strong> ' + data.php_version + '</div>';
+
+            // Memory
+            const memLimit = data.limits.memory_limit;
+            const memClass = memLimit && memLimit.includes('M') && parseInt(memLimit) >= 256 ? 'ok' : 'warning';
+            html += '<div class="metric ' + memClass + '"><strong>Memory:</strong> ' + memLimit + '</div>';
+
+            // POST max
+            const postMax = data.limits.post_max_size;
+            const postClass = postMax && postMax.includes('M') && parseInt(postMax) >= 10 ? 'ok' : 'error';
+            html += '<div class="metric ' + postClass + '"><strong>POST Max:</strong> ' + postMax + ' (images must fit in this)</div>';
+
+            // Upload max
+            const uploadMax = data.limits.upload_max_filesize;
+            const uploadClass = uploadMax && uploadMax.includes('M') && parseInt(uploadMax) >= 10 ? 'ok' : 'error';
+            html += '<div class="metric ' + uploadClass + '"><strong>Upload Max:</strong> ' + uploadMax + '</div>';
+
+            // Timeouts
+            const maxExec = parseInt(data.limits.max_execution_time);
+            const execClass = maxExec >= 300 ? 'ok' : 'warning';
+            html += '<div class="metric ' + execClass + '"><strong>Max Execution:</strong> ' + data.limits.max_execution_time + 's (should be 300+)</div>';
+
+            // SAPI
+            html += '<div class="metric"><strong>PHP SAPI:</strong> ' + data.server.php_sapi + '</div>';
+
+            // Content
+            if (data.server.content_length) {
+                const contentMB = (data.server.content_length / (1024*1024)).toFixed(1);
+                html += '<div class="metric"><strong>Current Request Size:</strong> ' + contentMB + 'MB</div>';
+            }
+
+            html += '</div>';
+            document.getElementById('php-config').innerHTML = html;
+        }
+
+        function loadLogs() {
+            fetch(API_BASE + '?action=diagnostics')
+                .then(r => r.json())
+                .then(data => {
+                    const uploadLog = data.log_samples.upload_log || [];
+                    const debugLog = data.log_samples.debug_log || [];
+
+                    document.getElementById('upload-log').innerHTML =
+                        uploadLog.length > 0
+                            ? uploadLog.map(l => l.trim()).join('\n')
+                            : '<span class="info">No upload logs yet</span>';
+
+                    document.getElementById('debug-log').innerHTML =
+                        debugLog.length > 0
+                            ? debugLog.map(l => l.trim()).join('\n')
+                            : '<span class="info">No debug logs yet</span>';
+                });
+        }
+
+        async function testUploadSize() {
+            // Create a 1MB test file
+            const testData = new Uint8Array(1024 * 1024).fill(255);
+            const blob = new Blob([testData], { type: 'image/jpeg' });
+            const reader = new FileReader();
+            reader.onload = () => {
+                sendTestUpload('test_small_1mb.jpg', reader.result);
+            };
+            reader.readAsDataURL(blob);
+        }
+
+        async function testUploadLarge() {
+            // Create a 5MB test file
+            const testData = new Uint8Array(5 * 1024 * 1024).fill(255);
+            const blob = new Blob([testData], { type: 'image/jpeg' });
+            const reader = new FileReader();
+            reader.onload = () => {
+                sendTestUpload('test_large_5mb.jpg', reader.result);
+            };
+            reader.readAsDataURL(blob);
+        }
+
+        async function sendTestUpload(filename, base64Data) {
+            document.getElementById('loading').style.display = 'inline';
+            try {
+                const payload = {
+                    filename: filename,
+                    location: 'upload',
+                    type: 'image/jpeg',
+                    data: base64Data.split(',')[1],
+                    isBase64: true
+                };
+
+                const sizeMB = (payload.data.length / (1024*1024)).toFixed(1);
+                console.log('Uploading ' + sizeMB + 'MB test file...');
+
+                const response = await fetch(API_BASE + '?action=upload', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    alert('✅ Upload succeeded! ' + sizeMB + 'MB uploaded OK');
+                } else {
+                    alert('❌ Upload failed: ' + data.error);
+                }
+                loadLogs();
+            } catch (e) {
+                alert('❌ Error: ' + e.message);
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        async function clearLogs() {
+            if (!confirm('Clear all logs?')) return;
+            // Would need a PHP endpoint to clear - for now just refresh
+            fetch(API_BASE + '?action=clear')
+                .then(() => { loadLogs(); alert('Logs cleared'); })
+                .catch(e => alert('Error: ' + e.message));
+        }
+
+        // Auto-load diagnostics on page load
+        window.addEventListener('load', () => {
+            checkDiagnostics();
+        });
+    </script>
+</body>
+</html>

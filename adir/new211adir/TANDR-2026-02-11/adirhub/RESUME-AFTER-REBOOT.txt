@@ -1,0 +1,171 @@
+═══════════════════════════════════════════════════════════════════════════════
+                       RESUME WORK AFTER REBOOT GUIDE
+═══════════════════════════════════════════════════════════════════════════════
+
+Last Updated: 2026-02-15 23:40 UTC
+Session Status: ✅ COMPLETE - READY FOR REBOOT
+System Status: ✅ 10/13 SERVICES OPERATIONAL
+
+───────────────────────────────────────────────────────────────────────────────
+STEP 1: READ THESE FILES FIRST (IN ORDER)
+───────────────────────────────────────────────────────────────────────────────
+
+1. SESSION-2026-02-15-FINAL.md
+   └─ What was accomplished, current state, and next steps
+
+2. CLAUDE-CONTEXT-2026-02-15.md
+   └─ Context for Claude Code to understand the system
+
+3. SANITY-CHECK-2026-02-15.md
+   └─ Verified current system status (what's running/offline)
+
+───────────────────────────────────────────────────────────────────────────────
+STEP 2: VERIFY SYSTEM IS RUNNING (Paste these commands)
+───────────────────────────────────────────────────────────────────────────────
+
+Check TANDRmgr (central orchestrator - port 8085):
+curl -X POST "http://127.0.0.1:8085/api/mgr.php" -H "Content-Type: application/json" -d '{"action":"status"}'
+
+Check all services:
+curl -s "http://127.0.0.1:9303/api/adir-api.php?action=check_status"
+
+Check Jerry's Agent (9200):
+curl -s "http://127.0.0.1:9200/agent/api/agent.php?action=status"
+
+───────────────────────────────────────────────────────────────────────────────
+STEP 3: FOLLOW NEXT STEPS (From SESSION-2026-02-15-FINAL.md)
+───────────────────────────────────────────────────────────────────────────────
+
+PRIORITY 1 (TODAY):
+□ Contact Jerry Agent (9200) for system validation
+□ Ask: Does TANDRmgr chat interface work? http://127.0.0.1:8085/
+□ Get his feedback on what's missing
+
+PRIORITY 2 (THIS WEEK):
+□ Expand TANDRmgr BOOT.md (currently only 2 lines)
+□ Test chat interface relay functionality
+□ Update ADIR Hub sidebar with agent links
+
+PRIORITY 3 (LATER THIS WEEK):
+□ Prepare for Randy/Tommy agent deployment
+□ Monitor error logs
+□ Update service docs as needed
+
+───────────────────────────────────────────────────────────────────────────────
+QUICK REFERENCE: SYSTEM LAYOUT
+───────────────────────────────────────────────────────────────────────────────
+
+MAIN HUB (Start Here):
+  ADIR Hub: http://127.0.0.1:9303/
+  Main Doc: index.md
+
+CENTRAL ORCHESTRATOR (Just Integrated):
+  TANDRmgr: http://127.0.0.1:8085/
+  Doc: /apps/TANDRmgr/adir/INDEX.md
+  Port: 8085
+  Role: Routes messages, manages LLM providers (Gemini/Claude/Ollama)
+
+PROCESS CONTROL:
+  Service Manager: http://127.0.0.1:9999/
+  Doc: tandr-manager/adir/ADD-SERVICE-GUIDE.md
+  Port: 9999
+  Role: Start/stop services, PID tracking
+
+PRIMARY USER:
+  Jerry's Agent: http://127.0.0.1:9200/
+  Status: ✅ RUNNING
+  Role: CRM Analysis & Business Intelligence
+
+OTHER SERVICES:
+  TANDRbot (8081) ✅ | TANDRSocial (8099) ✅ | 1CRM (9304) ✅ |
+  Ollama (11434) ✅ | ngrok (4040) ✅
+
+PLANNED (Not Yet Deployed):
+  Randy's Agent (9201) ⏳ | Tommy's Agent (9202) ⏳ | BASELINE (9199) ⏳
+
+───────────────────────────────────────────────────────────────────────────────
+KEY FACTS TO REMEMBER
+───────────────────────────────────────────────────────────────────────────────
+
+✅ What's Working:
+   - All 10 operational services responding
+   - TANDRmgr orchestrator live and configured
+   - ADIR Hub updated with all services
+   - Status bar showing real-time service health
+   - Quick Links all functional
+
+⚠️ What Needs Work:
+   - TANDRmgr BOOT.md file (flagged for expansion)
+   - Chat interface functionality (not yet tested)
+   - Randy/Tommy agent deployment (awaiting go-ahead)
+   - BASELINE reference clone (not created)
+
+🔑 Critical Understanding:
+   - TANDRmgr is the CENTRAL HUB for all message routing
+   - Randy & Tommy already configured in TANDRmgr (just need agent deployment)
+   - Jerry is the primary system user - validate everything with him
+   - Test live system first, compare to docs, flag differences with timestamps
+   - Never delete outdated info, flag with ⚠️ *date: reason*
+
+───────────────────────────────────────────────────────────────────────────────
+DOCUMENTATION FILES (Ready After Reboot)
+───────────────────────────────────────────────────────────────────────────────
+
+SESSION CONTINUITY:
+  SESSION-2026-02-15-FINAL.md ............ What was done + next steps
+  CLAUDE-CONTEXT-2026-02-15.md ......... Context for Claude AI
+
+CURRENT STATUS:
+  SANITY-CHECK-2026-02-15.md ........... What's actually running
+  index.md ............................. Main ADIR Hub documentation
+
+PROCEDURES & STANDARDS:
+  MAINTENANCE.md ....................... Weekly maintenance procedure
+  MD-STANDARDS.md ...................... Documentation format standards
+
+INTEGRATION DETAILS:
+  TANDRMGR-INTEGRATION-2026-02-15.md .. TANDRmgr integration summary
+  tandr-manager/adir/ADD-SERVICE-GUIDE.md .. Service Manager API
+
+SERVICE DOCUMENTATION:
+  /apps/TANDRmgr/adir/INDEX.md ........ TANDRmgr documentation hub
+  /apps/TANDRmgr/adir/REVIEW-2026-02-15.md .. TANDRmgr technical audit
+
+───────────────────────────────────────────────────────────────────────────────
+IF YOU GET STUCK
+───────────────────────────────────────────────────────────────────────────────
+
+1. Check SESSION-2026-02-15-FINAL.md for context
+2. Run verification commands (see STEP 2 above)
+3. Read CLAUDE-CONTEXT-2026-02-15.md for how to approach problems
+4. Contact Jerry Agent (9200) - he knows what actually works
+5. Flag unknowns with timestamps, don't assume
+
+───────────────────────────────────────────────────────────────────────────────
+SYSTEM HEALTH CHECKLIST
+───────────────────────────────────────────────────────────────────────────────
+
+After booting, verify:
+  □ TANDRmgr (8085) responding to API
+  □ Service Manager (9999) running
+  □ ADIR Hub (9303) loads
+  □ Jerry's Agent (9200) online
+  □ At least 9 other services showing online
+  □ ADIR Hub status bar shows all services
+  □ Quick Links load when clicked
+
+If anything offline, check:
+  1. Service is supposed to be running? (check SANITY-CHECK)
+  2. Port is available? (netstat -an | findstr :[PORT])
+  3. Service has logs? (check adir/logs/ directory)
+  4. Error messages? (check logs/errors.txt)
+
+───────────────────────────────────────────────────────────────────────────────
+
+✅ SYSTEM IS READY
+✅ DOCUMENTATION IS COMPLETE
+✅ NEXT STEPS ARE CLEAR
+
+Pick up from SESSION-2026-02-15-FINAL.md after reboot.
+
+═══════════════════════════════════════════════════════════════════════════════

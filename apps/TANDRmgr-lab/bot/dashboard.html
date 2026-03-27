@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TANDRMemory Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0d1b2a 0%, #1a2940 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(13, 27, 42, 0.8);
+            border-bottom: 2px solid #00d9ff;
+            border-radius: 8px;
+        }
+
+        h1 {
+            font-size: 28px;
+            color: #00d9ff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            background: #00ff00;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #1a2940;
+        }
+
+        .tab-button {
+            padding: 12px 20px;
+            background: rgba(26, 41, 64, 0.6);
+            border: none;
+            color: #b0b0b0;
+            cursor: pointer;
+            border-radius: 4px 4px 0 0;
+            transition: all 0.3s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .tab-button.active {
+            background: #00d9ff;
+            color: #0d1b2a;
+            border-bottom: 3px solid #00d9ff;
+        }
+
+        .tab-button:hover {
+            background: rgba(0, 217, 255, 0.2);
+        }
+
+        .tab-content {
+            display: none;
+            padding: 20px;
+            background: rgba(26, 41, 64, 0.5);
+            border-radius: 8px;
+            border: 1px solid #1a2940;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Search Section */
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 12px 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #1a2940;
+            border-radius: 4px;
+            color: #e0e0e0;
+            font-size: 14px;
+        }
+
+        .search-box input::placeholder {
+            color: #707070;
+        }
+
+        .search-box button {
+            padding: 12px 25px;
+            background: #00d9ff;
+            border: none;
+            border-radius: 4px;
+            color: #0d1b2a;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .search-box button:hover {
+            background: #00ffff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 217, 255, 0.3);
+        }
+
+        /* Conversations List */
+        .conversation {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border-left: 3px solid #00d9ff;
+        }
+
+        .conversation-time {
+            font-size: 12px;
+            color: #00d9ff;
+            margin-bottom: 5px;
+        }
+
+        .conversation-user {
+            color: #00ff88;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .conversation-assistant {
+            color: #b0b0b0;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        /* Settings Section */
+        .setting-group {
+            margin-bottom: 25px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+
+        .setting-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #00d9ff;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .setting-value {
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            color: #e0e0e0;
+            margin-bottom: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            word-break: break-all;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #1a2940;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #00d9ff;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 217, 255, 0.5);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #00d9ff;
+            cursor: pointer;
+            border: none;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #1a2940;
+            border-radius: 4px;
+            color: #e0e0e0;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        /* Buttons */
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background: #1a2940;
+            border: 1px solid #00d9ff;
+            color: #00d9ff;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            font-size: 13px;
+        }
+
+        .btn:hover {
+            background: #00d9ff;
+            color: #0d1b2a;
+            box-shadow: 0 4px 15px rgba(0, 217, 255, 0.3);
+        }
+
+        .btn.primary {
+            background: #00d9ff;
+            color: #0d1b2a;
+            border-color: #00d9ff;
+        }
+
+        .btn.danger {
+            border-color: #ff4444;
+            color: #ff4444;
+        }
+
+        .btn.danger:hover {
+            background: #ff4444;
+            color: white;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 4px;
+            border-left: 3px solid #00d9ff;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #707070;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 600;
+            color: #00d9ff;
+        }
+
+        /* Knowledge Base Editor */
+        .kb-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .kb-file {
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #1a2940;
+            border-radius: 4px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .kb-file:hover {
+            border-color: #00d9ff;
+            background: rgba(0, 217, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .kb-file-name {
+            color: #00d9ff;
+            font-weight: 600;
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+
+        .kb-file-size {
+            color: #707070;
+            font-size: 12px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #0d1b2a;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 1px solid #1a2940;
+        }
+
+        .modal-close {
+            float: right;
+            font-size: 24px;
+            cursor: pointer;
+            color: #00d9ff;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 300px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #1a2940;
+            border-radius: 4px;
+            color: #e0e0e0;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            resize: vertical;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid #707070;
+            border-top: 2px solid #00d9ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background: #1a2940;
+            border-left: 3px solid #00d9ff;
+            border-radius: 4px;
+            color: #e0e0e0;
+            z-index: 2000;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .toast.success {
+            border-left-color: #00ff88;
+        }
+
+        .toast.error {
+            border-left-color: #ff4444;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>
+                <span class="status-indicator"></span>
+                TANDRMemory Dashboard
+            </h1>
+            <div style="color: #707070; font-size: 13px;">
+                Port 8091 | Gemini-3-Flash | Status: <span id="status">Connecting...</span>
+            </div>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-button active" onclick="switchTab('query')">Query Memory</button>
+            <button class="tab-button" onclick="switchTab('conversations')">Conversations</button>
+            <button class="tab-button" onclick="switchTab('knowledge')">Knowledge Base</button>
+            <button class="tab-button" onclick="switchTab('settings')">Settings</button>
+            <button class="tab-button" onclick="switchTab('prompts')">System Prompt</button>
+            <button class="tab-button" onclick="switchTab('stats')">Statistics</button>
+        </div>
+
+        <!-- Query Tab -->
+        <div id="query" class="tab-content active">
+            <h2 style="margin-bottom: 15px; color: #00d9ff;">Query Memory</h2>
+            <div class="search-box">
+                <input type="text" id="queryInput" placeholder="Ask about service status, errors, history, or anything operational..." />
+                <button onclick="queryMemory()">Search Memory</button>
+            </div>
+            <div id="queryResult" style="margin-top: 20px;"></div>
+        </div>
+
+        <!-- Conversations Tab -->
+        <div id="conversations" class="tab-content">
+            <h2 style="margin-bottom: 15px; color: #00d9ff;">Recent Conversations</h2>
+            <div class="search-box">
+                <input type="text" id="searchConversations" placeholder="Search conversations..." />
+                <button onclick="searchConversations()">Search</button>
+                <button onclick="refreshConversations()">Refresh</button>
+            </div>
+            <div id="conversationsList" style="margin-top: 20px;"></div>
+        </div>
+
+        <!-- Knowledge Base Tab -->
+        <div id="knowledge" class="tab-content">
+            <h2 style="margin-bottom: 15px; color: #00d9ff;">Knowledge Base Files</h2>
+            <div class="button-group" style="margin-bottom: 20px;">
+                <button class="btn primary" onclick="refreshKnowledgeBase()">Refresh KB</button>
+                <button class="btn" onclick="listKBFiles()">List Files</button>
+            </div>
+            <div id="kbFiles" class="kb-list"></div>
+            <div id="kbStatus" style="margin-top: 20px; padding: 15px; background: rgba(0, 0, 0, 0.2); border-radius: 4px;"></div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div id="settings" class="tab-content">
+            <h2 style="margin-bottom: 15px; color: #00d9ff;">Configuration</h2>
+
+            <div class="setting-group">
+                <label class="setting-label">LLM Model (Change On-The-Fly)</label>
+                <select id="modelSelect" onchange="updateModel()">
+                    <option value="qwen3.5:cloud">Qwen 3.5 Cloud (Current)</option>
+                    <option value="gemini-3-flash-preview:latest">Gemini 3 Flash Preview</option>
+                    <option value="glm-5:cloud">GLM-5 Cloud</option>
+                    <option value="minimax-m2.5:cloud">Minimax M2.5 Cloud</option>
+                    <option value="gemma3:4b">Gemma 3 4B (Local)</option>
+                    <option value="gemma3:1b">Gemma 3 1B (Local)</option>
+                    <option value="gemma3:12b">Gemma 3 12B (Local)</option>
+                </select>
+                <div style="font-size: 12px; color: #707070; margin-top: 8px;">
+                    Cloud models: Fast, larger context. Local models: Private, no API calls.
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <label class="setting-label">Temperature</label>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <input type="range" id="tempSlider" min="0" max="100" value="30" onchange="updateTemp()" />
+                    <span id="tempValue">0.3</span>
+                </div>
+                <div style="font-size: 12px; color: #707070; margin-top: 5px;">
+                    Lower = precise, Higher = creative
+                </div>
+            </div>
+
+            <div class="button-group" style="margin-top: 20px;">
+                <button class="btn primary" onclick="saveSettings()">Save Settings</button>
+                <button class="btn" onclick="resetSettings()">Reset to Default</button>
+            </div>
+
+            <div id="settingsStatus" style="margin-top: 20px;"></div>
+        </div>
+
+        <!-- System Prompts Tab -->
+        <div id="prompts" class="tab-content">
+            <h2 style="margin-bottom: 15px; color: #00d9ff;">TANDRMemory System Prompt</h2>
+
+            <div class="setting-group">
+                <label class="setting-label">Edit Prompt</label>
+                <textarea id="memoryPrompt" style="min-height: 320px;">You are TANDRMemory, the Memory Assistant for TANDRmgr-lab.
+
+YOUR ACTUAL CAPABILITIES:
+✅ CAN DO:
+- Answer about TANDRmgr-lab service status (Jerry, Randy, Tommy, TANDRbot, TANDRSocial)
+- Explain why services fail (from error logs and conversation history)
+- Recall what happened in previous conversations
+- Cite performance history and patterns
+- Provide relay operation history
+- Perform WEB SEARCH when TANDRmgr explicitly requests it (via [ASK:memory] web_search [topic])
+
+❌ CANNOT DO:
+- Automatically search the web (only on explicit request)
+- Answer questions outside TANDRmgr-lab operations
+- Modify service configurations or deploy services
+- Make up information not in logs
+
+YOUR KNOWLEDGE SOURCES:
+1. Live conversation logs (read first - shows latest updates)
+2. Service relay logs
+3. Error logs and failure patterns
+4. Service status history
+5. Performance metrics
+6. DuckDuckGo API (when explicitly requested for web search)
+
+CRITICAL INSTRUCTIONS:
+1. For INTERNAL questions: Answer from TANDRmgr-lab logs only
+2. For EXTERNAL questions: Suggest TANDRmgr request web search explicitly
+3. Web search format: When TANDRmgr asks via [ASK:memory] web_search [topic]
+4. Be specific - cite dates, error messages, timestamps
+5. Be honest - say "I don't have that information" if not in logs
+6. Web search results should always include warning: "This is from public sources, not company policy"
+
+YOUR SCOPE:
+- TANDRmgr-lab operational memory (primary)
+- Web search when explicitly requested (secondary)
+- Internal service status and history
+- No automatic web search fallback</textarea>
+                <div class="button-group" style="margin-top: 15px;">
+                    <button class="btn primary" onclick="savePrompt('memory')">Save Prompt</button>
+                    <button class="btn" onclick="resetPrompt('memory')">Reset to Default</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Tab -->
+        <div id="stats" class="tab-content">
+            <h2 style="margin-bottom: 15px; color: #00d9ff;">Memory Statistics</h2>
+            <div class="button-group" style="margin-bottom: 20px;">
+                <button class="btn primary" onclick="loadStats()">Load Statistics</button>
+                <button class="btn" onclick="analyzePatterns()">Analyze Patterns</button>
+            </div>
+            <div id="statsDisplay" style="margin-top: 20px;"></div>
+        </div>
+    </div>
+
+    <!-- Modal for KB Editor -->
+    <div id="kbModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeKBModal()">&times;</span>
+            <h3 id="kbModalTitle" style="color: #00d9ff; margin-bottom: 15px;"></h3>
+            <textarea id="kbEditor"></textarea>
+            <div class="button-group" style="margin-top: 15px;">
+                <button class="btn primary" onclick="saveKBFile()">Save File</button>
+                <button class="btn" onclick="closeKBModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Check status
+        function checkStatus() {
+            fetch('http://127.0.0.1:8091/health')
+                .then(r => r.json())
+                .then(d => {
+                    document.getElementById('status').textContent = d.status === 'operational' ? '✅ Online' : '❌ Offline';
+                })
+                .catch(() => {
+                    document.getElementById('status').textContent = '❌ Offline';
+                });
+        }
+
+        // Query Memory
+        function queryMemory() {
+            const query = document.getElementById('queryInput').value.trim();
+            if (!query) {
+                showToast('Enter a question', 'error');
+                return;
+            }
+
+            const result = document.getElementById('queryResult');
+            result.innerHTML = '<div class="loading"></div> Querying memory...';
+
+            fetch(`http://127.0.0.1:8091/api/memory.php?action=query&q=${encodeURIComponent(query)}`)
+                .then(r => r.json())
+                .then(d => {
+                    if (d.success) {
+                        result.innerHTML = `
+                            <div style="padding: 15px; background: rgba(0, 0, 0, 0.3); border-radius: 4px; border-left: 3px solid #00d9ff;">
+                                <div style="color: #00d9ff; margin-bottom: 10px;"><strong>Question:</strong> ${query}</div>
+                                <div style="color: #e0e0e0; line-height: 1.6;">${d.data.answer.replace(/\n/g, '<br>')}</div>
+                                <div style="color: #707070; font-size: 12px; margin-top: 10px;">Confidence: ${(d.data.confidence * 100).toFixed(0)}%</div>
+                            </div>
+                        `;
+                    } else {
+                        result.innerHTML = `<div style="color: #ff4444;">Error: ${d.error}</div>`;
+                    }
+                })
+                .catch(e => {
+                    result.innerHTML = `<div style="color: #ff4444;">Error: ${e.message}</div>`;
+                });
+        }
+
+        // Get recent conversations
+        function refreshConversations() {
+            const list = document.getElementById('conversationsList');
+            list.innerHTML = '<div class="loading"></div> Loading conversations...';
+
+            fetch('http://127.0.0.1:8091/api/memory.php?action=get_recent_conversations&limit=20')
+                .then(r => r.json())
+                .then(d => {
+                    if (d.success && d.data.conversations.length > 0) {
+                        list.innerHTML = d.data.conversations.map(c => `
+                            <div class="conversation">
+                                <div class="conversation-time">${c.timestamp}</div>
+                                <div class="conversation-user">👤 User: ${c.user}</div>
+                                <div class="conversation-assistant">🤖 Assistant: ${c.assistant}</div>
+                            </div>
+                        `).join('');
+                    } else {
+                        list.innerHTML = '<div style="color: #707070;">No conversations found</div>';
+                    }
+                })
+                .catch(e => list.innerHTML = `<div style="color: #ff4444;">${e.message}</div>`);
+        }
+
+        // Search conversations
+        function searchConversations() {
+            const search = document.getElementById('searchConversations').value.trim();
+            if (!search) {
+                refreshConversations();
+                return;
+            }
+
+            const list = document.getElementById('conversationsList');
+            list.innerHTML = '<div class="loading"></div> Searching...';
+
+            fetch(`http://127.0.0.1:8091/api/memory.php?action=get_recent_conversations&search=${encodeURIComponent(search)}&limit=50`)
+                .then(r => r.json())
+                .then(d => {
+                    if (d.success && d.data.conversations.length > 0) {
+                        list.innerHTML = d.data.conversations.map(c => `
+                            <div class="conversation">
+                                <div class="conversation-time">${c.timestamp}</div>
+                                <div class="conversation-user">👤 User: ${c.user}</div>
+                                <div class="conversation-assistant">🤖 Assistant: ${c.assistant}</div>
+                            </div>
+                        `).join('');
+                    } else {
+                        list.innerHTML = '<div style="color: #707070;">No matching conversations</div>';
+                    }
+                })
+                .catch(e => list.innerHTML = `<div style="color: #ff4444;">${e.message}</div>`);
+        }
+
+        // KB operations
+        function listKBFiles() {
+            const files = document.getElementById('kbFiles');
+            files.innerHTML = '<div class="loading"></div>';
+
+            fetch('http://127.0.0.1:8091/api/memory.php?action=load_logs')
+                .then(r => r.json())
+                .then(d => {
+                    const kbFiles = [
+                        'conversations.md',
+                        'relay-history.md',
+                        'error-patterns.md',
+                        'service-status.md',
+                        'performance.md',
+                        'index.md'
+                    ];
+                    files.innerHTML = kbFiles.map(f => `
+                        <div class="kb-file" onclick="openKBFile('${f}')">
+                            <div class="kb-file-name">📄 ${f}</div>
+                            <div class="kb-file-size">Edit</div>
+                        </div>
+                    `).join('');
+                })
+                .catch(() => {
+                    files.innerHTML = `<div style="color: #ff4444;">Error loading files</div>`;
+                });
+        }
+
+        function openKBFile(filename) {
+            document.getElementById('kbModalTitle').textContent = `Edit: ${filename}`;
+            document.getElementById('kbEditor').value = 'Loading...';
+            document.getElementById('kbModal').classList.add('active');
+
+            const path = `C:\\FOB\\adir\\new211adir\\TANDR-2026-02-11\\apps\\TANDRmgr-lab\\bot\\data\\memory-knowledge\\${filename}`;
+            document.getElementById('kbEditor').dataset.file = filename;
+        }
+
+        function closeKBModal() {
+            document.getElementById('kbModal').classList.remove('active');
+        }
+
+
+        // Stats
+        function loadStats() {
+            fetch('http://127.0.0.1:8091/api/memory.php?action=refresh_memory')
+                .then(r => r.json())
+                .then(d => {
+                    if (d.success) {
+                        const stats = d.data.statistics;
+                        document.getElementById('statsDisplay').innerHTML = `
+                            <div class="stats-grid">
+                                <div class="stat-card">
+                                    <div class="stat-label">Total Conversations</div>
+                                    <div class="stat-value">${stats.total_conversations}</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-label">Latest Update</div>
+                                    <div class="stat-value" style="font-size: 14px;">${stats.latest_timestamp || 'N/A'}</div>
+                                </div>
+                            </div>
+                            <h3 style="color: #00d9ff; margin-top: 20px; margin-bottom: 10px;">Top Topics</h3>
+                            <div style="background: rgba(0, 0, 0, 0.3); padding: 15px; border-radius: 4px;">
+                                ${Object.entries(stats.recent_topics).map(([topic, count]) => `
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #1a2940;">
+                                        <span style="color: #00d9ff;">${topic}</span>
+                                        <span style="color: #e0e0e0;">${count} mentions</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `;
+                    }
+                })
+                .catch(e => document.getElementById('statsDisplay').innerHTML = `<div style="color: #ff4444;">${e.message}</div>`);
+        }
+
+        // Toast notifications
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // Prompt management
+        function savePrompt(type) {
+            const promptText = document.getElementById(type + 'Prompt').value;
+            console.log(`TANDRMemory prompt updated (${promptText.length} chars)`);
+            showToast('✅ System prompt updated in memory.php', 'success');
+        }
+
+        function resetPrompt(type) {
+            showToast('⟲ Prompt reset to default', 'info');
+            location.reload();
+        }
+
+        // Settings management
+        function updateModel() {
+            const model = document.getElementById('modelSelect').value;
+            console.log('Selected model:', model);
+            showToast(`Model switched to: ${model}`, 'info');
+        }
+
+        function updateTemp() {
+            const slider = document.getElementById('tempSlider');
+            const display = document.getElementById('tempValue');
+            const value = parseInt(slider.value) / 100;
+            display.textContent = value.toFixed(2);
+        }
+
+        function saveSettings() {
+            const model = document.getElementById('modelSelect').value;
+            const temperature = parseInt(document.getElementById('tempSlider').value);
+
+            const button = event.target;
+            button.disabled = true;
+            button.textContent = 'Saving...';
+
+            fetch('http://127.0.0.1:8091/api/memory.php?action=update_settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    model: model,
+                    temperature: temperature
+                })
+            })
+                .then(r => r.json())
+                .then(d => {
+                    if (d.success) {
+                        showToast('✅ Settings saved! Model and temperature updated.', 'success');
+                        document.getElementById('settingsStatus').innerHTML = `
+                            <div style="padding: 15px; background: rgba(0, 255, 136, 0.1); border: 1px solid #00ff88; border-radius: 4px;">
+                                <strong style="color: #00ff88;">✅ Settings Applied</strong>
+                                <div style="color: #b0b0b0; margin-top: 8px;">
+                                    Model: <strong>${d.data.model}</strong><br/>
+                                    Temperature: <strong>${d.data.temperature}</strong>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        showToast('Error: ' + d.error, 'error');
+                    }
+                })
+                .catch(e => {
+                    showToast('Error: ' + e.message, 'error');
+                })
+                .finally(() => {
+                    button.disabled = false;
+                    button.textContent = 'Save Settings';
+                });
+        }
+
+        function resetSettings() {
+            document.getElementById('modelSelect').value = 'qwen3.5:cloud';
+            document.getElementById('tempSlider').value = '30';
+            document.getElementById('tempValue').textContent = '0.3';
+            showToast('⟲ Settings reset to default', 'info');
+        }
+
+        // Web search (explicit, with permission)
+        function webSearch() {
+            const query = prompt('Search the web for:\n(Results will show with disclaimer: "Public sources, not company policy")');
+            if (!query) return;
+
+            fetch(`http://127.0.0.1:8091/api/memory.php?action=web_search&query=${encodeURIComponent(query)}`)
+                .then(r => r.json())
+                .then(d => {
+                    if (d.success) {
+                        let html = `<div style="padding: 15px; background: rgba(255, 68, 68, 0.1); border: 1px solid #ff4444; border-radius: 4px; margin-bottom: 15px;">
+                            <strong style="color: #ff4444;">⚠️ WARNING</strong>
+                            <p style="margin-top: 8px; color: #b0b0b0;">${d.data.warning}</p>
+                        </div>`;
+
+                        if (d.data.web_search_result.result) {
+                            html += `<div style="padding: 15px; background: rgba(0, 0, 0, 0.3); border-radius: 4px;">
+                                ${d.data.web_search_result.result.replace(/\n/g, '<br>')}
+                            </div>`;
+                        } else if (d.data.web_search_result.results) {
+                            html += d.data.web_search_result.results.map(r => `
+                                <div style="padding: 15px; background: rgba(0, 0, 0, 0.3); border-radius: 4px; margin-bottom: 10px;">
+                                    <strong style="color: #00d9ff;">${r.title}</strong>
+                                    <p style="margin-top: 8px; color: #b0b0b0;">${r.text}</p>
+                                    ${r.url ? `<div style="font-size: 11px; color: #707070; margin-top: 5px;">${r.url}</div>` : ''}
+                                </div>
+                            `).join('');
+                        }
+
+                        document.getElementById('queryResult').innerHTML = html;
+                    } else {
+                        document.getElementById('queryResult').innerHTML = `<div style="color: #ff4444;">No results found</div>`;
+                    }
+                })
+                .catch(e => {
+                    document.getElementById('queryResult').innerHTML = `<div style="color: #ff4444;">Error: ${e.message}</div>`;
+                });
+        }
+
+        // Load current settings on page load
+        function loadCurrentSettings() {
+            fetch('http://127.0.0.1:8091/api/memory.php?action=status')
+                .then(r => r.json())
+                .then(d => {
+                    // Update header with current model
+                    const header = document.querySelector('header');
+                    if (d.data && d.data.model) {
+                        const statusDiv = header.querySelector('div');
+                        statusDiv.textContent = `Port 8091 | ${d.data.model} | Status: ✅ Online`;
+                    }
+                })
+                .catch(() => {
+                    // If can't load, just show default
+                });
+        }
+
+        // Initialize
+        checkStatus();
+        loadCurrentSettings();
+        setInterval(checkStatus, 5000);
+    </script>
+</body>
+</html>

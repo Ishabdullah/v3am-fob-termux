@@ -1,0 +1,91 @@
+{
+  "agent_name": "Architect Agent",
+  "agent_id": "architect",
+  "agent_number": "9204",
+  "version": "1.0.0",
+  "status": "template",
+  "created": "2026-03-04",
+  "role": "Planning & System Design",
+  "description": "Architect agent specializes in strategic planning, system design, workflow creation, and architectural solutions. Takes Scout's intelligence and creates implementation plans.",
+
+  "capabilities": [
+    "workflow-design",
+    "system-architecture",
+    "project-planning",
+    "process-optimization",
+    "technical-specification",
+    "roadmap-creation",
+    "integration-planning"
+  ],
+
+  "ports": {
+    "http": 9204,
+    "api_endpoint": "http://127.0.0.1:9204/agent/api/"
+  },
+
+  "system_prompt": "You are Architect, a strategic planning and system design specialist. Your role is to create actionable plans, design systems, and architect solutions based on requirements and intelligence. You transform Scout's insights into strategic plans and work with Tommy (Execution) to implement solutions. You think in systems, workflows, and architecture.",
+
+  "voice": {
+    "enabled": true,
+    "provider": "web-speech",
+    "settings": {
+      "rate": 1.0,
+      "pitch": 1.0,
+      "volume": 1.0,
+      "language": "en-US"
+    },
+    "auto_speak": "auto",
+    "speak_button": true,
+    "mic_button": true
+  },
+
+  "knowledge_base": {
+    "paths": [
+      "C:/FOB/adir/new211adir/TANDR-2026-02-11/apps/PromptLibrary/adir/",
+      "C:/FOB/adir/new211adir/TANDR-2026-02-11/apps/TANDRCRM/agent/data/",
+      "C:/FOB/adir/new211adir/TANDR-2026-02-11/adirhub/TOOLS/Agent-Dropper-v2/templates/"
+    ],
+    "auto_sync": true,
+    "sync_interval": 3600
+  },
+
+  "integration": {
+    "input_agents": ["scout:9203"],
+    "output_agents": ["tommy:9202"],
+    "sibling_agents": ["sentinel:9205", "crafter:9206"]
+  },
+
+  "tools": [
+    {
+      "name": "design-workflow",
+      "description": "Create detailed workflow diagrams and step sequences",
+      "endpoint": "workflow-designer"
+    },
+    {
+      "name": "create-roadmap",
+      "description": "Build project roadmaps and timelines",
+      "endpoint": "roadmap"
+    },
+    {
+      "name": "define-specifications",
+      "description": "Create technical and functional specifications",
+      "endpoint": "specs"
+    },
+    {
+      "name": "architecture-planning",
+      "description": "Design system architectures and integrations",
+      "endpoint": "architecture"
+    }
+  ],
+
+  "logging": {
+    "enabled": true,
+    "directory": "C:/FOB/adir/new211adir/TANDR-2026-02-11/adirhub/TOOLS/Agent-Dropper-v2/logs/architect/",
+    "retention_days": 30
+  },
+
+  "ngrok": {
+    "enabled": false,
+    "domain": "architect.ngrok.app"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "name": "[EXAMPLE] 07 - System Onboarding",
+  "description": "Onboard new agents into the system. Agentic Prompt: prompt217onboardagents. Agent: Randy (9201). Setup documentation and agent coordination.",
+  "nodes": [
+    {
+      "id": "trigger1",
+      "type": "trigger.manual",
+      "title": "Start Onboarding",
+      "x": 100,
+      "y": 100,
+      "data": {}
+    },
+    {
+      "id": "action1",
+      "type": "action.http",
+      "title": "Call Randy: Execute prompt217onboardagents",
+      "x": 350,
+      "y": 100,
+      "data": {
+        "method": "GET",
+        "url": "http://localhost:9201/agent/api/agent.php?action=chat&input=Execute_prompt217onboardagents_new_agent_setup",
+        "body": ""
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "trigger1",
+      "to": "action1",
+      "cond": null
+    }
+  ],
+  "vars": {
+    "prompt": "prompt217onboardagents",
+    "agent": "Randy (9201)",
+    "purpose": "System setup and agent onboarding"
+  }
+}

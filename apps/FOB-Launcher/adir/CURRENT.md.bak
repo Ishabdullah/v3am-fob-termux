@@ -1,0 +1,71 @@
+```
+╔══════════════════════════════════════════════════════════════════════╗
+║  FOB-LAUNCHER ADIR — CURRENT TASK                                    ║
+║  Path: apps\FOB-Launcher\adir\CURRENT.md                             ║
+║  Updated: 2026-03-22 | Author: Claude                                ║
+╚══════════════════════════════════════════════════════════════════════╝
+```
+
+# Current Task
+
+## Status
+**HOLDING** — launcher feature work complete, waiting on user to finalize agent prompts and MD files before next package run.
+
+---
+
+## Active Work
+
+All six created. Now to finish the answer I was in the middle of when you dropped the
+  file request:
+                                                                                            ---
+  System Message / Memory — Full Logic                                                    
+  System prompt: every single request, not first wake up.
+
+  The system prompt is NOT sent as a native system: parameter. It gets concatenated into
+  one big string alongside context and history, then sent as the user message:
+
+  # System
+  {system_prompt from config.json}
+
+  # Directory Context
+  {all scanned .md/.txt files — from cache or fresh scan}
+
+  {tools block if any}
+
+  # Conversation History
+  Human: [message -10]
+  AgentName: [response -10]
+  ...last 20 entries (10 exchanges)...
+
+
+_Nothing active. Next session picks up here._
+
+---
+
+## Next Up
+
+1. Agent prompt updates (user handling)
+2. Asar repack with all 2026-03-22 changes
+3. Rebuild FOB-Setup.exe installer
+4. Test fresh install end-to-end
+
+---
+
+## Blocked On
+
+- Nothing technical. User is working on prompts.
+
+---
+
+## Last Completed
+
+- Dynamic bat scanner → tray Scripts submenu
+- Fullscreen toggle (⛶ button)
+- postMessage CSS bridge (fob-css + fob-skin message types)
+- SOT-V3AMFOB-LAUNCHER.md fully updated
+
+```
+╔══════════════════════════════════════════════════════════════════════╗
+║  END OF CURRENT.md                                                    ║
+╚══════════════════════════════════════════════════════════════════════╝
+```

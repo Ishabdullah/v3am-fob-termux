@@ -1,0 +1,16 @@
+C:\FOB\adir\new211adir\TANDR-2026-02-11\adirhub\TOOLS\Agent-Dropper-v2\config.json
+C:\FOB\adir\new211adir\TANDR-2026-02-11\adirhub\TOOLS\GGBOT\config.json
+C:\FOB\adir\new211adir\TANDR-2026-02-11\adirhub\TOOLS\KB-Maker-v2\config.json
+C:\FOB\adir\new211adir\TANDR-2026-02-11\adirhub\TOOLS\KB-Maker-v2\adir\config.json
+C:\FOB\adir\new211adir\TANDR-2026-02-11\adirhub\TOOLS\Parser\ParserBot\config.json
+C:\FOB\adir\new211adir\TANDR-2026-02-11\adirhub\TOOLS\TEMPLATE-JERRY-CLEAN\config.json
+C:\FOB\adir\new211adir\TANDR-2026-02-11\adirhub\TOOLS\TEMPLATE-TANDRSOCIAL-CLEAN\config.json
+C:\FOB\adir\new211adir\TANDR-2026-02-11\apps\Agent1\config.json
+C:\FOB\adir\new211adir\TANDR-2026-02-11\apps\Agent2\agent\config.json
+C:\FOB\adir\new211adir\TANDR-2026-02-11\apps\Agent3\config.json
+C:\FOB\adir\new211adir\TANDR-2026-02-11\apps\Agent4\config.json
+C:\FOB\adir\new211adir\TANDR-2026-02-11\apps\Bot1\config.json
+C:\FOB\adir\new211adir\TANDR-2026-02-11\apps\TANDRmgr-lab\config.json
+C:\FOB\adir\new211adir\TANDR-2026-02-11\apps\TANDRmgr-lab\bot\config.json
+
+

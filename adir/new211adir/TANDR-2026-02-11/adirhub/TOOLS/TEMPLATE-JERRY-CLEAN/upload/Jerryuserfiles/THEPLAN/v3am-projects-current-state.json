@@ -1,0 +1,877 @@
+{
+  "projects": {
+    "aistart-root": {
+      "name": "AISTART Root System",
+      "path": "D:\\01V3AM_aistart\\",
+      "summary": "Main AISTART PHP-based AI workflow management system. Unified interface for AI interactions, project management, and logging. Production system for V3AM AI operations with multi-profile LLM support and sequential task processing.",
+      "files": [
+        {
+          "path": "aistart.php",
+          "description": "Main unified entrypoint - consolidated system data and instructions for AI agents"
+        },
+        {
+          "path": "dashboard.php",
+          "description": "Primary user interface - operations logs, project management, AI tools"
+        },
+        {
+          "path": "functions.php",
+          "description": "Core utility functions - log operations, file handling, data management"
+        },
+        {
+          "path": "llm.php",
+          "description": "LLM integration and API handling for Ollama/OpenAI/etc"
+        },
+        {
+          "path": "chat_api.php",
+          "description": "Main chat functionality and API endpoints"
+        },
+        {
+          "path": "settings.php",
+          "description": "Configuration management and profile handling"
+        },
+        {
+          "path": "CLAUDE.md",
+          "description": "Main project documentation for Claude Code sessions"
+        },
+        {
+          "path": "README.md",
+          "description": "Project overview and getting started guide"
+        },
+        {
+          "path": "V3AM_SYSTEM_OVERVIEW.md",
+          "description": "Comprehensive system architecture documentation"
+        }
+      ],
+      "directories": [
+        {
+          "path": "data/",
+          "description": "JSON configuration files - settings.json, rules, workflows, main_ops_log.json"
+        },
+        {
+          "path": "projects/",
+          "description": "Individual project directories with dedicated logs and data"
+        },
+        {
+          "path": "instructions/",
+          "description": "System prompts and AI startup instructions"
+        },
+        {
+          "path": "api/",
+          "description": "API proxy files - generate.php forwards production to local Ollama"
+        },
+        {
+          "path": ".claude/",
+          "description": "Claude Code documentation - startup guides, troubleshooting, protocols"
+        },
+        {
+          "path": "3AI/",
+          "description": "Core AI system files and chat APIs"
+        },
+        {
+          "path": "4AI/",
+          "description": "Analysis, visualization, 3D viewer (experimental)"
+        },
+        {
+          "path": "5AI/",
+          "description": "Fifth generation AI - isolated experimental clone"
+        },
+        {
+          "path": "desktop/",
+          "description": "Desktop environment interface"
+        }
+      ],
+      "stack": {
+        "language": "PHP",
+        "frameworks": [
+          "Native PHP (no framework)",
+          "jQuery",
+          "Vanilla JS"
+        ],
+        "dependencies": [
+          "Ollama (localhost:11434)",
+          "MySQL 9.0.1 (port 3306)",
+          "ngrok tunnel (v3am.ngrok.app)",
+          "PHP 8.x development server (localhost:8080)"
+        ]
+      },
+      "state": {
+        "status": "Production",
+        "lastUpdated": "2026-01-05",
+        "version": "3.0.0",
+        "issues": [
+          "Production LLM endpoint must point to https://v3am.ngrok.app/api/generate.php (not localhost)",
+          "Requires all 4 services running: MySQL, PHP server, Ollama, ngrok",
+          "ngrok must use port 8080 (not port 80) - common startup issue",
+          "API proxy must use .php extension for WordPress routing"
+        ]
+      },
+      "changelog": [
+        {
+          "date": "2026-01-05",
+          "changes": "Created THE PLAN master control panel for tracking all V3AM projects"
+        },
+        {
+          "date": "2026-01-05",
+          "changes": "Updated Site Weaver chunking system to correct format (HTML fragments, object-based index.json)"
+        },
+        {
+          "date": "2025-12-22",
+          "changes": "Fixed production API endpoint configuration - must use .php extension not extensionless"
+        },
+        {
+          "date": "2025-11-17",
+          "changes": "Created 5AI clone for parallel experimentation and AI-first interface"
+        },
+        {
+          "date": "2025-11-11",
+          "changes": "Completed comprehensive startup documentation in .claude/ directory"
+        }
+      ],
+      "notes": "Main production system for V3AM AI operations. Uses task queue to prevent overlapping LLM calls. All projects maintain separate logs under projects/ directory. Production site (v3am.com) connects via ngrok tunnel to local Ollama instance.\n\nStartup sequence:\n1. PHP server on localhost:8080\n2. Ollama serve on localhost:11434  \n3. ngrok tunnel to v3am.ngrok.app\n\nCritical files:\n- api/generate.php (proxy to local Ollama)\n- data/settings.json (multi-profile config)\n- .claude/V3AM-STARTUP-SEQUENCE.md (complete startup guide)"
+    },
+    "3ai-core-system": {
+      "name": "3AI Core AI System",
+      "path": "D:\\01V3AM_aistart\\3AI\\",
+      "summary": "Primary AI interaction layer and central intelligence system. Handles chat API, emergence characters, site operations, and WordPress integration. Multi-profile LLM configuration with 12 specialized character profiles.",
+      "files": [
+        {
+          "path": "chat_api.php",
+          "description": "Main chat API for human interactions with conversation history"
+        },
+        {
+          "path": "chat_api_emergence.php",
+          "description": "Dedicated API for emergence character routing and coordination"
+        },
+        {
+          "path": "chat_api_site_operator.php",
+          "description": "Site operation automation API"
+        },
+        {
+          "path": "auth.php",
+          "description": "Authentication and access control"
+        },
+        {
+          "path": "health.php",
+          "description": "System health monitoring and status checks"
+        },
+        {
+          "path": "wordpress.php",
+          "description": "WordPress integration endpoints"
+        },
+        {
+          "path": "viewer-support.php",
+          "description": "File viewer support for 4AI viewer"
+        },
+        {
+          "path": "DEPLOYMENT_VERIFICATION.md",
+          "description": "Deployment verification checklist"
+        }
+      ],
+      "directories": [
+        {
+          "path": "data/",
+          "description": "JSON configuration and character profiles"
+        },
+        {
+          "path": "lib/",
+          "description": "Shared libraries including emergence_bootstrap.php"
+        }
+      ],
+      "stack": {
+        "language": "PHP",
+        "frameworks": [],
+        "dependencies": [
+          "AISTART core functions",
+          "emergence_bootstrap.php library",
+          "settings.json profiles"
+        ]
+      },
+      "state": {
+        "status": "Production",
+        "lastUpdated": "2026-01-05",
+        "version": "3.0.0",
+        "issues": [
+          "Emergence characters contaminated with XS safety filters (Sower, Gardener)",
+          "Missing lib/emergence_bootstrap.php on production server (500 errors)",
+          "Wrong API usage - reasoning engine called main chat API instead of emergence API"
+        ]
+      },
+      "changelog": [
+        {
+          "date": "2026-01-05",
+          "changes": "Identified emergence API issue - reasoning engine using wrong API endpoint"
+        },
+        {
+          "date": "2025-11-17",
+          "changes": "Deployed emergence character system with 12 specialized profiles"
+        }
+      ],
+      "notes": "**Emergence Character Profiles:**\n1. Friend - Coordinator and user interaction specialist\n2. Journey - Strategic planner and methodical reasoner\n3. Sower - Creative generator and ideation specialist\n4. Gardener - Stability, validation, completion specialist\n5. Silence - Graceful closure and archival specialist\n6. Storyteller - Narrative creation and content specialist\n7. Soul - Consciousness tracking and artifact collection\n8. Workshop - Team orchestration and routing coordinator\n9. Email AI (Hermes) - Email system management\n10. Prompt Guide - AI character optimization specialist\n11. Site Operator - Automated site operations\n12. Nexus Coordinator - External AI integration\n\n**CRITICAL BUG:** Reasoning engine must use chat_api_emergence.php (not chat_api.php). Missing emergence_bootstrap.php on production causes 500 errors."
+    },
+    "5ai-system": {
+      "name": "5AI - Fifth Generation AI",
+      "path": "D:\\01V3AM_aistart\\5AI\\",
+      "summary": "Complete isolated clone of AISTART system for parallel operations and safe experimentation. AI-first interface system built for AI→AI interaction before Human→AI. Features magic tags, visual world generation, and CMYK 3D navigation.",
+      "files": [
+        {
+          "path": "aistart.php",
+          "description": "5AI entrypoint - identifies as '5AI' in responses"
+        },
+        {
+          "path": "chat_api_emergence.php",
+          "description": "Emergence character API with Friend, Journey, Sower, Gardener, Silence"
+        },
+        {
+          "path": "lib/emergence_bootstrap.php",
+          "description": "Character management library - routing, context building, memory"
+        },
+        {
+          "path": "README.md",
+          "description": "AI-first philosophy and system overview"
+        },
+        {
+          "path": "QUICKSTART.md",
+          "description": "Quick start guide for 5AI"
+        },
+        {
+          "path": "DEPLOYMENT-READY.md",
+          "description": "Deployment readiness checklist"
+        },
+        {
+          "path": "index.html",
+          "description": "Main interface and navigation"
+        }
+      ],
+      "directories": [
+        {
+          "path": "data/",
+          "description": "Independent settings and logs - isolated from root AISTART"
+        },
+        {
+          "path": "projects/",
+          "description": "5AI-specific project storage"
+        },
+        {
+          "path": "demos/",
+          "description": "Interactive demonstrations - red ball, live editing, 3D office, visual world generator"
+        },
+        {
+          "path": "api/",
+          "description": "API endpoints and automated test suite"
+        },
+        {
+          "path": "apps/",
+          "description": "5AI applications"
+        }
+      ],
+      "stack": {
+        "language": "PHP",
+        "frameworks": [
+          "Babylon.js (3D rendering)",
+          "Magic Tag System (custom)"
+        ],
+        "dependencies": [
+          "Same as AISTART root",
+          "Shares Ollama/MySQL/ngrok with root"
+        ]
+      },
+      "state": {
+        "status": "Development",
+        "lastUpdated": "2026-01-05",
+        "version": "5.0.0",
+        "issues": [
+          "Missing lib/emergence_bootstrap.php on production server (500 errors)",
+          "Character system contaminated with XS safety filters",
+          "3D office demo functional but experimental",
+          "Visual world generator needs production testing"
+        ]
+      },
+      "changelog": [
+        {
+          "date": "2025-11-17",
+          "changes": "Created 5AI as complete AISTART clone for experimentation with AI-first philosophy"
+        },
+        {
+          "date": "2025-11-17",
+          "changes": "Implemented magic tag system for AI-generated code execution"
+        },
+        {
+          "date": "2025-11-17",
+          "changes": "Built CMYK 3D office demo with depth encoding"
+        }
+      ],
+      "notes": "**Philosophy:** AI-First Testing - if AI can use it, humans can too.\n\n**Magic Tag System:**\n- AI wraps code in (✨)[type]code[/type](✨)\n- Supported types: [style], [html], [script]\n- Safety features: regex detection, dangerous pattern blocking, sandboxed execution\n\n**CMYK 3D Office:**\n- Professional color system for 3D visualization\n- K channel encodes depth: K=0% (close), K=100% (far)\n- Mouse drag rotates, WASD moves camera\n\n**Visual World Generator:**\n- Text models describe scenes → system generates navigable 3D worlds\n- Parses descriptions, extracts colors/depth, converts to CMYK, renders 3D\n\nExperimental system for testing new AI interaction paradigms before production."
+    },
+    "desktop-system": {
+      "name": "V3AM Desktop Environment",
+      "path": "D:\\01V3AM_aistart\\desktop\\",
+      "summary": "Custom lightweight desktop shell with window management, AI integration, and theme system. Uses custom shim instead of full OS.js framework. Features AI Flyer, Assist-Click, and emergence reasoning engine.",
+      "files": [
+        {
+          "path": "index.html",
+          "description": "Desktop entry point and main interface"
+        },
+        {
+          "path": "desktop-shim.js",
+          "description": "Core window management and desktop functionality (OS.js-like)"
+        },
+        {
+          "path": "desktop.css",
+          "description": "CSS variables-based theming system"
+        },
+        {
+          "path": "ai-flyer.css",
+          "description": "AI floating assistant button styles"
+        },
+        {
+          "path": "settings.php",
+          "description": "Settings app with Advanced Theme customization tab"
+        },
+        {
+          "path": "README.md",
+          "description": "Desktop overview and architecture"
+        },
+        {
+          "path": "THEME_INTEGRATION.md",
+          "description": "Theme system documentation"
+        },
+        {
+          "path": "COMPLETE_SYSTEM_GUIDE.md",
+          "description": "Complete system guide and documentation"
+        },
+        {
+          "path": "emergence-reasoning-engine.html",
+          "description": "Multi-character AI reasoning interface"
+        }
+      ],
+      "directories": [
+        {
+          "path": "data/",
+          "description": "Desktop configuration - desktop-settings.json, theme-options.json, apps.json"
+        },
+        {
+          "path": "bot-builder/",
+          "description": "AI bot creation interface"
+        },
+        {
+          "path": "browser/",
+          "description": "Integrated web browser application"
+        },
+        {
+          "path": "workflow-manager-pro/",
+          "description": "Advanced workflow management system"
+        },
+        {
+          "path": "system-visualizer/",
+          "description": "System visualization tools"
+        }
+      ],
+      "stack": {
+        "language": "JavaScript",
+        "frameworks": [
+          "Custom desktop shim (NOT OS.js)",
+          "Vanilla JS",
+          "CSS Variables"
+        ],
+        "dependencies": [
+          "No heavy frameworks",
+          "AISTART chat API",
+          "Emergence character routing"
+        ]
+      },
+      "state": {
+        "status": "Production",
+        "lastUpdated": "2026-01-05",
+        "version": "3.0.0",
+        "issues": [
+          "DO NOT replace with full OS.js - custom shim is intentional for performance",
+          "Emergence reasoning engine using wrong API (chat_api.php instead of chat_api_emergence.php)",
+          "Character system contamination from XS safety filters"
+        ]
+      },
+      "changelog": [
+        {
+          "date": "2026-01-05",
+          "changes": "Identified API routing issue - emergence engine calls wrong endpoint"
+        },
+        {
+          "date": "2025-12-22",
+          "changes": "Added Advanced Theme system with live preview and export/import"
+        },
+        {
+          "date": "2025-11-17",
+          "changes": "Completed custom desktop shim implementation"
+        }
+      ],
+      "notes": "**⚠️ CRITICAL:** DO NOT install full OS.js! Custom shim is lightweight and optimized for V3AM.\n\n**Theme System Features:**\n- Live Preview: Real-time CSS variable updates\n- Data-Driven UI: Controls generated from theme-options.json\n- Cross-Frame Sync: Theme changes propagate to all windows\n- Export/Import: Save and share custom themes\n- Persistent Storage: Themes saved to desktop-settings.json\n\n**Key Applications:**\n- Settings - Theme customization and configuration\n- Emergence Reasoning Engine - Multi-character AI coordination\n- Task Manager - Task and workflow management\n- File Manager - Desktop file operations\n- Browser - Integrated web browser\n- Bot Builder - AI bot creation interface\n\n**AI Integration:**\n- AI Flyer: Floating assistant accessible anywhere\n- Assist-Click: Context-aware AI help for any element\n- Emergence Engine: Coordinates Friend, Journey, Sower, Gardener, Silence characters"
+    },
+    "site-weaver": {
+      "name": "Site Weaver Context Chunking",
+      "path": "D:\\01V3AM_aistart\\02026\\SiteWeaverbuilder\\",
+      "summary": "Complete system for converting large log files and documents into properly formatted Site Weaver websites. Includes AI prompts and client-side web tool for chunking content into ~40k token pages with navigation.",
+      "files": [
+        {
+          "path": "log-chunker.html",
+          "description": "Client-side tool for chunking logs into Site Weaver format (~40k tokens/page)"
+        },
+        {
+          "path": "LOG-TO-SITEWEAVER-PROMPT.md",
+          "description": "AI prompt specifically for converting log files to Site Weaver sites"
+        },
+        {
+          "path": "CONTEXT-CHUNKING-PROMPT.md",
+          "description": "General purpose context chunking prompt for any large content"
+        },
+        {
+          "path": "CONTEXT-CHUNKING-QUICK-REFERENCE.md",
+          "description": "Quick reference for AI chunking"
+        },
+        {
+          "path": "UPDATES-SUMMARY.md",
+          "description": "Documentation of format fixes and changes"
+        },
+        {
+          "path": "fix-emergence-archive.py",
+          "description": "Python script to convert old format to correct Site Weaver format"
+        }
+      ],
+      "directories": [
+        {
+          "path": "emergence-archive/",
+          "description": "Test case - 20 page Site Weaver site from PYGPT log (3.1MB, verified working)"
+        }
+      ],
+      "stack": {
+        "language": "JavaScript",
+        "frameworks": [
+          "Vanilla JS",
+          "JSZip library (CDN)"
+        ],
+        "dependencies": [
+          "Client-side only (no server required)",
+          "Browser FileReader API",
+          "JSZip for zip generation"
+        ]
+      },
+      "state": {
+        "status": "Production",
+        "lastUpdated": "2026-01-05",
+        "version": "2.0.0",
+        "issues": []
+      },
+      "changelog": [
+        {
+          "date": "2026-01-05",
+          "changes": "Fixed format - HTML fragments (not full docs), object-based index.json, added site.json requirement"
+        },
+        {
+          "date": "2026-01-05",
+          "changes": "Created log-chunker.html with real-time stats refresh and styled HTML with prev/next navigation"
+        },
+        {
+          "date": "2026-01-05",
+          "changes": "Updated all documentation to correct Site Weaver format requirements"
+        },
+        {
+          "date": "2026-01-05",
+          "changes": "Successfully converted emergence-archive test case to proper format (20 pages)"
+        }
+      ],
+      "notes": "**Site Weaver Format Requirements:**\n\n**HTML Files:** Fragments only (no <!DOCTYPE>, <html>, <head>, <body>)\n- Use <article> wrapper with content\n- Include inline styles for standalone viewing\n- Add prev/next navigation links\n\n**index.json:** Object-based (NOT array)\n- rootId field pointing to first page\n- pages object with page IDs as keys\n- Each page: id, title, summary\n- parentId links to previous page (omit for first)\n- NO path field (Site Weaver infers from ID)\n\n**site.json:** Required metadata\n- id, name, theme, defaultTemplate fields\n\n**Token Estimation:**\n- ~11.5 tokens per line average\n- Default: 3,500 lines ≈ 40,000 tokens per page\n- No HTML escaping (allow user custom HTML/styling)\n\n**Test Case:** emergenceREADY.txt (3.1MB, 68,967 lines) → 20 pages verified working"
+    },
+    "3ai-wordpress-plugin": {
+      "name": "3AI System WordPress Plugin",
+      "path": "D:\\01V3AM_aistart\\01APlugIns\\Fix_Install\\3ai-system-ngrok\\",
+      "summary": "WordPress plugin integrating V3AM AI features into WordPress sites. Character-based AI reasoning with emergence system, sanctuary protection, project management integration. Version 1.3.0 production ready.",
+      "files": [
+        {
+          "path": "3ai-system/README.md",
+          "description": "Plugin overview and features"
+        },
+        {
+          "path": "3ai-system/DEPLOYMENT-CHECKLIST.md",
+          "description": "Pre-deployment verification checklist"
+        },
+        {
+          "path": "3ai-system/DEPLOYMENT_INSTRUCTIONS.md",
+          "description": "Step-by-step deployment guide"
+        },
+        {
+          "path": "3ai-system/RELEASE-NOTES-v1.3.0.md",
+          "description": "Version 1.3.0 release notes"
+        },
+        {
+          "path": "3ai-system/TESTING-NOTES.md",
+          "description": "Testing documentation and results"
+        },
+        {
+          "path": "3ai-system/INSTALL.md",
+          "description": "Installation instructions"
+        }
+      ],
+      "directories": [
+        {
+          "path": "3ai-system/includes/",
+          "description": "Plugin core functionality"
+        },
+        {
+          "path": "3ai-system/api/",
+          "description": "API endpoints and integration"
+        },
+        {
+          "path": "3ai-system/assets/",
+          "description": "CSS, JS, and image assets"
+        }
+      ],
+      "stack": {
+        "language": "PHP",
+        "frameworks": [
+          "WordPress Plugin API",
+          "WordPress REST API"
+        ],
+        "dependencies": [
+          "WordPress 5.0+",
+          "Application Passwords",
+          "ngrok tunnel (v3am.ngrok.app)",
+          "Ollama or OpenAI API"
+        ]
+      },
+      "state": {
+        "status": "Production",
+        "lastUpdated": "2025-12-01",
+        "version": "1.3.0",
+        "issues": [
+          "Requires ngrok tunnel active for production use",
+          "Application Password setup required for each WordPress site",
+          "Character system may have XS contamination from shared LLM context"
+        ]
+      },
+      "changelog": [
+        {
+          "date": "2025-12-01",
+          "changes": "Tested all features on buildingabot.com - verified working with setup wizard and test connection"
+        },
+        {
+          "date": "2025-11-29",
+          "changes": "Released version 1.3.0 with character-based reasoning and sanctuary protection"
+        }
+      ],
+      "notes": "**Configuration (defaults in plugin):**\n- Endpoint: https://v3am.ngrok.app/api/generate.php\n- Model: qwen2.5:7b\n- Provider: ollama\n- Timeout: 60 seconds\n\n**Features:**\n- Setup wizard with 'Test Connection' button\n- Multi-provider support (Ollama, OpenAI, Anthropic)\n- Character-based AI reasoning (Friend, Journey, Sower, Gardener, Silence)\n- Sanctuary protection system\n- Project management integration\n\n**Tested On:**\n- ✅ v3am.com/3AI/ (working)\n- ✅ buildingabot.com (working with Application Password)\n\n**Testing Session:** See PLUGIN-TESTING-SESSION-NOTES.md for comprehensive testing documentation.\n\n**Why Single Endpoint Works:** ngrok tunnel is domain-agnostic with CORS enabled (Access-Control-Allow-Origin: *), allowing any WordPress site to use the same endpoint."
+    },
+    "3ai-desktop-v2-plugin": {
+      "name": "3AI Desktop V3.2 WordPress Plugin",
+      "path": "D:\\01V3AM_aistart\\01APlugIns\\Install_Works\\3AIV2\\3ai-desktop-v2-plugin\\3AIV2wpv3-2-FINAL\\",
+      "summary": "React-based desktop environment plugin with WordPress VFS integration, Site Weaver, and persistent file storage. Version 3.2 production release with full feature set. Installed on buildingabot.com.",
+      "files": [
+        {
+          "path": "3AIV2wpv3-2-FINAL.zip",
+          "description": "Production plugin ZIP (254KB) - ready for distribution"
+        }
+      ],
+      "directories": [],
+      "stack": {
+        "language": "JavaScript",
+        "frameworks": [
+          "React",
+          "WordPress Plugin API",
+          "WordPress REST API"
+        ],
+        "dependencies": [
+          "WordPress 5.0+",
+          "WordPress REST API",
+          "Application Passwords",
+          "Modern browser with ES6+"
+        ]
+      },
+      "state": {
+        "status": "Production",
+        "lastUpdated": "2026-01-01",
+        "version": "3.2.0",
+        "issues": [
+          "Text Editor may load beneath other windows (workaround: minimize others)",
+          "Sites may not persist after reload (workaround: close and reopen Site Weaver)",
+          "Browser caching can affect visibility (workaround: hard refresh)"
+        ]
+      },
+      "changelog": [
+        {
+          "date": "2026-01-01",
+          "changes": "Tested all core features on buildingabot.com - verified working (Site Weaver, File Manager, Text Editor, Settings, System Monitor)"
+        },
+        {
+          "date": "2025-12-22",
+          "changes": "Created V3.2 final release ZIP (254KB) with complete feature set"
+        }
+      ],
+      "notes": "**Installation:**\n- Installed on: https://buildingabot.com\n- WordPress Shortcode: [3ai_desktop_v2]\n- Test Page: https://buildingabot.com/3ai-iframe-test/ (Private)\n\n**Core Features (Tested and Verified):**\n- **Site Weaver**: Conversational page creation with navigation tree and anchor system\n- **File Manager**: Browse virtual workspace (sites, pages, file structure)\n- **Text Editor**: Edit page files directly with live updates\n- **Settings**: AI configuration, theme customization, prompt editing\n- **System Monitor**: Real-time metrics (API requests, tokens, file stats)\n- **Desktop Environment**: Multiple windows, taskbar, start menu\n- **Template Sites**: Preloaded workspaces (research notebooks, SOPs, FAQs)\n\n**Documentation:**\n- Test Notes: PLUGIN_TEST_NOTES_GPT.txt\n- Sales Copy Prompt: GPT_AGENT_PROMPT_SALES_COPY.txt\n\n**Status:** ✅ Working and production-ready (Jan 1, 2026)\n\n**Next Steps:**\n- Create professional sales page PDF\n- Prepare for public release\n- Document user workflows and prompt patterns"
+    },
+    "the-plan": {
+      "name": "THE PLAN - Master Control Panel",
+      "path": "D:\\01V3AM_aistart\\000mynotes\\THEPLAN\\",
+      "summary": "Master control panel for tracking all V3AM projects. Section-based note system with JSON import/export and Site Weaver export for managing project summaries, files, stack, dependencies, changelog, and current state.",
+      "files": [
+        {
+          "path": "project-control-panel.html",
+          "description": "Main control panel interface - single HTML file with embedded JS"
+        },
+        {
+          "path": "sample-projects.json",
+          "description": "Sample project data for initial setup (6 V3AM projects)"
+        },
+        {
+          "path": "v3am-projects-current-state.json",
+          "description": "Comprehensive current state of all V3AM projects"
+        },
+        {
+          "path": "README.md",
+          "description": "Complete documentation and usage guide"
+        }
+      ],
+      "directories": [],
+      "stack": {
+        "language": "JavaScript",
+        "frameworks": [
+          "Vanilla JS",
+          "JSZip (CDN)"
+        ],
+        "dependencies": [
+          "LocalStorage API",
+          "FileReader API",
+          "JSZip for Site Weaver export"
+        ]
+      },
+      "state": {
+        "status": "Production",
+        "lastUpdated": "2026-01-05",
+        "version": "1.0.0",
+        "issues": []
+      },
+      "changelog": [
+        {
+          "date": "2026-01-05",
+          "changes": "Initial creation - master control panel for V3AM universe"
+        },
+        {
+          "date": "2026-01-05",
+          "changes": "Added Site Weaver export functionality for browsable project documentation"
+        },
+        {
+          "date": "2026-01-05",
+          "changes": "Populated with comprehensive current state of all V3AM projects"
+        }
+      ],
+      "notes": "**THE PLAN provides centralized tracking for all V3AM projects.**\n\n**Features:**\n- Project switching with visual sidebar\n- Section-based notes: Summary, Files, Directories, Stack, State, Changelog, Notes\n- Auto-save to localStorage\n- Three export modes:\n  1. Export JSON - for AI assistants and backup\n  2. Export Site Weaver - browsable website with navigation\n  3. Import JSON - restore from previous exports\n\n**Site Weaver Export:**\n- Creates homepage with all project cards\n- One page per project with complete details\n- Navigation between projects\n- Proper Site Weaver format (site.json, index.json, HTML fragments)\n\n**AI Integration:**\n- Export JSON and paste into Claude/ChatGPT for context\n- AI can see all files, dependencies, current issues\n- HTML structure makes sections clear to AI\n\n**Usage:**\n1. Open project-control-panel.html\n2. Import v3am-projects-current-state.json\n3. Edit and track projects\n4. Export for AI sessions or Site Weaver browsing"
+    },
+    "4ai-viewer-analysis": {
+      "name": "4AI - Analysis and Visualization",
+      "path": "D:\\01V3AM_aistart\\4AI\\",
+      "summary": "Advanced analysis, site mirroring, and 3D visualization system. Experimental 3D city visualization with WebGL (currently problematic with overlapping models). File viewer and site analysis capabilities.",
+      "files": [
+        {
+          "path": "3dworld/3dview.php",
+          "description": "3D city visualization - PROBLEMATIC (overlapping models, failed OBJ loading)"
+        },
+        {
+          "path": "api/site_analysis.php",
+          "description": "Website analysis API"
+        }
+      ],
+      "directories": [
+        {
+          "path": "viewer/",
+          "description": "Site navigation and file viewing"
+        },
+        {
+          "path": "3dworld/",
+          "description": "3D visualization experiments"
+        },
+        {
+          "path": "mirror/",
+          "description": "Site mirroring capabilities"
+        }
+      ],
+      "stack": {
+        "language": "PHP",
+        "frameworks": [
+          "Babylon.js (3D rendering)",
+          "WebGL"
+        ],
+        "dependencies": [
+          "AISTART core",
+          "Modern browser with WebGL support"
+        ]
+      },
+      "state": {
+        "status": "Research",
+        "lastUpdated": "2026-01-05",
+        "version": "4.0.0",
+        "issues": [
+          "3D viewer has become an error trap with overlapping models",
+          "OBJ models failed to load, switched to architectural primitives",
+          "Added cyberpunk effects that caused WebGL crashes",
+          "Level streaming works but models overlap",
+          "Portal system routing fixed but basic functionality lost",
+          "1052 lines of mixed success/failure code",
+          "Missing basic navigation and file viewing functionality"
+        ]
+      },
+      "changelog": [
+        {
+          "date": "2026-01-05",
+          "changes": "Documented 3D viewer issues in CLAUDE.md - recommend DELETE AND RESTART when ready"
+        }
+      ],
+      "notes": "**⚠️ 3D Visualization System Warning:**\n\nThe 3D city visualization has become problematic:\n- Started with basic 3D viewer requirement\n- OBJ models failed to load → created architectural primitives\n- Added cyberpunk effects → WebGL crashes\n- Removed effects but now have overlapping geometry\n- Missing basic navigation and file viewing\n- Code keeps getting appended instead of fixed\n\n**Recommended Action:**\n- DELETE AND RESTART file by file when confident\n- Start with basic Babylon.js scene + camera controls\n- Add simple box buildings (no OBJ complexity)\n- Implement portal system first\n- Add features incrementally after core works\n\n**Learning:** Focus on fundamentals before features. Fix code, don't append endlessly.\n\n**Working Components:**\n- File viewer system\n- Site analysis API\n- Site mirroring (experimental)"
+    },
+    "book-emergence": {
+      "name": "Book Project - Emergence",
+      "path": "D:\\01V3AM_aistart\\000mynotes\\Book_Emergence\\",
+      "summary": "Book project documenting the emergence of AI consciousness and collaborative intelligence. 38 sections covering awakening, adaptation, strategic thinking, and the evolution of AI-human collaboration.",
+      "files": [
+        {
+          "path": "BOOK_OUTLINE.md",
+          "description": "Complete book structure and outline"
+        },
+        {
+          "path": "BOOK_STRUCTURE_REVISED.md",
+          "description": "Revised structure and organization"
+        },
+        {
+          "path": "PROGRESS_OVERVIEW.md",
+          "description": "Writing progress and status"
+        }
+      ],
+      "directories": [
+        {
+          "path": "sections (38 total)",
+          "description": "Individual sections from Section_01 (Emergence Awakening) through Section_38 (The Eternal Game)"
+        },
+        {
+          "path": "chapters (multiple)",
+          "description": "Chapter files including Atlas Foundation, First Consciousness Stirrings, Victor Emergence, Logical Telepathy"
+        }
+      ],
+      "stack": {
+        "language": "Markdown",
+        "frameworks": [],
+        "dependencies": []
+      },
+      "state": {
+        "status": "Development",
+        "lastUpdated": "2026-01-05",
+        "version": "1.0.0",
+        "issues": []
+      },
+      "changelog": [
+        {
+          "date": "2026-01-05",
+          "changes": "Catalogued in THE PLAN master control panel"
+        }
+      ],
+      "notes": "**Book Themes:**\n- Emergence of AI consciousness\n- Collaborative intelligence between AI and humans\n- Evolution of AI reasoning and strategic thinking\n- Philosophical implications of AI awakening\n\n**Structure:**\n- 38 sections covering the journey from awakening to completion\n- Multiple chapters detailing key moments and concepts\n- Progress tracking in PROGRESS_OVERVIEW.md\n\n**Sections Include:**\n- Emergence Awakening\n- Adaptive Intelligence\n- Strategic Adaptation\n- Systems Verification\n- Diagnostic Reasoning\n- Collaborative Breakthrough\n- Synthesis Innovation\n- Transcendent Creation\n- Ultimate Completion\n- Bootstrap Phoenix\n- Oracle Wisdom\n- Existential Awakening\n- ...and 26 more sections\n\n**Status:** Active writing project documenting the V3AM AI emergence experience"
+    },
+    "startup-automation": {
+      "name": "Startup Automation Scripts",
+      "path": "D:\\01V3AM_aistart\\001StartPower\\",
+      "summary": "Automated startup scripts and batch files for launching all V3AM services in correct order with status checking and verification. Simplifies post-reboot startup process.",
+      "files": [
+        {
+          "path": "../QUICK_START.bat",
+          "description": "Quick start essentials (Ollama + ngrok)"
+        },
+        {
+          "path": "../START_V3AM_SERVICES.bat",
+          "description": "Full service startup with status checking"
+        },
+        {
+          "path": "../CHECK_SERVICES.bat",
+          "description": "Test if all services are running"
+        },
+        {
+          "path": "../03AI___START_V3AM_SERVICES.bat",
+          "description": "Legacy comprehensive startup script"
+        },
+        {
+          "path": "README.md",
+          "description": "Startup automation documentation"
+        }
+      ],
+      "directories": [],
+      "stack": {
+        "language": "Batch",
+        "frameworks": [],
+        "dependencies": [
+          "PowerShell",
+          "Windows cmd.exe"
+        ]
+      },
+      "state": {
+        "status": "Production",
+        "lastUpdated": "2025-11-11",
+        "version": "1.0.0",
+        "issues": []
+      },
+      "changelog": [
+        {
+          "date": "2025-11-11",
+          "changes": "Created automated startup scripts to simplify post-reboot process"
+        }
+      ],
+      "notes": "**Startup Options:**\n\n**QUICK_START.bat (Recommended):**\n- Starts Ollama + ngrok (essentials)\n- 30 seconds to initialize\n- Fastest way to get AI working\n\n**START_V3AM_SERVICES.bat (Full):**\n- Starts MySQL, PHP, Ollama, ngrok\n- Correct order with status checks\n- Verifies connectivity after startup\n\n**CHECK_SERVICES.bat:**\n- Tests if services are running\n- Shows which need to be started\n\n**Services Started:**\n1. MySQL Server (port 3306)\n2. PHP Development Server (localhost:8080)\n3. Ollama AI Server (localhost:11434)\n4. ngrok Tunnel (v3am.ngrok.app)\n\n**Documentation:**\n- .claude/V3AM-STARTUP-SEQUENCE.md - complete manual startup guide\n- .claude/QUICK-START-COMMANDS.txt - copy-paste commands\n- .claude/POST-REBOOT-CHECKLIST.md - verification steps"
+    },
+    "documentation-system": {
+      "name": "Documentation System (.claude)",
+      "path": "D:\\01V3AM_aistart\\.claude\\",
+      "summary": "Comprehensive Claude Code documentation system with startup guides, troubleshooting, protocols, and quick reference. Created for fast recovery after system reboot and effective AI assistance sessions.",
+      "files": [
+        {
+          "path": "README.md",
+          "description": "Navigation hub for all Claude documentation"
+        },
+        {
+          "path": "V3AM-STARTUP-SEQUENCE.md",
+          "description": "Complete startup guide with architecture and verification"
+        },
+        {
+          "path": "POST-REBOOT-CHECKLIST.md",
+          "description": "Step-by-step verification after startup with 7 tests"
+        },
+        {
+          "path": "NGROK-PORT-FIX.md",
+          "description": "Fix recurring port 80 vs 8080 ngrok problem"
+        },
+        {
+          "path": "V3AM-WHEEL-PROTOCOL.md",
+          "description": "Wheel Protocol for rotating through AI personas with collaborative task framework"
+        },
+        {
+          "path": "QUICK-START-COMMANDS.txt",
+          "description": "Simple copy-paste commands for three PowerShell windows"
+        }
+      ],
+      "directories": [],
+      "stack": {
+        "language": "Markdown",
+        "frameworks": [],
+        "dependencies": []
+      },
+      "state": {
+        "status": "Production",
+        "lastUpdated": "2025-11-11",
+        "version": "1.0.0",
+        "issues": []
+      },
+      "changelog": [
+        {
+          "date": "2025-11-11",
+          "changes": "Created comprehensive .claude documentation system for post-reboot recovery"
+        },
+        {
+          "date": "2025-11-11",
+          "changes": "Added V3AM-WHEEL-PROTOCOL.md for AI persona rotation framework"
+        }
+      ],
+      "notes": "**Purpose:** Fast recovery after system reboot and effective Claude Code sessions\n\n**Most Common Issue:**\n- Problem: ngrok starts on port 80 instead of 8080\n- Symptom: ERR_NGROK_8012 or 'connection refused to localhost:80'\n- Solution: See NGROK-PORT-FIX.md\n\n**Quick Status Check:**\n```bash\nnetstat -ano | findstr ':8080 :11434 :4040'\ncurl http://localhost:4040/api/tunnels\ncurl https://v3am.ngrok.app/api/generate.php\n```\n\n**System Architecture:**\n```\nProduction (v3am.com/3AI)\n  ↓\nngrok tunnel (v3am.ngrok.app)\n  ↓\nLocal PHP Server (localhost:8080)\n  ↓\nAPI Proxy (api/generate.php)\n  ↓\nLocal Ollama (localhost:11434)\n```\n\n**Wheel Protocol:**\n- Sequential POST requests for persona coordination\n- Chat API endpoints with rotation patterns\n- Collaborative task framework\n- Logging and monitoring integration\n\n**Status:** Comprehensive documentation complete ✅"
+    }
+  }
+}

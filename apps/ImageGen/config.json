@@ -1,0 +1,7 @@
+{
+  "name": "ImageGen",
+  "port": 9230,
+  "engine": "http://127.0.0.1:7860",
+  "output": "F:\\4\\ME\\EYES",
+  "ui": "VeilEdge"
+}

@@ -1,0 +1,53 @@
+{
+  "name": "[EXAMPLE] 01 - Lead Search",
+  "description": "Find and categorize leads by temperature. Agentic Prompt: promptleadsearch1. Agent: Jerry (9200). Cycles: 5-7.",
+  "nodes": [
+    {
+      "id": "trigger1",
+      "type": "trigger.manual",
+      "title": "Start Lead Search",
+      "x": 100,
+      "y": 100,
+      "data": {}
+    },
+    {
+      "id": "action1",
+      "type": "action.http",
+      "title": "Call Jerry: Execute promptleadsearch1",
+      "x": 350,
+      "y": 100,
+      "data": {
+        "method": "GET",
+        "url": "http://localhost:9200/agent/api/agent.php?action=chat&input=Execute_promptleadsearch1_Find_hot_warm_and_cold_leads_from_pipeline",
+        "body": ""
+      }
+    },
+    {
+      "id": "delay1",
+      "type": "action.delay",
+      "title": "Wait for results",
+      "x": 600,
+      "y": 100,
+      "data": {
+        "ms": "2000"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "trigger1",
+      "to": "action1",
+      "cond": null
+    },
+    {
+      "from": "action1",
+      "to": "delay1",
+      "cond": null
+    }
+  ],
+  "vars": {
+    "prompt": "promptleadsearch1",
+    "agent": "Jerry (9200)",
+    "cycles_estimated": "5-7"
+  }
+}

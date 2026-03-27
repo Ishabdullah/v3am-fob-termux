@@ -1,0 +1,16 @@
+[2026-02-05T18:35:52.217Z] Unhandled error: ENOENT: no such file or directory, stat 'C:\V3AM\COMMAND-CENTER\apps\TANDRSocial\logo.jpg'
+Stack: Error: ENOENT: no such file or directory, stat 'C:\V3AM\COMMAND-CENTER\apps\TANDRSocial\logo.jpg'
+[2026-02-05T18:36:37.901Z] PHP execution error: Command failed: php "C:\V3AM\COMMAND-CENTER\apps\TANDRSocial\api\bot.php"
+
+Script: C:\V3AM\COMMAND-CENTER\apps\TANDRSocial\api\bot.php
+Stderr: 
+[2026-02-06T05:07:01.902Z] Unhandled error: ENOENT: no such file or directory, stat 'C:\V3AM\COMMAND-CENTER\apps\TANDRSocial\logo.jpg'
+Stack: Error: ENOENT: no such file or directory, stat 'C:\V3AM\COMMAND-CENTER\apps\TANDRSocial\logo.jpg'
+[2026-02-06T18:10:32.126Z] Unhandled error: ENOENT: no such file or directory, stat 'C:\v3am\COMMAND-CENTER\apps\TANDRSocial\logo.jpg'
+Stack: Error: ENOENT: no such file or directory, stat 'C:\v3am\COMMAND-CENTER\apps\TANDRSocial\logo.jpg'
+[2026-02-06T18:32:39.578Z] Unhandled error: ENOENT: no such file or directory, stat 'C:\v3am\COMMAND-CENTER\apps\TANDRSocial\logo.jpg'
+Stack: Error: ENOENT: no such file or directory, stat 'C:\v3am\COMMAND-CENTER\apps\TANDRSocial\logo.jpg'
+[2026-02-06T18:33:18.853Z] PHP execution error: Command failed: php "C:\v3am\COMMAND-CENTER\apps\TANDRSocial\api\bot.php"
+
+Script: C:\v3am\COMMAND-CENTER\apps\TANDRSocial\api\bot.php
+Stderr: 

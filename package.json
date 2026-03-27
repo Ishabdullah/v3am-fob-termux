@@ -1,0 +1,20 @@
+{
+  "name": "v3am-fob-termux",
+  "version": "3.0.0",
+  "description": "V3AM FOB — Termux/Android port of the multi-agent AI platform",
+  "main": "lib/launcher.js",
+  "scripts": {
+    "start": "node lib/launcher.js",
+    "launcher": "node lib/launcher.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "node-fetch": "^3.3.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "author": "V3AM Team",
+  "license": "MIT"
+}

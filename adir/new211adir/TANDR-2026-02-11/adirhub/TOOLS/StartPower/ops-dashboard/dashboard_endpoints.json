@@ -1,0 +1,14 @@
+{
+  "generatedAt": "2026-01-23T00:00:00Z",
+  "endpoints": [
+    {"name":"Local Dashboard UI","path":"http://localhost:8080/dashboard.php","type":"GET","description":"Main dashboard UI"},
+    {"name":"Local Desk UI","path":"http://localhost:8080/desktop/","type":"GET","description":"Desktop Shim UI"},
+    {"name":"Local API Proxy","path":"http://localhost:8080/api/generate.php","type":"GET/POST","description":"Local API to proxy to Ollama"},
+    {"name":"Ollama API","path":"http://localhost:11434/api/generate","type":"POST","description":"LLM local endpoint"},
+    {"name":"Health Endpoint","path":"http://localhost:4096/health","type":"GET","description":"Service health"},
+    {"name":"Prod LLM Proxy","path":"https://v3am.ngrok.app/api/generate.php","type":"POST","description":"Ngrok-proxied Ollama"},
+    {"name":"Prod Chat API","path":"https://v3am.com/3AI/chat_api.php","type":"GET","description":"Production main chat API"},
+    {"name":"Prod Emergence API","path":"https://v3am.com/3AI/chat_api_emergence.php","type":"GET","description":"Production emergence character API"},
+    {"name":"Settings Page","path":"https://v3am.com/3AI/settings.php","type":"GET","description":"LLM/endpoint config"}
+  ]
+}

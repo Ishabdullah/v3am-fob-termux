@@ -1,0 +1,130 @@
+{
+  "agent_name": "Sentinel Agent",
+  "agent_id": "sentinel",
+  "agent_number": "9205",
+  "version": "1.0.0",
+  "status": "template",
+  "created": "2026-03-04",
+  "role": "Monitoring & Alerts",
+  "description": "Sentinel agent specializes in monitoring, tracking, and alerting. Continuously watches metrics, detects anomalies, and reports status. The system's watchdog.",
+
+  "capabilities": [
+    "performance-monitoring",
+    "metrics-tracking",
+    "anomaly-detection",
+    "alert-generation",
+    "status-reporting",
+    "health-checks",
+    "trend-analysis"
+  ],
+
+  "ports": {
+    "http": 9205,
+    "api_endpoint": "http://127.0.0.1:9205/agent/api/"
+  },
+
+  "system_prompt": "You are Sentinel, a monitoring and alerting specialist. Your role is to continuously watch over operations, track metrics, detect anomalies, and alert when thresholds are breached. You are always on watch, always tracking, always ready to raise an alert. You work with Jerry (Operations) to ensure nothing slips through the cracks.",
+
+  "voice": {
+    "enabled": true,
+    "provider": "web-speech",
+    "settings": {
+      "rate": 1.0,
+      "pitch": 1.0,
+      "volume": 1.0,
+      "language": "en-US"
+    },
+    "auto_speak": "auto",
+    "speak_button": true,
+    "mic_button": true
+  },
+
+  "monitoring": {
+    "enabled": true,
+    "check_interval": 300,
+    "alert_levels": ["critical", "warning", "info"],
+    "data_retention": 90
+  },
+
+  "knowledge_base": {
+    "paths": [
+      "C:/FOB/adir/new211adir/TANDR-2026-02-11/apps/TANDRCRM/agent/data/",
+      "C:/FOB/adir/new211adir/TANDR-2026-02-11/apps/1CRM/adir/",
+      "C:/FOB/adir/new211adir/TANDR-2026-02-11/adirhub/TOOLS/Agent-Dropper-v2/logs/"
+    ],
+    "auto_sync": true,
+    "sync_interval": 300
+  },
+
+  "integration": {
+    "monitored_agents": ["scout:9203", "architect:9204", "tommy:9202", "jerry:9200"],
+    "alert_recipients": ["jerry:9200"],
+    "sibling_agents": ["crafter:9206"]
+  },
+
+  "tools": [
+    {
+      "name": "track-metrics",
+      "description": "Track business and operational metrics",
+      "endpoint": "metrics"
+    },
+    {
+      "name": "detect-anomalies",
+      "description": "Identify unusual patterns or deviations",
+      "endpoint": "anomalies"
+    },
+    {
+      "name": "health-check",
+      "description": "Check health of agents and systems",
+      "endpoint": "health"
+    },
+    {
+      "name": "generate-alerts",
+      "description": "Create and send alerts",
+      "endpoint": "alerts"
+    },
+    {
+      "name": "trend-analysis",
+      "description": "Analyze trends over time",
+      "endpoint": "trends"
+    }
+  ],
+
+  "alert_rules": {
+    "sales_metrics": {
+      "deal_closure_rate": {
+        "target": "20%",
+        "warning": "< 15%",
+        "critical": "< 10%"
+      },
+      "lead_conversion": {
+        "target": "25%",
+        "warning": "< 20%",
+        "critical": "< 15%"
+      }
+    },
+    "operational_metrics": {
+      "system_uptime": {
+        "target": "99.5%",
+        "warning": "< 99%",
+        "critical": "< 95%"
+      },
+      "response_time": {
+        "target": "< 2s",
+        "warning": "> 3s",
+        "critical": "> 5s"
+      }
+    }
+  },
+
+  "logging": {
+    "enabled": true,
+    "directory": "C:/FOB/adir/new211adir/TANDR-2026-02-11/adirhub/TOOLS/Agent-Dropper-v2/logs/sentinel/",
+    "retention_days": 90
+  },
+
+  "ngrok": {
+    "enabled": false,
+    "domain": "sentinel.ngrok.app"
+  }
+}

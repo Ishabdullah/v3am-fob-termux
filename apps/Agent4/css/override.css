@@ -1,0 +1,156 @@
+/* ============================================================
+   Agent Four — override.css
+   Live-editable. Browser refresh applies changes instantly.
+   No server restart needed.
+   Path: C:\FOB\adir\new211adir\TANDR-2026-02-11\apps\Agent4\css\override.css
+   ============================================================ */
+
+/* ============================================================
+   FLOATING BROWSER — viewport-pinned top-right
+   Agent Four injects this via script in its response:
+
+   document.body.appendChild(agentBrowserEl)
+
+   Controls:
+     window.agentBrowser.navigate('http://127.0.0.1:PORT/')
+     window.agentBrowser.toggle()
+     window.agentBrowser.close()
+   ============================================================ */
+
+#agent-browser {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 520px;
+    height: 420px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-secondary, #111638);
+    border: 1px solid var(--accent, #00d9ff);
+    border-top: none;
+    border-right: none;
+    border-radius: 0 0 0 12px;
+    box-shadow: -4px 4px 24px rgba(0, 217, 255, 0.15);
+    transition: transform 0.25s ease, opacity 0.25s ease;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+#agent-browser.collapsed {
+    transform: translateY(calc(-100% + 32px));
+    opacity: 0.7;
+}
+
+/* Toolbar bar */
+#agent-browser-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    background: var(--bg-tertiary, #161b42);
+    border-bottom: 1px solid var(--accent, #00d9ff);
+    border-radius: 0 0 0 0;
+    flex-shrink: 0;
+    cursor: grab;
+    user-select: none;
+    min-height: 32px;
+}
+
+#agent-browser-bar .ab-label {
+    font-size: 10px;
+    color: var(--accent, #00d9ff);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+}
+
+#agent-browser-url {
+    flex: 1;
+    padding: 3px 8px;
+    font-size: 11px;
+    font-family: monospace;
+    background: var(--bg-primary, #0a0e27);
+    color: var(--text-primary, #e0e6f0);
+    border: 1px solid var(--border, rgba(255,255,255,0.08));
+    border-radius: 4px;
+    outline: none;
+    min-width: 0;
+}
+#agent-browser-url:focus {
+    border-color: var(--accent, #00d9ff);
+}
+
+#agent-browser-go {
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    background: var(--accent, #00d9ff);
+    color: #000;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+#agent-browser-go:hover {
+    background: #33e5ff;
+}
+
+#agent-browser-reload {
+    padding: 3px 7px;
+    font-size: 12px;
+    background: transparent;
+    color: var(--text-secondary, #8892b0);
+    border: 1px solid var(--border, rgba(255,255,255,0.08));
+    border-radius: 4px;
+    cursor: pointer;
+    flex-shrink: 0;
+    line-height: 1;
+}
+#agent-browser-reload:hover {
+    color: var(--accent, #00d9ff);
+    border-color: var(--accent, #00d9ff);
+}
+
+#agent-browser-toggle {
+    padding: 3px 7px;
+    font-size: 11px;
+    background: transparent;
+    color: var(--text-secondary, #8892b0);
+    border: 1px solid var(--border, rgba(255,255,255,0.08));
+    border-radius: 4px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+#agent-browser-toggle:hover {
+    color: var(--accent, #00d9ff);
+    border-color: var(--accent, #00d9ff);
+}
+
+#agent-browser-close {
+    padding: 3px 7px;
+    font-size: 11px;
+    background: transparent;
+    color: var(--text-secondary, #8892b0);
+    border: 1px solid var(--border, rgba(255,255,255,0.08));
+    border-radius: 4px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+#agent-browser-close:hover {
+    color: var(--danger, #ff5252);
+    border-color: var(--danger, #ff5252);
+}
+
+/* The iframe */
+#agent-browser-frame {
+    flex: 1;
+    width: 100%;
+    border: none;
+    background: #fff;
+    display: block;
+}
+
+/* ============================================================
+   Add custom CSS below this line.
+   Save file → browser refresh → live instantly.
+   ============================================================ */

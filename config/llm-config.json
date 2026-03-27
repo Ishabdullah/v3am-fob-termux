@@ -1,0 +1,39 @@
+{
+  "_readme": "LLM Provider Configuration for V3AM FOB Termux",
+  "_note": "This file is merged into fob-config.json. Edit fob-config.json for the authoritative config.",
+
+  "providers": {
+    "llamacpp": {
+      "name": "llama.cpp (local)",
+      "type": "local",
+      "endpoint": "http://127.0.0.1:8080/completion",
+      "health_url": "http://127.0.0.1:8080/health",
+      "description": "Local LLM running via llama.cpp server. Built from source during setup.sh.",
+      "default_model": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+      "model_dir": "$HOME/fob/models/",
+      "start_command": "$HOME/llama.cpp/build/bin/llama-server --model MODEL_FILE --host 127.0.0.1 --port 8080"
+    },
+    "anthropic": {
+      "name": "Anthropic Claude",
+      "type": "cloud",
+      "endpoint": "https://api.anthropic.com/v1/messages",
+      "requires_key": true,
+      "recommended_model": "claude-haiku-4-5-20251001",
+      "description": "Anthropic's Claude API. Fast and capable. Set api_key in fob-config.json."
+    },
+    "gemini": {
+      "name": "Google Gemini",
+      "type": "cloud",
+      "endpoint": "https://generativelanguage.googleapis.com/v1beta/models/",
+      "requires_key": true,
+      "recommended_model": "gemini-2.0-flash",
+      "description": "Google Gemini API. Free tier available. Set api_key in fob-config.json."
+    }
+  },
+
+  "switching": {
+    "note": "To switch provider, change 'provider' in fob-config.json llm section",
+    "options": ["llamacpp", "anthropic", "gemini"],
+    "priority_order": ["llamacpp", "gemini", "anthropic"]
+  }
+}

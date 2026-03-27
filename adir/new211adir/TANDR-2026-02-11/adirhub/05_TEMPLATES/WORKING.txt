@@ -1,0 +1,81 @@
+# 🧠 WORKING MEMORY
+
+**Last Updated**: [DATE]
+**Agent**: [YOUR NAME]
+**Directory**: [DIRECTORY NAME]
+
+---
+
+## 📦 PROJECT OVERVIEW
+
+**Goal**: [What are we trying to accomplish?]
+
+**Current Status**: [Where are we?]
+
+---
+
+## 🏗️ ARCHITECTURE
+
+**System Structure**:
+```
+[Describe your system structure here]
+```
+
+**Key Components**:
+- Component 1: [Description]
+- Component 2: [Description]
+- Component 3: [Description]
+
+---
+
+## 🔧 TECHNICAL DECISIONS
+
+**Decision 1: [Title]**
+- What: [What was decided]
+- Why: [Why this choice]
+- Impact: [What it affects]
+
+**Decision 2: [Title]**
+- What: [What was decided]
+- Why: [Why this choice]
+- Impact: [What it affects]
+
+---
+
+## 📊 PROGRESS TRACKING
+
+**Overall Progress**: [X]%
+
+**Phases**:
+- Phase 1: [Status]
+- Phase 2: [Status]
+- Phase 3: [Status]
+
+---
+
+## 🔗 DEPENDENCIES
+
+**External Dependencies**:
+- Dependency 1: [What we need from who]
+- Dependency 2: [What we need from who]
+
+**Internal Dependencies**:
+- Component A depends on Component B
+- Task X blocks Task Y
+
+---
+
+## 📌 NOTES
+
+**Important Context**:
+- Note 1
+- Note 2
+- Note 3
+
+**Lessons Learned**:
+- Lesson 1
+- Lesson 2
+
+**Things to Remember**:
+- Important thing 1
+- Important thing 2

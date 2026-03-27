@@ -1,0 +1,180 @@
+324 All ports and paths have changed example only for syntax 
+324 All ports and paths have changed example only for syntax 
+324 All ports and paths have changed example only for syntax 
+
+
+```
+╔══════════════════════════════════════════════════════════════════════╗
+║  ADIR SYSTEM - BOOT LOADER                                          ║
+║  C:\FOB\adir\new211adir\TANDR-2026-02-11\apps\TANDRmgr-lab\        ║
+║  adir\BOOT.md                                                        ║
+║  Updated: 2026-03-16 | The manual — how to operate TANDRmgr-lab.     ║
+╠══════════════════════════════════════════════════════════════════════╣
+║  AGENT: TANDRmgr-lab is a core service on port 8086. It's the       ║
+║  manager lab — testing interface for LLM interactions, Ollama relay,  ║
+║  conversation memory, and API testing. Memory Bot (8091) runs from   ║
+║  inside this directory at bot/.                                       ║
+║                                                                      ║
+║  Service: http://127.0.0.1:8086                                     ║
+║  Memory Bot: http://127.0.0.1:8091                                  ║
+║  Hub: http://127.0.0.1:9303                                         ║
+╚══════════════════════════════════════════════════════════════════════╝
+```
+
+# How to Operate TANDRmgr-lab
+
+TANDRmgr-lab is the manager lab and testing service for FOB. It provides a testing interface for LLM interactions, relays requests to Ollama on port 11434, maintains conversation memory, and offers API endpoints for service testing. Memory Bot (port 8091) lives inside this directory at `bot/` and provides persistent context support.
+
+---
+
+## Starting
+
+**Via MasterSTART6 (recommended):**
+```
+C:\FOB\MasterSTART6.bat
+```
+Starts TANDRmgr-lab on 8086 and Memory Bot on 8091 as part of all FOB services.
+
+**Direct start:**
+```
+cd C:\FOB\adir\new211adir\TANDR-2026-02-11\apps\TANDRmgr-lab
+node server.js
+```
+
+**Memory Bot separately:**
+```
+cd C:\FOB\adir\new211adir\TANDR-2026-02-11\apps\TANDRmgr-lab\bot
+node server.js
+```
+
+**Install dependencies (first time):**
+```
+cd C:\FOB\adir\new211adir\TANDR-2026-02-11\apps\TANDRmgr-lab
+npm install
+```
+
+---
+
+## Verify
+
+```
+http://127.0.0.1:8086/          TANDRmgr-lab status
+http://127.0.0.1:8091/          Memory Bot status
+```
+
+---
+
+## Common Operations
+
+**Query Ollama via TANDRmgr:**
+```
+curl -X POST http://127.0.0.1:8086/api/generate -H "Content-Type: application/json" -d "{\"prompt\":\"Hello\",\"model\":\"qwen2.5:7b\"}"
+```
+
+**Check available models:**
+```
+curl http://127.0.0.1:11434/api/tags
+```
+
+**Check memory:**
+```
+curl http://127.0.0.1:8086/api/memory
+```
+
+**Query Memory Bot:**
+```
+curl "http://127.0.0.1:8091/api/memory.php?action=query&q=What+recent+information+do+you+have%3F"
+```
+
+---
+
+## Configuration
+
+Config lives at `C:\FOB\adir\new211adir\TANDR-2026-02-11\apps\TANDRmgr-lab\bot\config.json`:
+
+```json
+{
+  "port": 8086,
+  "ollama": {
+    "host": "http://localhost",
+    "port": 11434,
+    "defaultModel": "qwen2.5:7b"
+  },
+  "memory": {
+    "enabled": true,
+    "path": "./data/memory-knowledge"
+  }
+}
+```
+
+To change the LLM model, edit `defaultModel` and restart.
+
+---
+
+## Directory Structure
+
+```
+TANDRmgr-lab/
+├── server.js              ← TANDRmgr-lab Express server (port 8086)
+├── config.json            ← Root config
+├── index.html             ← Web UI
+├── api.php                ← PHP API handler
+├── api/                   ← API endpoints
+├── data/                  ← Context data
+│   └── help-context.md
+├── bot/                   ← Memory Bot (port 8091)
+│   ├── server.js          ← Memory Bot Express server
+│   ├── config.json        ← Memory Bot config
+│   ├── data/
+│   │   └── memory-knowledge/  ← Persistent memory files
+│   └── adir/logs/         ← Memory Bot logs
+└── adir/                  ← You are here
+    ├── logs/              ← TANDRmgr-lab logs
+    │   └── conversations.txt
+    └── [documentation files]
+```
+
+---
+
+## Troubleshooting
+
+**Port 8086 in use:** `netstat -ano | findstr :8086` then `taskkill /PID [PID] /f`
+
+**Ollama not responding:** `curl http://127.0.0.1:11434/api/tags` — if fails, start Ollama.
+
+**Dependencies missing:** `npm install` in the TANDRmgr-lab root directory.
+
+**Memory not loading:** Check `bot/config.json` → `memory.path` points to `./data/memory-knowledge`. Verify that directory exists.
+
+---
+
+## Data Sensitivity
+
+TANDRmgr-lab contains conversation logs and memory files that may include company/customer data. See `SANITIZATION-GUIDE.md` in this adir directory before sharing or open-sourcing.
+
+```
+╔══════════════════════════════════════════════════════════════════════╗
+║  END OF BOOT.md                                                      ║
+╠══════════════════════════════════════════════════════════════════════╣
+║  You know how to operate TANDRmgr-lab. Your next move:               ║
+║                                                                      ║
+║  → What's happening right now:                                       ║
+║    C:\FOB\adir\new211adir\TANDR-2026-02-11\apps\TANDRmgr-lab\       ║
+║    adir\current.md                                                   ║
+║                                                                      ║
+║  → How it works under the hood:                                      ║
+║    C:\FOB\adir\new211adir\TANDR-2026-02-11\apps\TANDRmgr-lab\       ║
+║    adir\working.md                                                   ║
+║                                                                      ║
+║  → Back to the hub:                                                  ║
+║    C:\FOB\adir\new211adir\TANDR-2026-02-11\adirhub\index.md         ║
+║                                                                      ║
+║  To evolve this manual, create:                                      ║
+║  SOT-[YYYYMMDD]-tandrmgr-boot.md                                    ║
+║  Place in this adir directory.                                       ║
+╚══════════════════════════════════════════════════════════════════════╝
+```
+
+324 All ports and paths have changed example only for syntax 
+324 All ports and paths have changed example only for syntax 
+324 All ports and paths have changed example only for syntax 

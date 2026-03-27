@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FOB - Getting Started</title>
+<link rel="icon" href="assets/logo.ico" type="image/x-icon">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #06080f;
+    color: #c8d6e5;
+    min-height: 100vh;
+    line-height: 1.7;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      linear-gradient(rgba(0,217,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,217,255,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none; z-index: 0;
+  }
+
+  .page { position: relative; z-index: 1; max-width: 800px; margin: 0 auto; padding: 30px 24px 60px; }
+
+  .top-bar {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 30px; padding-bottom: 16px;
+    border-bottom: 1px solid rgba(0,217,255,0.15);
+  }
+  .top-bar img { width: 44px; height: 44px; border-radius: 10px; border: 1px solid rgba(0,217,255,0.2); }
+  .top-bar h1 { font-size: 1.4em; font-weight: 300; letter-spacing: 5px; color: #00d9ff; text-transform: uppercase; }
+  .top-bar .back {
+    margin-left: auto;
+    color: #556; text-decoration: none; font-size: 0.82em;
+    padding: 6px 14px; border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 6px; transition: all 0.2s;
+  }
+  .top-bar .back:hover { color: #99a; border-color: rgba(255,255,255,0.15); }
+
+  h2 {
+    font-size: 1.15em; font-weight: 600; color: #00d9ff;
+    margin: 32px 0 12px; padding-bottom: 6px;
+    border-bottom: 1px solid rgba(0,217,255,0.1);
+    letter-spacing: 1px;
+  }
+  h2:first-of-type { margin-top: 0; }
+
+  p { margin-bottom: 14px; color: #aab; font-size: 0.92em; }
+
+  .step-list { list-style: none; counter-reset: steps; margin: 0 0 20px; }
+  .step-list li {
+    counter-increment: steps;
+    padding: 12px 16px 12px 52px;
+    position: relative;
+    margin-bottom: 8px;
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 8px;
+    font-size: 0.9em;
+  }
+  .step-list li::before {
+    content: counter(steps);
+    position: absolute; left: 14px; top: 12px;
+    width: 26px; height: 26px;
+    background: rgba(0,217,255,0.12); color: #00d9ff;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.82em; font-weight: 700;
+  }
+
+  code {
+    background: rgba(0,217,255,0.08);
+    color: #00d9ff;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: 'Consolas', monospace;
+    font-size: 0.88em;
+  }
+
+  .warn-box {
+    background: rgba(245,158,11,0.08);
+    border: 1px solid rgba(245,158,11,0.2);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin: 16px 0;
+    font-size: 0.88em;
+    color: #ddb;
+  }
+  .warn-box strong { color: #f59e0b; }
+
+  .tip-box {
+    background: rgba(34,197,94,0.06);
+    border: 1px solid rgba(34,197,94,0.15);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin: 16px 0;
+    font-size: 0.88em;
+    color: #adc;
+  }
+  .tip-box strong { color: #22c55e; }
+
+  .port-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0 20px;
+    font-size: 0.85em;
+  }
+  .port-table th {
+    text-align: left;
+    padding: 8px 12px;
+    color: #00d9ff;
+    border-bottom: 1px solid rgba(0,217,255,0.15);
+    font-weight: 500;
+    font-size: 0.85em;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .port-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    color: #99a;
+  }
+  .port-table td:first-child { color: #dde; font-weight: 500; }
+
+  .key-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 12px 0 20px;
+  }
+  .key-card {
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 8px;
+    padding: 14px;
+  }
+  .key-card .kl { font-size: 0.75em; color: #556; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+  .key-card .kv { font-size: 0.88em; color: #dde; word-break: break-all; }
+
+  a { color: #00d9ff; }
+
+  @media (max-width: 600px) {
+    .key-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="top-bar">
+    <img src="assets/logo.jpg" alt="FOB" />
+    <h1>Getting Started</h1>
+    <span></span>
+  </div>
+
+  <h2>What is FOB?</h2>
+  <p>FOB is a local AI agent system that runs on your computer. It launches several small servers that each do a specific job — chat agents, knowledge bots, and tools for building more of them. Everything runs locally. Your data stays on your machine.</p>
+
+  <h2>Starting Up</h2>
+  <ol class="step-list">
+    <li>Double-click the <strong>V3AM FOB</strong> desktop shortcut, or launch <code>C:\FOB\V3AMFOB\V3AMFOB.exe</code> directly.</li>
+    <li>V3AMFOB starts all services automatically in the background. The rack panel shows a status card for each service — watch for the indicators to go green.</li>
+    <li>Click any service card to open it in your browser.</li>
+  </ol>
+
+  <div class="tip-box">
+    <strong>Tip:</strong> If a card stays red, click the restart button on that card or check the log panel for error output.
+  </div>
+
+  <h2>Shutting Down</h2>
+  <ol class="step-list">
+    <li><strong>To keep services running:</strong> Click the X on V3AMFOB — it minimizes to the system tray. Services keep running in the background.</li>
+    <li><strong>To stop everything:</strong> Right-click the tray icon → <strong>Quit</strong>. This kills all services and exits cleanly.</li>
+  </ol>
+  <p>You can also run <code>C:\FOB\STOP-ALL2.bat</code> to kill all services from the command line.</p>
+
+  <div class="warn-box">
+    <strong>Important:</strong> Clicking X does NOT stop the services — it just hides the window. Use right-click → Quit, or STOP-ALL2.bat to actually shut down.
+  </div>
+
+  <h2>Setting Up API Keys</h2>
+  <p>Agents need an AI model to work. You have two options:</p>
+
+  <p><strong>Option A: Local models (free, private)</strong> — Install <a href="https://ollama.com" target="_blank">Ollama</a>, then pull a model:</p>
+  <ol class="step-list">
+    <li>Install Ollama from <a href="https://ollama.com" target="_blank">ollama.com</a></li>
+    <li>Open a terminal and run: <code>ollama pull qwen2.5:7b</code></li>
+    <li>Ollama runs automatically on port 11434. Agents will find it.</li>
+  </ol>
+
+  <p><strong>Option B: Cloud models (faster, smarter)</strong> — Get an API key from one of these providers:</p>
+
+  <div class="key-grid">
+    <div class="key-card">
+      <div class="kl">Google Gemini (recommended)</div>
+      <div class="kv"><a href="https://aistudio.google.com/apikey" target="_blank">Get free API key</a><br>Free tier is generous. Works great.</div>
+    </div>
+    <div class="key-card">
+      <div class="kl">Anthropic Claude</div>
+      <div class="kv"><a href="https://console.anthropic.com/" target="_blank">Get API key</a><br>Paid. Best quality responses.</div>
+    </div>
+  </div>
+
+  <p><strong>Where to enter your key:</strong></p>
+  <ol class="step-list">
+    <li>Open the agent or bot you want to configure (click its card on the Command Center).</li>
+    <li>Go to the <strong>Settings</strong> tab in the chat interface.</li>
+    <li>Paste your API key into the provider field (Gemini, Anthropic, or OpenAI).</li>
+    <li>Select that provider as active. Click Save. The agent will use it immediately.</li>
+  </ol>
+
+  <div class="tip-box">
+    <strong>Tip:</strong> Each agent has its own config. You can run different agents on different models — a cheap local model for simple tasks, a cloud model for complex ones.
+  </div>
+
+  <h2>Where Things Live</h2>
+  <table class="port-table">
+    <tr><th>What</th><th>Where</th></tr>
+    <tr><td>Launcher</td><td>V3AM FOB desktop shortcut / <code>C:\FOB\V3AMFOB\V3AMFOB.exe</code></td></tr>
+    <tr><td>Stop everything</td><td><code>C:\FOB\STOP-ALL2.bat</code></td></tr>
+    <tr><td>Agent configs</td><td>Each agent's <code>config.json</code> (API keys, model, prompt)</td></tr>
+    <tr><td>Deploy new agents</td><td>Agent-Dropper at <code>127.0.0.1:9210</code></td></tr>
+    <tr><td>Build knowledge bots</td><td>KB-Maker at <code>127.0.0.1:9220</code></td></tr>
+    <tr><td>All services</td><td><code>C:\FOB\adir\new211adir\TANDR-2026-02-11\</code></td></tr>
+  </table>
+
+  <h2>Quick Reference — Ports</h2>
+  <table class="port-table">
+    <tr><th>Service</th><th>Port</th><th>Type</th></tr>
+    <tr><td>FOB Server</td><td>8100</td><td>Help &amp; index</td></tr>
+    <tr><td>ADIR Hub</td><td>9303</td><td>Dashboard</td></tr>
+    <tr><td>Agent-Dropper</td><td>9210</td><td>Agent Factory</td></tr>
+    <tr><td>KB-Maker</td><td>9220</td><td>Bot Factory</td></tr>
+    <tr><td>TANDRmgr-lab</td><td>8086</td><td>Switchboard</td></tr>
+    <tr><td>Librarian</td><td>57785</td><td>Knowledge &amp; Onboarding</td></tr>
+    <tr><td>StartPower</td><td>57775</td><td>LLM Relay</td></tr>
+    <tr><td>TANDRSocial</td><td>57790</td><td>Social Content</td></tr>
+    <tr><td>ImageGen</td><td>9230</td><td>Image Generation</td></tr>
+    <tr><td>ScreenStream</td><td>9240</td><td>Screen Capture</td></tr>
+    <tr><td>VisionBot</td><td>10337</td><td>Vision Agent</td></tr>
+    <tr><td>GGBot KB</td><td>10333</td><td>Knowledge Bot</td></tr>
+    <tr><td>Agent1</td><td>11111</td><td>Chat Agent</td></tr>
+    <tr><td>Agent2</td><td>11112</td><td>Chat Agent</td></tr>
+    <tr><td>Agent4</td><td>11113</td><td>Chat Agent</td></tr>
+    <tr><td>Bot1</td><td>11114</td><td>Knowledge Bot</td></tr>
+    <tr><td>GGBOT</td><td>10336</td><td>Knowledge Bot</td></tr>
+    <tr><td>Memory Bot</td><td>8091</td><td>Context Service</td></tr>
+    <tr><td>ParserBot</td><td>10108</td><td>Parser</td></tr>
+    <tr><td>Ollama</td><td>11434</td><td>Local LLM</td></tr>
+  </table>
+
+  <h2>Troubleshooting</h2>
+  <ol class="step-list">
+    <li><strong>Agent says "PHP not found"</strong> — Make sure <code>C:\FOB\php\php-cgi.exe</code> exists. It should already be bundled.</li>
+    <li><strong>No response from agent</strong> — Check that you have an API key set (Settings tab) or Ollama running. No model = no response.</li>
+    <li><strong>"Port already in use"</strong> — Run <code>C:\FOB\STOP-ALL2.bat</code> first, then relaunch V3AMFOB.</li>
+    <li><strong>Voice not working</strong> — Use Chrome. Click the mic button once (don't double-click). Allow microphone permission when prompted.</li>
+    <li><strong>Services won't start</strong> — Open the rack panel in V3AMFOB to see service status and logs. Click the restart button on the failed card.</li>
+  </ol>
+
+</div>
+</body>
+</html>

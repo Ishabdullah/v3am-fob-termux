@@ -1,0 +1,341 @@
+{
+  "projects": {
+    "aistart-root": {
+      "name": "AISTART Root System",
+      "path": "D:\\01V3AM_aistart\\",
+      "summary": "Main AISTART PHP-based AI workflow management system. Unified interface for AI interactions, project management, and logging. Production system for V3AM AI operations.",
+      "files": [
+        {
+          "path": "aistart.php",
+          "description": "Main unified entrypoint - consolidated system data and instructions for AI agents"
+        },
+        {
+          "path": "dashboard.php",
+          "description": "Primary user interface - operations logs, project management, AI tools"
+        },
+        {
+          "path": "functions.php",
+          "description": "Core utility functions - log operations, file handling, data management"
+        },
+        {
+          "path": "llm.php",
+          "description": "LLM integration and API handling for Ollama/OpenAI/etc"
+        },
+        {
+          "path": "chat_api.php",
+          "description": "Chat functionality and API endpoints"
+        },
+        {
+          "path": "settings.php",
+          "description": "Configuration management and profile handling"
+        }
+      ],
+      "directories": [
+        {
+          "path": "data/",
+          "description": "JSON configuration files - settings, rules, workflows, main_ops_log.json"
+        },
+        {
+          "path": "projects/",
+          "description": "Individual project directories with dedicated logs and data"
+        },
+        {
+          "path": "instructions/",
+          "description": "System prompts and AI startup instructions"
+        },
+        {
+          "path": "api/",
+          "description": "API proxy files - generate.php forwards production to local Ollama"
+        }
+      ],
+      "stack": {
+        "language": "PHP",
+        "frameworks": [
+          "Native PHP (no framework)"
+        ],
+        "dependencies": [
+          "Ollama (localhost:11434)",
+          "MySQL 9.0.1",
+          "ngrok tunnel (v3am.ngrok.app)",
+          "PHP 8.x development server"
+        ]
+      },
+      "state": {
+        "status": "Production",
+        "lastUpdated": "2026-01-05",
+        "version": "3.0.0",
+        "issues": [
+          "Production LLM endpoint must point to ngrok proxy (not localhost)",
+          "Requires all 4 services running: MySQL, PHP, Ollama, ngrok"
+        ]
+      },
+      "changelog": [
+        {
+          "date": "2026-01-05",
+          "changes": "Created master control panel (THE PLAN) for tracking all V3AM projects"
+        },
+        {
+          "date": "2025-12-22",
+          "changes": "Fixed production API endpoint configuration - must use .php extension"
+        },
+        {
+          "date": "2025-11-17",
+          "changes": "Created 5AI clone for parallel experimentation"
+        }
+      ],
+      "notes": "Main production system for V3AM AI operations. Uses task queue to prevent overlapping LLM calls. All projects maintain separate logs under projects/ directory. Production site (v3am.com) connects via ngrok tunnel to local Ollama instance."
+    },
+    "5ai-system": {
+      "name": "5AI - Fifth Generation AI",
+      "path": "D:\\01V3AM_aistart\\5AI\\",
+      "summary": "Complete isolated clone of AISTART system for parallel operations and safe experimentation. Full feature parity with production but independent configuration and data.",
+      "files": [
+        {
+          "path": "aistart.php",
+          "description": "5AI entrypoint - identifies as '5AI' in responses"
+        },
+        {
+          "path": "chat_api_emergence.php",
+          "description": "Emergence character API with Friend, Journey, Sower, Gardener, Silence"
+        },
+        {
+          "path": "lib/emergence_bootstrap.php",
+          "description": "Character management library - routing, context building, memory"
+        }
+      ],
+      "directories": [
+        {
+          "path": "data/",
+          "description": "Independent settings and logs - isolated from root AISTART"
+        },
+        {
+          "path": "projects/",
+          "description": "5AI-specific project storage"
+        }
+      ],
+      "stack": {
+        "language": "PHP",
+        "frameworks": [],
+        "dependencies": [
+          "Same as AISTART root",
+          "Shares Ollama/MySQL/ngrok with root"
+        ]
+      },
+      "state": {
+        "status": "Development",
+        "lastUpdated": "2026-01-05",
+        "version": "5.0.0",
+        "issues": [
+          "Missing lib/emergence_bootstrap.php on production server (500 errors)",
+          "Character system contaminated with XS safety filters"
+        ]
+      },
+      "changelog": [
+        {
+          "date": "2025-11-17",
+          "changes": "Created 5AI as complete AISTART clone for experimentation"
+        }
+      ],
+      "notes": "Experimental system for testing new features before production. All 5 emergence characters configured. Use for trying new LLM models, character behaviors, and system modifications without affecting production."
+    },
+    "desktop-system": {
+      "name": "V3AM Desktop Environment",
+      "path": "D:\\01V3AM_aistart\\desktop\\",
+      "summary": "Custom lightweight desktop shell with window management, AI integration, and theme system. Uses custom shim instead of full OS.js framework.",
+      "files": [
+        {
+          "path": "index.html",
+          "description": "Desktop entry point and main interface"
+        },
+        {
+          "path": "desktop-shim.js",
+          "description": "Core window management and desktop functionality (OS.js-like)"
+        },
+        {
+          "path": "desktop.css",
+          "description": "CSS variables-based theming system"
+        },
+        {
+          "path": "ai-flyer.css",
+          "description": "AI floating assistant button styles"
+        },
+        {
+          "path": "settings.php",
+          "description": "Settings app with Advanced Theme customization tab"
+        }
+      ],
+      "directories": [
+        {
+          "path": "data/",
+          "description": "Desktop configuration and theme options (desktop-settings.json, theme-options.json)"
+        },
+        {
+          "path": "apps/",
+          "description": "Desktop applications (bot-builder, browser, file manager, etc.)"
+        }
+      ],
+      "stack": {
+        "language": "JavaScript",
+        "frameworks": [
+          "Custom desktop shim (NOT OS.js)",
+          "Vanilla JS"
+        ],
+        "dependencies": [
+          "CSS Variables for theming",
+          "No heavy frameworks"
+        ]
+      },
+      "state": {
+        "status": "Production",
+        "lastUpdated": "2026-01-05",
+        "version": "3.0.0",
+        "issues": [
+          "DO NOT replace with full OS.js - custom shim is intentional for performance"
+        ]
+      },
+      "changelog": [
+        {
+          "date": "2025-12-22",
+          "changes": "Added Advanced Theme system with live preview and export/import"
+        }
+      ],
+      "notes": "Custom lightweight desktop environment. Theme system uses CSS variables for real-time updates. AI flyer provides floating assistant access. Settings app manages all configuration."
+    },
+    "site-weaver": {
+      "name": "Site Weaver Context Chunking",
+      "path": "D:\\01V3AM_aistart\\02026\\SiteWeaverbuilder\\",
+      "summary": "System for converting large log files and documents into properly formatted Site Weaver websites. Includes AI prompts and client-side web tool.",
+      "files": [
+        {
+          "path": "log-chunker.html",
+          "description": "Client-side tool for chunking logs into Site Weaver format (~40k tokens/page)"
+        },
+        {
+          "path": "LOG-TO-SITEWEAVER-PROMPT.md",
+          "description": "AI prompt for converting logs to Site Weaver sites"
+        },
+        {
+          "path": "CONTEXT-CHUNKING-PROMPT.md",
+          "description": "General purpose context chunking prompt"
+        }
+      ],
+      "directories": [
+        {
+          "path": "emergence-archive/",
+          "description": "Test case - 20 page Site Weaver site from PYGPT log (verified working)"
+        }
+      ],
+      "stack": {
+        "language": "JavaScript",
+        "frameworks": [
+          "Vanilla JS",
+          "JSZip library"
+        ],
+        "dependencies": [
+          "Client-side only (no server required)"
+        ]
+      },
+      "state": {
+        "status": "Production",
+        "lastUpdated": "2026-01-05",
+        "version": "2.0.0",
+        "issues": []
+      },
+      "changelog": [
+        {
+          "date": "2026-01-05",
+          "changes": "Fixed format - HTML fragments (not full docs), object-based index.json, added site.json"
+        },
+        {
+          "date": "2026-01-05",
+          "changes": "Created log-chunker.html with real-time stats and styled HTML output"
+        }
+      ],
+      "notes": "Site Weaver requires specific format: HTML fragments (no DOCTYPE), object-based index.json with rootId, site.json metadata file. Tool generates proper structure with navigation and styling."
+    },
+    "3ai-wordpress-plugin": {
+      "name": "3AI Desktop WordPress Plugin",
+      "path": "D:\\01V3AM_aistart\\01APlugIns\\Install_Works\\3AIV2\\3ai-desktop-v2-plugin\\3AIV2wpv3-2-FINAL\\",
+      "summary": "React-based desktop environment plugin with WordPress VFS integration, Site Weaver, and persistent file storage. Version 3.2 production release.",
+      "files": [
+        {
+          "path": "3AIV2wpv3-2-FINAL.zip",
+          "description": "Production plugin ZIP (254KB) - ready for distribution"
+        }
+      ],
+      "directories": [],
+      "stack": {
+        "language": "JavaScript",
+        "frameworks": [
+          "React",
+          "WordPress Plugin API"
+        ],
+        "dependencies": [
+          "WordPress 5.0+",
+          "WordPress REST API",
+          "Application Passwords"
+        ]
+      },
+      "state": {
+        "status": "Production",
+        "lastUpdated": "2026-01-01",
+        "version": "3.2.0",
+        "issues": [
+          "Text Editor may load beneath other windows (workaround: minimize others)",
+          "Sites may not persist after reload (workaround: close and reopen Site Weaver)",
+          "Browser caching can affect visibility"
+        ]
+      },
+      "changelog": [
+        {
+          "date": "2026-01-01",
+          "changes": "Tested all core features on buildingabot.com - verified working"
+        },
+        {
+          "date": "2025-12-22",
+          "changes": "Created V3.2 final release with Site Weaver, File Manager, Settings, System Monitor"
+        }
+      ],
+      "notes": "Installed on buildingabot.com using [3ai_desktop_v2] shortcode. Includes Site Weaver (conversational page creation), File Manager, Text Editor, Settings, System Monitor. Template sites preloaded (research notebooks, SOPs, FAQs)."
+    },
+    "the-plan": {
+      "name": "THE PLAN - Master Control Panel",
+      "path": "D:\\01V3AM_aistart\\000mynotes\\THEPLAN\\",
+      "summary": "Master control panel for tracking all V3AM projects. Section-based note system with JSON import/export for managing project summaries, files, stack, dependencies, changelog, and current state.",
+      "files": [
+        {
+          "path": "project-control-panel.html",
+          "description": "Main control panel interface - single HTML file with embedded JS"
+        },
+        {
+          "path": "sample-projects.json",
+          "description": "Sample project data for initial setup"
+        }
+      ],
+      "directories": [],
+      "stack": {
+        "language": "JavaScript",
+        "frameworks": [
+          "Vanilla JS"
+        ],
+        "dependencies": [
+          "LocalStorage API",
+          "FileReader API"
+        ]
+      },
+      "state": {
+        "status": "Development",
+        "lastUpdated": "2026-01-05",
+        "version": "1.0.0",
+        "issues": []
+      },
+      "changelog": [
+        {
+          "date": "2026-01-05",
+          "changes": "Initial creation - master control panel for V3AM universe"
+        }
+      ],
+      "notes": "THE PLAN provides centralized tracking for all V3AM projects. Features: project switching, section-based notes (Summary, Files, Directories, Stack, State, Changelog, Notes), auto-save to localStorage, JSON export/import for backup and sharing with AI assistants."
+    }
+  }
+}

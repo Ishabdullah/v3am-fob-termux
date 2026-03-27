@@ -1,0 +1,33 @@
+{
+  "name": "agent-dropper-v2",
+  "version": "2.0.0",
+  "description": "Agent Spawning & Deployment Tool - Jerry Template Adaptation",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "agent",
+    "dropper",
+    "deployment",
+    "tandr",
+    "jerry-template"
+  ],
+  "author": "TANDR System",
+  "license": "PROPRIETARY",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "file:///c/FOB/adir/new211adir/TANDR-2026-02-11"
+  },
+  "homepage": "http://127.0.0.1:9210"
+}

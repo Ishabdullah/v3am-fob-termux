@@ -1,0 +1,318 @@
+**324 Ports and paths are changed ref data**
+
+# Agent Template - Architecture & Design
+
+**Status:** ✅ Template Reference
+**Version:** 2.0.0
+**Root:** `C:\FOB\adir\new211adir\TANDR-2026-02-11\adirhub\TOOLS\TEMPLATE-JERRY-CLEAN`
+
+---
+
+## Template Purpose
+
+TEMPLATE-JERRY-CLEAN is a reference architecture for agents deployed by Agent-Dropper v2.
+
+Shows:
+- Expected file organization
+- API layer design
+- Configuration structure
+- Documentation pattern
+
+---
+
+## Architecture
+
+```
+Agent (New Instance from Template)
+├── server.js
+│   └── Express HTTP server
+│       └── Routes all /api/* requests
+│
+├── api/
+│   ├── agent.php
+│   │   ├── Handles /api/agent.php?action=...
+│   │   ├── tool_execute
+│   │   ├── chat
+│   │   ├── tools (list)
+│   │   └── status
+│   │
+│   ├── auto.php
+│   │   └── Auto-detection logic
+│   │
+│   └── providers/
+│       ├── anthropic.php (Cloud LLM)
+│       └── gemini.php (Alternative)
+│
+├── config.json
+│   ├── port: Assigned by Dropper
+│   ├── name: Agent name
+│   ├── llm: Provider settings
+│   └── api_keys: Credentials
+│
+├── dashboard.html
+│   └── Web UI for agent interaction
+│
+└── adir/
+    ├── NEW-313-index.md
+    ├── NEW-313-BOOT.md
+    ├── NEW-313-current.md
+    ├── NEW-313-working.md
+    └── logs/
+        ├── conversations.txt
+        ├── errors.txt
+        └── startup.log
+```
+
+---
+
+## Data Flow
+
+### Chat Request
+```
+User Browser
+    ↓
+dashboard.html (JavaScript)
+    ↓
+POST /api/agent.php?action=chat
+    ↓
+server.js routes to agent.php
+    ↓
+agent.php reads config.json
+    ↓
+Calls LLM (Ollama/Anthropic)
+    ↓
+Returns response
+    ↓
+Logged to conversations.txt
+    ↓
+Response sent to browser
+```
+
+### Tool Execution
+```
+LLM generates tool call
+    ↓
+agent.php executes tool
+    ↓
+File operations / HTTP requests / etc
+    ↓
+Result returned to LLM
+    ↓
+LLM continues conversation
+```
+
+---
+
+## Key Components
+
+### server.js
+- Express HTTP server
+- Routes requests to PHP
+- Manages CORS headers
+- Handles static files (dashboard.html)
+
+### agent.php
+- Main API handler
+- Routes actions (chat, tools, status, etc)
+- Executes tool calls
+- Manages context
+
+### config.json
+- Agent configuration
+- LLM provider settings
+- API keys
+- Port number
+
+### dashboard.html
+- Web interface
+- Chat input/output
+- Tool listings
+- Status display
+
+---
+
+## Configuration Template
+
+```json
+{
+  "app": {
+    "name": "Agent Name Here",
+    "port": 9200,
+    "environment": "production",
+    "version": "2.0.0"
+  },
+
+  "llm": {
+    "provider": "ollama",
+    "model": "qwen2.5:7b",
+    "endpoint": "http://localhost:11434",
+    "temperature": 0.7,
+    "max_tokens": 2000
+  },
+
+  "api_keys": {
+    "anthropic": "sk-...",
+    "google": "..."
+  },
+
+  "logging": {
+    "conversations": "adir/logs/conversations.txt",
+    "errors": "adir/logs/errors.txt",
+    "startup": "adir/logs/startup.log"
+  }
+}
+```
+
+---
+
+## Agent Lifecycle (Spawning)
+
+### When Agent-Dropper Creates New Agent:
+
+1. **Clone Template**
+   - Copy entire TEMPLATE-JERRY-CLEAN directory
+   - Target: `/TOOLS/[AgentName]/`
+
+2. **Update Configuration**
+   - config.json port → assigned port
+   - config.json name → agent name
+   - API keys → copy from secrets
+
+3. **Create Documentation**
+   - NEW-313-index.md
+   - NEW-313-BOOT.md
+   - NEW-313-current.md
+   - NEW-313-working.md
+
+4. **Initialize Logs**
+   - Create adir/logs/ directory
+   - Write startup.log entry
+   - Initialize conversations.txt
+
+5. **Start Agent**
+   - `node server.js`
+   - Register with ADIR Hub
+   - Listen on assigned port
+
+---
+
+## Communication Pattern
+
+### From Browser to Agent
+```
+GET /
+    → dashboard.html
+
+POST /api/agent.php?action=chat
+    → agent response
+
+GET /api/agent.php?action=status
+    → agent status
+
+GET /api/agent.php?action=tools
+    → available tools list
+```
+
+### From LLM to Tools
+```
+[TOOL_CALL: file_read | path=data/file.md]
+    → agent.php executes
+    → File content returned
+    → LLM sees result
+
+[TOOL_CALL: http_get | url=...]
+    → HTTP request made
+    → Response captured
+    → Returned to LLM
+```
+
+---
+
+## Logging Structure
+
+```
+adir/logs/
+├── conversations.txt    ← All chat messages
+├── errors.txt          ← Error log
+└── startup.log         ← Boot events
+```
+
+**Logging is automatic:**
+- Each message logged to conversations.txt
+- Errors caught and logged
+- Startup sequence recorded
+
+---
+
+## Security Model
+
+**Sandboxing:**
+- File access restricted to `/data/`, `/upload/`, `/adir/logs/`
+- Path traversal blocked
+- API keys in config.json only
+
+**Input Validation:**
+- All user inputs sanitized
+- SQL injection prevention
+- Parameter type checking
+
+---
+
+## Extending the Template
+
+### Adding New Tool
+
+1. Update `api/agent.php` to handle new tool
+2. Add tool to `tools` array
+3. Implement tool logic
+4. Test via dashboard
+
+### Adding New LLM Provider
+
+1. Create `api/providers/[provider].php`
+2. Implement API calls
+3. Update config.json option
+4. Test in agent
+
+### Modifying Dashboard
+
+1. Edit `dashboard.html`
+2. Restart agent
+3. Test in browser
+
+---
+
+## Performance
+
+**Response Times:**
+- Status check: ~50ms
+- Chat message: 1-5 seconds (LLM dependent)
+- Tool execution: Varies by tool
+- Dashboard load: ~500ms
+
+**Concurrency:**
+- Multiple chat requests supported
+- LLM processes one at a time
+- Dashboard remains responsive
+
+---
+
+## Related Documentation
+
+- [NEW-313-index.md](./NEW-313-index.md) - Overview
+- [NEW-313-BOOT.md](./NEW-313-BOOT.md) - Startup
+- [NEW-313-current.md](./NEW-313-current.md) - Status
+- Agent-Dropper v2: `C:\FOB\adir\new211adir\TANDR-2026-02-11\adirhub\TOOLS\Agent-Dropper-v2\`
+
+---
+
+## Footer
+
+**File:** `C:\FOB\adir\new211adir\TANDR-2026-02-11\adirhub\TOOLS\TEMPLATE-JERRY-CLEAN\adir\NEW-313-working.md`
+**Created:** 2026-03-13
+**Status:** ✅ Template Reference
+**Last Updated:** 2026-03-13
+
+**This is the reference architecture used by Agent-Dropper v2 for all agent deployments.**
+
+**324 Ports and paths are changed ref data**

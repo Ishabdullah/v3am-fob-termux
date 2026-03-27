@@ -1,0 +1,84 @@
+{
+    "_meta": {
+        "name": "Agent Tools Configuration",
+        "version": "1.0.0",
+        "description": "Tools available to the agent for execution"
+    },
+    "tools": {
+        "web_search": {
+            "name": "Web Search",
+            "description": "Search the web using Google Custom Search (requires cx in config.json)",
+            "type": "internal",
+            "enabled": true,
+            "handler": "web_search",
+            "parameters": {
+                "query": {
+                    "type": "string",
+                    "required": true,
+                    "description": "Search query"
+                }
+            }
+        },
+        "http_get": {
+            "name": "HTTP GET",
+            "description": "Make an HTTP GET request to a URL",
+            "type": "internal",
+            "enabled": true,
+            "handler": "http_get",
+            "parameters": {
+                "url": {
+                    "type": "string",
+                    "required": true,
+                    "description": "URL to fetch"
+                }
+            }
+        },
+        "calculate": {
+            "name": "Calculator",
+            "description": "Perform mathematical calculations",
+            "type": "internal",
+            "enabled": true,
+            "handler": "calculate",
+            "parameters": {
+                "expression": {
+                    "type": "string",
+                    "required": true,
+                    "description": "Math expression to evaluate"
+                }
+            }
+        },
+        "datetime": {
+            "name": "Date\/Time",
+            "description": "Get current date and time information",
+            "type": "internal",
+            "enabled": true,
+            "handler": "datetime",
+            "parameters": {
+                "format": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Date format (default: Y-m-d H:i:s)"
+                },
+                "timezone": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Timezone (default: UTC)"
+                }
+            }
+        },
+        "shell_command": {
+            "name": "Shell Command",
+            "description": "Command to execute (Restricted no delete or modify only write new md files and read access - use with care ",
+            "type": "internal",
+            "enabled": true,
+            "parameters": {
+                "command": {
+                    "type": "string",
+                    "required": true,
+                    "description": "Command to execute (Restricted no delete or modify only write new md files and read access - use with care )"
+                }
+            },
+            "handler": "read_file"
+        }
+    }
+}

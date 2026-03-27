@@ -1,0 +1,40 @@
+{
+  "name": "[EXAMPLE] 08 - Commercial Script",
+  "description": "Generate voiceover and commercial scripts. Agentic Prompt: promptcommercial1. Agent: Randy (9201). Cycles: 4-6. Layer 2 prompt (usually paired with Layer 1).",
+  "nodes": [
+    {
+      "id": "trigger1",
+      "type": "trigger.manual",
+      "title": "Start Script Generation",
+      "x": 100,
+      "y": 100,
+      "data": {}
+    },
+    {
+      "id": "action1",
+      "type": "action.http",
+      "title": "Call Randy: Execute promptcommercial1",
+      "x": 350,
+      "y": 100,
+      "data": {
+        "method": "GET",
+        "url": "http://localhost:9201/agent/api/agent.php?action=chat&input=Execute_promptcommercial1_topic_Job_Posting_script_60_second_commercial",
+        "body": ""
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "trigger1",
+      "to": "action1",
+      "cond": null
+    }
+  ],
+  "vars": {
+    "prompt": "promptcommercial1",
+    "agent": "Randy (9201)",
+    "cycles_estimated": "4-6",
+    "layer": "Layer 2 (support prompt)",
+    "description": "Used after Layer 1 prompt approval. Output to voice/audio services."
+  }
+}

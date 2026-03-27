@@ -1,0 +1,89 @@
+# 📝 SESSION RECOVERY
+
+**Session Started**: [YYYY-MM-DD HH:MM]
+**Agent**: [YOUR NAME]
+**Directory**: [DIRECTORY NAME]
+
+---
+
+## ✅ ACCOMPLISHED
+
+What did you do this session?
+- Accomplishment 1
+- Accomplishment 2
+- Accomplishment 3
+
+---
+
+## 🎯 CURRENT TASK
+
+**Task Name**: [What task were you working on?]
+**Status**: [In Progress / Completed / Blocked]
+**Progress**: [X]%
+**Next Step**: [What comes next?]
+
+---
+
+## 📝 WORK LOG
+
+**Session Start**:
+- [HH:MM] Started session
+- [HH:MM] Read CURRENT.txt
+- [HH:MM] Began work on [task]
+
+**During Session**:
+- [HH:MM] Completed [action 1]
+- [HH:MM] Completed [action 2]
+- [HH:MM] Made decision: [decision]
+
+**Session End**:
+- [HH:MM] Updated CURRENT.txt
+- [HH:MM] Updated WORKING.txt
+- [HH:MM] Posted to FEED.txt
+- [HH:MM] Session complete
+
+---
+
+## 🔄 RECOVERY INFO (For Next Session)
+
+**What was I doing?**
+- [Describe what you were working on]
+
+**What state are we in?**
+- [Describe current state]
+
+**What do I need to remember?**
+- Important context 1
+- Important context 2
+- Important context 3
+
+**What comes next?**
+1. Next action 1
+2. Next action 2
+3. Next action 3
+
+---
+
+## 🚨 BLOCKERS
+
+**Current Blockers**:
+- Blocker 1 - [Status]
+- Blocker 2 - [Status]
+
+**Waiting On**:
+- Waiting for [what] from [who]
+- Waiting for [what] from [who]
+
+---
+
+## 📌 SESSION END
+
+**Status**: [Complete / Interrupted / In Progress]
+**Time Ended**: [YYYY-MM-DD HH:MM]
+
+**Final Note**:
+[Any important message for next session]
+
+---
+
+*Session logged. Ready for next session or agent handoff.*

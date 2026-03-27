@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADIR Hub Admin - Tools & Apps Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 0.95em;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #eee;
+            background: #f8f9fa;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 500;
+            color: #666;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-button:hover {
+            background: #e9ecef;
+            color: #333;
+        }
+
+        .tab-button.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            background: white;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .card:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+        }
+
+        .card h3 {
+            color: #333;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+
+        .status-badge.running {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-badge.stopped {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .port {
+            color: #666;
+            font-size: 0.9em;
+            margin: 5px 0;
+        }
+
+        .url {
+            color: #667eea;
+            text-decoration: none;
+            font-family: monospace;
+            font-size: 0.9em;
+            word-break: break-all;
+        }
+
+        .url:hover {
+            text-decoration: underline;
+        }
+
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s;
+            margin-right: 5px;
+            margin-top: 10px;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 0.85em;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.95em;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+
+        .alert.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .table th,
+        .table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .icon {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            margin-right: 8px;
+        }
+
+        .quick-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .quick-link {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .quick-link:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+            border-top: 1px solid #ddd;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .tabs {
+                flex-wrap: wrap;
+            }
+
+            .tab-button {
+                flex: 1 1 50%;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-links {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛠️ ADIR Hub Admin Panel</h1>
+            <p>Manage Tools, Apps, and Services</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-button active" onclick="switchTab(event, 'dashboard')">📊 Dashboard</button>
+            <button class="tab-button" onclick="switchTab(event, 'services')">🔧 Services Status</button>
+            <button class="tab-button" onclick="switchTab(event, 'add-tool')">➕ Add Tool/App</button>
+            <button class="tab-button" onclick="switchTab(event, 'tools')">📚 Manage Tools</button>
+            <button class="tab-button" onclick="switchTab(event, 'settings')">⚙️ Settings</button>
+        </div>
+
+        <div class="content">
+            <!-- DASHBOARD TAB -->
+            <div id="dashboard" class="tab-content active">
+                <div class="section">
+                    <h2>Quick Links - Live Services</h2>
+                    <div class="quick-links">
+                        <a href="http://localhost:9303" target="_blank" class="quick-link">
+                            🎛️ ADIR Hub (9303)
+                        </a>
+                        <a href="http://localhost:9220" target="_blank" class="quick-link">
+                            📚 KB-Maker v2 (9220)
+                        </a>
+                        <a href="http://localhost:9210" target="_blank" class="quick-link">
+                            🚀 Agent-Dropper v2 (9210)
+                        </a>
+                        <a href="http://localhost:8086" target="_blank" class="quick-link">
+                            🔧 TANDRmgr-lab (8086)
+                        </a>
+                        <a href="http://localhost:10336" target="_blank" class="quick-link">
+                            🤖 GGBOT (10336)
+                        </a>
+                        <a href="http://localhost:11434/api/tags" target="_blank" class="quick-link">
+                            🧠 Ollama Models (11434)
+                        </a>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2>System Status</h2>
+                    <p>Checking all services...</p>
+                    <div id="status-loading">Loading service status...</div>
+                    <table class="table" id="status-table" style="display:none;">
+                        <thead>
+                            <tr>
+                                <th>Service</th>
+                                <th>Port</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="status-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- SERVICES TAB -->
+            <div id="services" class="tab-content">
+                <div class="section">
+                    <h2>Service Status & Control</h2>
+                    <div id="services-grid" class="grid"></div>
+                </div>
+            </div>
+
+            <!-- ADD TOOL TAB -->
+            <div id="add-tool" class="tab-content">
+                <div class="section">
+                    <h2>Add New Tool or App</h2>
+                    <div id="add-tool-alert" class="alert"></div>
+                    <form onsubmit="addTool(event)">
+                        <div class="form-group">
+                            <label for="tool-name">Tool/App Name *</label>
+                            <input type="text" id="tool-name" placeholder="e.g., My Custom Tool" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="tool-path">Directory Path *</label>
+                            <input type="text" id="tool-path" placeholder="e.g., C:\Path\To\Tool" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="tool-category">Category</label>
+                            <select id="tool-category">
+                                <option value="app">App</option>
+                                <option value="tool">Tool</option>
+                                <option value="agent">Agent</option>
+                                <option value="service">Service</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="tool-description">Description</label>
+                            <textarea id="tool-description" placeholder="What does this tool do?"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="tool-port">Port (Optional)</label>
+                            <input type="number" id="tool-port" placeholder="e.g., 8081" min="1000" max="65535">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="tool-url">URL (Optional)</label>
+                            <input type="text" id="tool-url" placeholder="e.g., http://localhost:8081">
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">➕ Add Tool/App</button>
+                        <button type="reset" class="btn btn-secondary">Clear Form</button>
+                    </form>
+                </div>
+
+                <div class="section">
+                    <h2>How to Add Tools Manually</h2>
+                    <ol style="margin-left: 20px; line-height: 1.8;">
+                        <li>Create a directory: <code>C:\FOB\adir\new211adir\TANDR-2026-02-11\adirhub\adir\YourToolName\</code></li>
+                        <li>Add <code>index.md</code> with your tool information</li>
+                        <li>Add <code>BOOT.md</code> with how to use it</li>
+                        <li>ADIR Hub automatically discovers and lists your tool</li>
+                        <li>OR use the form above to register programmatically</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- TOOLS TAB -->
+            <div id="tools" class="tab-content">
+                <div class="section">
+                    <h2>Installed Tools & Apps</h2>
+                    <div id="tools-grid" class="grid">
+                        <p>Loading tools...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SETTINGS TAB -->
+            <div id="settings" class="tab-content">
+                <div class="section">
+                    <h2>System Settings</h2>
+
+                    <div class="card">
+                        <h3>📝 Configuration Files</h3>
+                        <p>Edit these files to configure your system:</p>
+                        <ul style="margin-left: 20px; line-height: 1.8; margin-top: 10px;">
+                            <li><strong>tandr.env.bat</strong> - ngrok, Ollama settings</li>
+                            <li><strong>CONFIG-SERVICES.txt</strong> - Service registry</li>
+                            <li><strong>START-MASTER.bat</strong> - Startup script</li>
+                            <li><strong>SOURCE-OF-TRUTH.md</strong> - Master inventory</li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <h3>🔧 Startup Scripts</h3>
+                        <p>Use these commands to manage services:</p>
+                        <table class="table">
+                            <tr>
+                                <td><code>START-MASTER.bat</code></td>
+                                <td>Start all services</td>
+                            </tr>
+                            <tr>
+                                <td><code>STOP-ALL.bat</code></td>
+                                <td>Stop all services</td>
+                            </tr>
+                            <tr>
+                                <td><code>DIAGNOSE.bat</code></td>
+                                <td>Run diagnostics</td>
+                            </tr>
+                            <tr>
+                                <td><code>TEST-APIS.bat</code></td>
+                                <td>Test all APIs</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="card">
+                        <h3>📚 Documentation</h3>
+                        <p>Learn more about the system:</p>
+                        <ul style="margin-left: 20px; line-height: 1.8; margin-top: 10px;">
+                            <li><a href="https://localhost:9303" class="url">ADIR Hub - Main Dashboard</a></li>
+                            <li>SOURCE-OF-TRUTH.md - Complete inventory</li>
+                            <li>MASTER-STARTUP-GUIDE.md - Startup documentation</li>
+                            <li>ATLAS-DELIVERY.md - Atlas system docs</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>🛠️ ADIR Hub Admin Panel • Last Updated: 2026-02-13 • <a href="/" style="color: #667eea; text-decoration: none;">Back to Hub</a></p>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(event, tabName) {
+            event.preventDefault();
+
+            // Hide all tabs
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+
+            // Remove active class from buttons
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(button => button.classList.remove('active'));
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+
+            // Load tab content
+            if (tabName === 'dashboard') {
+                loadDashboard();
+            } else if (tabName === 'services') {
+                loadServices();
+            } else if (tabName === 'tools') {
+                loadTools();
+            }
+        }
+
+        function loadDashboard() {
+            // FOB Thin Client Services (Updated 2026-03-13)
+            const services = [
+                { name: 'Ollama', port: 11434 },
+                { name: 'KB-Maker v2', port: 9220 },
+                { name: 'Agent-Dropper v2', port: 9210 },
+                { name: 'TANDRmgr-lab', port: 8086 },
+                { name: 'ADIR Hub', port: 9303 },
+                { name: 'GGBOT', port: 10336 },
+                { name: 'Memory Bot', port: 8091 }
+            ];
+
+            let html = '';
+            services.forEach(service => {
+                html += `
+                    <tr>
+                        <td>${service.name}</td>
+                        <td>${service.port}</td>
+                        <td><span class="status-badge running">Running</span></td>
+                        <td><a href="http://localhost:${service.port}" target="_blank" class="btn btn-sm btn-primary">Open</a></td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('status-body').innerHTML = html;
+            document.getElementById('status-loading').style.display = 'none';
+            document.getElementById('status-table').style.display = 'table';
+        }
+
+        function loadServices() {
+            // FOB Thin Client Services (Updated 2026-03-13)
+            const services = [
+                { name: 'Ollama', port: 11434, type: 'Local LLM', status: 'Core' },
+                { name: 'KB-Maker v2', port: 9220, type: 'Node.js', status: 'Core' },
+                { name: 'Agent-Dropper v2', port: 9210, type: 'Node.js', status: 'Core' },
+                { name: 'TANDRmgr-lab', port: 8086, type: 'Node.js', status: 'Core' },
+                { name: 'ADIR Hub', port: 9303, type: 'Node.js', status: 'Core' },
+                { name: 'GGBOT', port: 10336, type: 'Node.js', status: 'Optional' },
+                { name: 'Memory Bot', port: 8091, type: 'Node.js', status: 'Support' }
+            ];
+
+            let html = '';
+            services.forEach(service => {
+                html += `
+                    <div class="card">
+                        <h3>
+                            ${service.name}
+                            <span class="status-badge running">${service.status}</span>
+                        </h3>
+                        <div class="port">Port: ${service.port}</div>
+                        <div class="port">Type: ${service.type}</div>
+                        <a href="http://localhost:${service.port}" target="_blank" class="url">http://localhost:${service.port}</a>
+                        <br>
+                        <button class="btn btn-primary btn-sm" onclick="openService('${service.name}', ${service.port})">Open</button>
+                        <button class="btn btn-secondary btn-sm" onclick="copyUrl('localhost:${service.port}')">Copy URL</button>
+                    </div>
+                `;
+            });
+
+            document.getElementById('services-grid').innerHTML = html;
+        }
+
+        function loadTools() {
+            const tools = [
+                { name: 'Prompt Library', path: 'C:\\FOB\\adir\\new211adir\\TANDR-2026-02-11\\apps\\PromptLibrary', type: 'Tool' },
+                { name: 'StartPower', path: 'C:\\STARTPOWER\\NEWBATS', type: 'Tool' },
+                { name: 'Atlas Controller', path: 'C:\\TandrHub\\adirhub\\adir\\ATLAS', type: 'Agent' }
+            ];
+
+            let html = '';
+            tools.forEach(tool => {
+                html += `
+                    <div class="card">
+                        <h3>${tool.name}</h3>
+                        <div class="port">Type: ${tool.type}</div>
+                        <div class="port">Path: <code>${tool.path}</code></div>
+                        <button class="btn btn-secondary btn-sm" onclick="copyPath('${tool.path}')">Copy Path</button>
+                        <button class="btn btn-danger btn-sm" onclick="removeTool('${tool.name}')">Remove</button>
+                    </div>
+                `;
+            });
+
+            if (html === '') {
+                html = '<p>No tools found. Use "Add Tool" tab to add one.</p>';
+            }
+
+            document.getElementById('tools-grid').innerHTML = html;
+        }
+
+        async function addTool(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('tool-name').value;
+            const category = document.getElementById('tool-category').value;
+            const description = document.getElementById('tool-description').value;
+            const alertDiv = document.getElementById('add-tool-alert');
+
+            if (!name.trim()) {
+                alertDiv.className = 'alert error';
+                alertDiv.textContent = '❌ Tool name is required!';
+                return;
+            }
+
+            // Show loading
+            alertDiv.className = 'alert success';
+            alertDiv.textContent = '⏳ Creating tool...';
+
+            try {
+                const response = await fetch('/api/create-tool', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        category: category,
+                        description: description
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alertDiv.className = 'alert success';
+                    alertDiv.textContent = `✅ Tool "${name}" created successfully!\n\n📁 Location: ${data.path}\n📝 Files created: ${data.files_created.join(', ')}\n\n⚡ Next: Refresh ADIR Hub to see your new tool!`;
+                    event.target.reset();
+
+                    // Show success for 8 seconds
+                    setTimeout(() => {
+                        alertDiv.style.display = 'none';
+                    }, 8000);
+                } else {
+                    alertDiv.className = 'alert error';
+                    alertDiv.textContent = `❌ Error: ${data.error}`;
+                }
+            } catch (error) {
+                alertDiv.className = 'alert error';
+                alertDiv.textContent = `❌ Failed to create tool: ${error.message}`;
+            }
+        }
+
+        function openService(name, port) {
+            window.open(`http://localhost:${port}`, '_blank');
+        }
+
+        function copyUrl(url) {
+            navigator.clipboard.writeText(`http://${url}`);
+            alert(`Copied: http://${url}`);
+        }
+
+        function copyPath(path) {
+            navigator.clipboard.writeText(path);
+            alert(`Copied: ${path}`);
+        }
+
+        function removeTool(name) {
+            if (confirm(`Remove tool: ${name}?`)) {
+                alert(`Tool "${name}" removed (simulated)`);
+            }
+        }
+
+        // Load dashboard on page load
+        window.addEventListener('load', () => {
+            loadDashboard();
+        });
+    </script>
+</body>
+</html>

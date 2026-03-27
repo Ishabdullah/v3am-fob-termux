@@ -1,0 +1,2340 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--
+  AGENT PACK - Self-Contained AI Directory Agent
+
+  DEPENDENCIES:
+  - config.json (same directory)
+  - api/agent.php (API endpoint)
+  - PHP server running
+  - Ollama running on configured endpoint
+
+  USAGE:
+  1. Drop this folder into any directory
+  2. Configure paths in config.json
+  3. Run: php -S localhost:8080
+  4. Open: http://localhost:8080/path/to/agent-pack/
+
+  API ENDPOINTS:
+  - ?action=scan - Scan directory for MD files
+  - ?action=chat&input=MESSAGE - Chat with agent
+  - ?action=status - Get agent status
+  - ?action=context - Get loaded context
+  - ?action=memory&id=NAME - Get memory
+  - ?action=clear&id=NAME - Clear memory
+-->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Pack v2 — Windowed</title>
+    <link rel="stylesheet" href="/css/override.css">
+    <link rel="stylesheet" href="/css/win-frame.css">
+    <link rel="stylesheet" href="/css/windows.css">
+    <style>
+        :root {
+            --bg-primary: #0a0e27;
+            --bg-secondary: #111638;
+            --bg-tertiary: #161b42;
+            --accent: #00d9ff;
+            --accent-dim: rgba(0, 217, 255, 0.15);
+            --text-primary: #e0e6f0;
+            --text-secondary: #8892b0;
+            --text-muted: #5a6380;
+            --border: rgba(255, 255, 255, 0.08);
+            --success: #00e676;
+            --warning: #ffab40;
+            --danger: #ff5252;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            background: var(--bg-secondary);
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid var(--accent);
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .logo { font-size: 28px; }
+        .title { font-size: 20px; font-weight: 600; }
+        .subtitle { font-size: 12px; color: var(--text-secondary); }
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .status-badge.online { background: rgba(74, 222, 128, 0.2); color: var(--success); }
+        .status-badge.offline { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+        .tabs {
+            background: var(--bg-secondary);
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
+        }
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+        }
+        .tab:hover { color: var(--accent); background: rgba(233, 69, 96, 0.1); }
+        .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+        .content { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+        .panel { display: none; flex: 1; overflow: auto; padding: 20px; }
+        .panel.active { display: flex; flex-direction: column; }
+
+        /* Chat Panel */
+        .chat-container { display: flex; flex-direction: column; height: 100%; }
+        .messages { flex: 1; overflow-y: auto; padding: 10px 0; }
+        .message {
+            margin: 10px 0;
+            padding: 12px 16px;
+            border-radius: 12px;
+            max-width: 80%;
+        }
+        .message.user {
+            background: var(--accent);
+            margin-left: auto;
+        }
+        .message.assistant {
+            background: var(--bg-tertiary);
+        }
+        .message-time { font-size: 10px; color: var(--text-secondary); margin-top: 4px; }
+        .input-area {
+            display: flex;
+            gap: 10px;
+            padding: 15px 0;
+            border-top: 1px solid var(--border);
+        }
+        .input-area input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+        .input-area input:focus { outline: none; border-color: var(--accent); }
+        .voice-btn {
+            width: 44px;
+            height: 44px;
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .voice-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .voice-btn.recording {
+            background: rgba(255, 82, 82, 0.15);
+            border-color: #ff5252;
+            color: #ff5252;
+            animation: voicePulse 1.5s infinite;
+        }
+        .voice-btn.speaking {
+            background: rgba(0, 230, 118, 0.15);
+            border-color: #00e676;
+            color: #00e676;
+        }
+        @keyframes voicePulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            background: var(--accent);
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn:hover { background: var(--accent-hover); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+        }
+
+        /* Dashboard */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border);
+        }
+        .card-title {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card-value { font-size: 24px; font-weight: 600; }
+        .file-list { max-height: 300px; overflow-y: auto; }
+        .file-item {
+            padding: 10px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+        }
+        .file-item:last-child { border-bottom: none; }
+
+        /* Settings */
+        .settings-form { max-width: 600px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+        .form-group textarea { min-height: 100px; resize: vertical; }
+
+        /* Context View */
+        .context-box {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            overflow: auto;
+            max-height: 500px;
+        }
+
+        /* Loading */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+        .spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Tools */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        .tool-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .tool-card:hover { border-color: var(--accent); }
+        .tool-card.enabled { border-color: var(--success); }
+        .tool-icon { font-size: 24px; margin-bottom: 8px; }
+        .tool-name { font-weight: 500; margin-bottom: 4px; }
+        .tool-desc { font-size: 12px; color: var(--text-secondary); }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <div class="logo">🤖</div>
+            <div>
+                <div class="title" id="agent-name">Agent Pack</div>
+                <div class="subtitle">Directory AI Assistant</div>
+            </div>
+        </div>
+        <div class="status-badge online" id="status-badge">
+            <span class="status-dot"></span>
+            <span id="status-text">Connecting...</span>
+        </div>
+    </div>
+
+    <div class="tabs">
+        <button class="tab active" data-panel="dashboard">📊 Dashboard</button>
+        <button class="tab" data-panel="chat">💬 Chat</button>
+        <button class="tab" data-panel="context">📄 Context</button>
+        <button class="tab" data-panel="tools">🔧 Tools</button>
+        <button class="tab" data-panel="auto">🔄 Auto</button>
+        <button class="tab" data-panel="settings">⚙️ Settings</button>
+    </div>
+
+    <div class="content">
+        <!-- Dashboard Panel -->
+        <div class="panel active" id="dashboard">
+            <div class="dashboard-grid">
+                <div class="card">
+                    <div class="card-title">📁 Files Scanned</div>
+                    <div class="card-value" id="file-count">-</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">📏 Context Size</div>
+                    <div class="card-value" id="context-size">-</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">🧠 Model</div>
+                    <div class="card-value" id="model-name">-</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">💾 Memory</div>
+                    <div class="card-value" id="memory-count">-</div>
+                </div>
+            </div>
+            <div class="card" style="margin-top: 20px;">
+                <div class="card-title">📑 Scanned Files</div>
+                <button class="btn btn-secondary" onclick="scanDirectory()" style="margin-bottom: 15px;">🔄 Rescan Directory</button>
+                <div class="file-list" id="file-list">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <span>Loading files...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Panel -->
+        <div class="panel" id="chat">
+            <div class="chat-container">
+                <div class="messages" id="messages">
+                    <div class="message assistant">
+                        <div>Hello! I'm your directory assistant. I've read the markdown files in this directory and can answer questions about them. What would you like to know?</div>
+                        <div class="message-time">Just now</div>
+                    </div>
+                </div>
+                <div class="input-area">
+                    <input type="text" id="chat-input" placeholder="Ask about this directory..." onkeypress="if(event.key==='Enter' && !autoSettings.enabled)sendMessage()">
+                    <button class="btn" onclick="sendMessage()">Send</button>
+                    <button class="voice-btn" id="voiceBtn" title="Voice input" >🎤</button>
+                    <button class="btn btn-secondary" onclick="clearMemory()">Clear</button>
+                    <div style="border-left: 1px solid var(--border); margin: 0 5px;"></div>
+                    <input type="file" id="file-upload" accept="image/*,.txt,.md,.json,.pdf" style="display: none;" onchange="handleFileUpload(event)">
+                    <button class="btn btn-secondary" onclick="document.getElementById('file-upload').click()" title="Upload file or image">📎</button>
+                    <button class="btn btn-secondary" onclick="showImageBrowser()" title="Browse images in folders">🖼️</button>
+                    <div style="border-left: 1px solid var(--border); margin: 0 5px;"></div>
+                    <button class="btn" id="auto-toggle-btn" onclick="toggleAutoMode()" style="background: var(--success);">▶️ Auto</button>
+                    <button class="btn" id="emergency-btn" onclick="emergencyStop()" style="background: #ef4444; display: none;">⛔ STOP</button>
+                </div>
+                <!-- Image Preview (shown when image selected) -->
+                <div id="image-preview-bar" style="display: none; padding: 8px 12px; background: var(--bg-tertiary); border-radius: 8px; margin-top: 10px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <img id="preview-img" style="max-height: 60px; max-width: 100px; border-radius: 4px;">
+                        <span id="preview-filename" style="flex: 1;"></span>
+                        <select id="save-location" style="padding: 4px 8px; border-radius: 4px; background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border);">
+                            <option value="upload">Save to: upload/</option>
+                            <option value="data">Save to: data/</option>
+                            <option value="none">Don't save</option>
+                        </select>
+                        <button class="btn" onclick="analyzeImage()" style="padding: 8px 12px;">🔍 Analyze</button>
+                        <button class="btn btn-secondary" onclick="clearImagePreview()" style="padding: 8px 12px;">✕</button>
+                    </div>
+                </div>
+                <!-- Auto Mode Status Bar (shown when active) -->
+                <div id="auto-status-bar" style="display: none; padding: 8px 12px; background: var(--bg-tertiary); border-radius: 8px; margin-top: 10px; font-size: 12px;">
+                    <span>🔄 Auto Mode: </span>
+                    <span id="auto-status-text">Running</span>
+                    <span style="margin-left: 15px;">Cycle: <span id="auto-cycle-count">0</span></span>
+                    <span style="margin-left: 15px;">Next: <span id="auto-next-time">-</span></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Context Panel -->
+        <div class="panel" id="context">
+            <div class="card">
+                <div class="card-title">📄 Loaded Context</div>
+                <button class="btn btn-secondary" onclick="loadContext()" style="margin-bottom: 15px;">🔄 Reload Context</button>
+                <div class="context-box" id="context-content">Loading...</div>
+            </div>
+        </div>
+
+        <!-- Tools Panel -->
+        <div class="panel" id="tools">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3>🔧 Available Tools</h3>
+                <button class="btn" onclick="showAddToolModal()">➕ Add Tool</button>
+            </div>
+            <div class="tools-grid" id="tools-grid">
+                <!-- Tools will be loaded here -->
+            </div>
+
+            <!-- Tool Editor Modal -->
+            <div id="tool-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 1000; padding: 20px; overflow: auto;">
+                <div class="card" style="max-width: 600px; margin: 20px auto;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 id="modal-title">Add Tool</h3>
+                        <button class="btn btn-secondary" onclick="closeToolModal()">✕</button>
+                    </div>
+                    <div class="form-group">
+                        <label>Tool ID (unique identifier)</label>
+                        <input type="text" id="tool-id" placeholder="my_tool">
+                    </div>
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" id="tool-name" placeholder="My Tool">
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="tool-description" placeholder="What this tool does..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Type</label>
+                        <select id="tool-type" onchange="showToolTypeOptions()">
+                            <option value="internal">Internal (Built-in handler)</option>
+                            <option value="api">API (External endpoint)</option>
+                        </select>
+                    </div>
+                    <div id="internal-options" class="form-group">
+                        <label>Handler</label>
+                        <select id="tool-handler">
+                            <option value="read_file">Read File</option>
+                            <option value="list_files">List Files</option>
+                            <option value="write_file">Write File</option>
+                            <option value="http_get">HTTP GET</option>
+                            <option value="calculate">Calculator</option>
+                            <option value="datetime">Date/Time</option>
+                            <option value="shell_command">Shell Command</option>
+                        </select>
+                    </div>
+                    <div id="api-options" style="display: none;">
+                        <div class="form-group">
+                            <label>Endpoint URL</label>
+                            <input type="text" id="tool-endpoint" placeholder="https://api.example.com/endpoint">
+                        </div>
+                        <div class="form-group">
+                            <label>Method</label>
+                            <select id="tool-method">
+                                <option value="GET">GET</option>
+                                <option value="POST">POST</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Parameters (JSON format)</label>
+                        <textarea id="tool-parameters" placeholder='{"param1": {"type": "string", "required": true, "description": "Parameter description"}}'></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; gap: 10px;">
+                            <input type="checkbox" id="tool-enabled" checked>
+                            Enabled
+                        </label>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn" onclick="saveTool()">💾 Save Tool</button>
+                        <button class="btn btn-secondary" onclick="testTool()">🧪 Test</button>
+                        <span id="tool-save-status" style="color: var(--text-secondary); line-height: 40px;"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Auto Mode Panel (Settings Only) -->
+        <div class="panel" id="auto">
+            <div style="max-width: 600px;">
+                <!-- Instructions -->
+                <div class="card" style="margin-bottom: 20px; background: var(--bg-tertiary);">
+                    <h3 style="margin-bottom: 10px;">💡 How Auto Mode Works</h3>
+                    <ol style="margin: 0; padding-left: 20px; color: var(--text-secondary); line-height: 1.8;">
+                        <li>Configure your settings below (prompt, cycles, timer)</li>
+                        <li>Go to the <strong>Chat</strong> tab</li>
+                        <li>Click the <strong>▶️ Auto</strong> button to start</li>
+                        <li>The prompt will be sent automatically at your set interval</li>
+                        <li>Click <strong>⛔ STOP</strong> to halt at any time</li>
+                    </ol>
+                </div>
+
+                <!-- Auto Mode Settings -->
+                <div class="card" style="margin-bottom: 20px;">
+                    <h3 style="margin-bottom: 15px;">⚙️ Auto Mode Settings</h3>
+                    <div class="form-group">
+                        <label>Prompt (sent automatically each cycle)</label>
+                        <textarea id="auto-prompt" rows="4" placeholder="Enter the prompt to send automatically..."></textarea>
+                    </div>
+                    <div style="display: flex; gap: 20px;">
+                        <div class="form-group" style="flex: 1;">
+                            <label>Number of Cycles</label>
+                            <input type="number" id="auto-cycles" value="0" min="0" placeholder="0 = infinite">
+                            <small style="color: var(--text-secondary);">0 = infinite cycles</small>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label>Timer (seconds)</label>
+                            <input type="number" id="auto-timer" value="30" min="5" max="1800" placeholder="30">
+                            <small style="color: var(--text-secondary);">Idle time before auto-send (5-1800)</small>
+                        </div>
+                    </div>
+                    <button class="btn" onclick="saveAutoSettings()">💾 Save Settings</button>
+                    <span id="auto-save-status" style="margin-left: 10px; color: var(--text-secondary);"></span>
+                </div>
+
+                <!-- Current Status -->
+                <div class="card" style="margin-bottom: 20px;">
+                    <h3 style="margin-bottom: 15px;">📊 Current Status</h3>
+                    <div style="display: flex; gap: 30px;">
+                        <div>
+                            <span style="color: var(--text-secondary);">Status:</span>
+                            <span id="auto-status" style="font-weight: bold;">Stopped</span>
+                        </div>
+                        <div>
+                            <span style="color: var(--text-secondary);">Cycles Completed:</span>
+                            <span id="auto-cycles-display">0 / 0</span>
+                        </div>
+                        <div>
+                            <span style="color: var(--text-secondary);">Last Run:</span>
+                            <span id="auto-last-run">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Auto Mode Log -->
+                <div class="card">
+                    <h3 style="margin-bottom: 15px;">📋 Activity Log</h3>
+                    <div id="auto-log" style="max-height: 300px; overflow-y: auto; font-family: monospace; font-size: 12px; background: var(--bg-tertiary); padding: 10px; border-radius: 8px;">
+                        <div style="color: var(--text-secondary);">No activity yet. Start auto mode from the Chat tab.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Panel -->
+        <div class="panel" id="settings">
+            <div class="settings-form" style="max-width: 800px;">
+                <!-- Provider Selection -->
+                <div class="card" style="margin-bottom: 20px;">
+                    <h3 style="margin-bottom: 15px;">🔌 LLM Provider</h3>
+                    <div class="form-group">
+                        <label>Active Provider</label>
+                        <select id="setting-provider" onchange="showProviderSettings()">
+                            <option value="local">Local (Ollama)</option>
+                            <option value="external">External (Ollama via ngrok)</option>
+                            <option value="gemini">Google Gemini</option>
+                            <option value="anthropic">Anthropic Claude</option>
+                            <option value="openai">OpenAI</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-secondary" onclick="testProvider()" style="margin-right: 10px;">🧪 Test Connection</button>
+                    <span id="provider-status" style="color: var(--text-secondary);"></span>
+                </div>
+
+                <!-- Local Ollama Settings -->
+                <div class="card provider-settings" id="settings-local" style="margin-bottom: 20px;">
+                    <h4 style="margin-bottom: 15px;">🖥️ Local Ollama Settings</h4>
+                    <div class="form-group">
+                        <label>Endpoint</label>
+                        <input type="text" id="local-endpoint" placeholder="http://127.0.0.1:11434/api/generate">
+                    </div>
+                    <div class="form-group">
+                        <label>Model</label>
+                        <select id="local-model">
+                            <option value="">Loading models...</option>
+                        </select>
+                        <small style="color: var(--text-secondary);">Models from Ollama (localhost:11434)</small>
+                        <button class="btn btn-secondary" onclick="refreshOllamaModels()" style="margin-top: 5px; padding: 4px 12px; font-size: 12px;">Refresh Models</button>
+                    </div>
+                </div>
+
+                <!-- External Ollama Settings -->
+                <div class="card provider-settings" id="settings-external" style="margin-bottom: 20px; display: none;">
+                    <h4 style="margin-bottom: 15px;">🌐 External Ollama Settings (via ngrok)</h4>
+                    <div class="form-group">
+                        <label>Endpoint</label>
+                        <input type="text" id="external-endpoint" placeholder="https://adir.ngrok.app/api/generate" value="https://adir.ngrok.app/api/generate">
+                    </div>
+                    <div class="form-group">
+                        <label>Model</label>
+                        <select id="external-model">
+                            <option value="">Click Refresh to load models</option>
+                        </select>
+                        <small style="color: var(--text-secondary);">Models from external Ollama</small>
+                        <button class="btn btn-secondary" onclick="refreshExternalModels()" style="margin-top: 5px; padding: 4px 12px; font-size: 12px;">Refresh Models</button>
+                    </div>
+                </div>
+
+                <!-- Gemini Settings -->
+                <div class="card provider-settings" id="settings-gemini" style="margin-bottom: 20px; display: none;">
+                    <h4 style="margin-bottom: 15px;">✨ Google Gemini Settings</h4>
+                    <div class="form-group">
+                        <label>API Key</label>
+                        <input type="password" id="gemini-api-key" placeholder="Enter your Gemini API key">
+                        <small style="color: var(--text-secondary);">Get key at: ai.google.dev</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Model</label>
+                        <select id="gemini-model">
+                            <optgroup label="Gemini 3 (Preview)">
+                                <option value="gemini-3-pro-preview">Gemini 3 Pro Preview</option>
+                                <option value="gemini-3-flash-preview">Gemini 3 Flash Preview</option>
+                            </optgroup>
+                            <optgroup label="Gemini 2.5 (Stable)">
+                                <option value="gemini-2.5-pro">Gemini 2.5 Pro (Most Capable)</option>
+                                <option value="gemini-2.5-flash">Gemini 2.5 Flash (Fast)</option>
+                                <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash Lite</option>
+                            </optgroup>
+                            <optgroup label="Gemini 2.0">
+                                <option value="gemini-2.0-flash">Gemini 2.0 Flash (Stable)</option>
+                                <option value="gemini-2.0-flash-exp" selected>Gemini 2.0 Flash Exp</option>
+                                <option value="gemini-2.0-flash-lite">Gemini 2.0 Flash Lite</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Anthropic Settings -->
+                <div class="card provider-settings" id="settings-anthropic" style="margin-bottom: 20px; display: none;">
+                    <h4 style="margin-bottom: 15px;">🤖 Anthropic Claude Settings</h4>
+                    <div class="form-group">
+                        <label>API Key</label>
+                        <input type="password" id="anthropic-api-key" placeholder="Enter your Anthropic API key">
+                        <small style="color: var(--text-secondary);">Get key at: console.anthropic.com</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Model</label>
+                        <select id="anthropic-model">
+                            <option value="claude-haiku-4-5-20251001">Claude 4.5 Haiku (Fast)</option>
+                            <option value="claude-sonnet-4-5-20250929">Claude 4.5 Sonnet</option>
+                            <option value="claude-opus-4-6">Claude Opus 4.6 (Most Capable)</option>
+                            <option value="claude-3-5-sonnet-20241022">Claude 3.5 Sonnet (Legacy)</option>
+                            <option value="claude-3-haiku-20240307">Claude 3 Haiku (Legacy)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- OpenAI Settings -->
+                <div class="card provider-settings" id="settings-openai" style="margin-bottom: 20px; display: none;">
+                    <h4 style="margin-bottom: 15px;">🌐 OpenAI Settings</h4>
+                    <div class="form-group">
+                        <label>API Key</label>
+                        <input type="password" id="openai-api-key" placeholder="Enter your OpenAI API key">
+                        <small style="color: var(--text-secondary);">Get key at: platform.openai.com</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Model</label>
+                        <select id="openai-model">
+                            <option value="gpt-4o-mini">GPT-4o Mini (Fast)</option>
+                            <option value="gpt-4o">GPT-4o</option>
+                            <option value="gpt-4-turbo">GPT-4 Turbo</option>
+                        </select>
+                    </div>
+                    <p style="color: var(--warning);">⚠️ Not yet implemented</p>
+                </div>
+
+                <!-- Web Search Settings -->
+                <div class="card" style="margin-bottom: 20px;">
+                    <h3 style="margin-bottom: 15px;">🔍 Web Search (Google Custom Search)</h3>
+                    <div class="form-group">
+                        <label>Search Engine ID (cx)</label>
+                        <input type="text" id="search-cx" placeholder="Enter your Google Custom Search Engine ID">
+                        <small style="color: var(--text-secondary);">Create at: programmablesearchengine.google.com</small>
+                    </div>
+                    <div class="form-group">
+                        <label>API Key</label>
+                        <input type="password" id="search-api-key" placeholder="Enter your Google Custom Search API key">
+                        <small style="color: var(--text-secondary);">Get key at: console.cloud.google.com/apis/credentials</small>
+                    </div>
+                </div>
+
+                <!-- Agent Settings -->
+                <div class="card" style="margin-bottom: 20px;">
+                    <h3 style="margin-bottom: 15px;">🤖 Agent Settings</h3>
+                    <div class="form-group">
+                        <label>Agent Name</label>
+                        <input type="text" id="setting-name" placeholder="Directory Agent">
+                    </div>
+                    <div class="form-group">
+                        <label>System Prompt</label>
+                        <textarea id="setting-prompt" placeholder="You are a helpful AI assistant..." style="min-height: 120px;"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Scan Directory (relative to agent-pack)</label>
+                        <input type="text" id="setting-scan-dir" placeholder=".">
+                    </div>
+                </div>
+
+                <button class="btn" onclick="saveSettings()" style="margin-right: 10px;">💾 Save Settings</button>
+                <span id="save-status" style="color: var(--success);"></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API base URL - Robust detection for multiple deployment scenarios
+        let API_BASE = '/api/agent.php';  // Default assumption
+
+        // If we're at /agent/ or /agent/index.html, use /agent/api/agent.php
+        let pathname = window.location.pathname;
+        if (pathname.includes('/agent/')) {
+            // Extract the /agent/ part and use it as prefix
+            let agentMatch = pathname.match(/.*\/agent\//);
+            if (agentMatch) {
+                API_BASE = agentMatch[0] + 'api/agent.php';
+            }
+        }
+
+        console.log('Detected pathname:', window.location.pathname);
+        console.log('Computed API_BASE:', API_BASE);
+
+        // State
+        let config = {};
+        let status = {};
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadStatus();
+            await loadConfig();
+            await scanDirectory();
+            loadTools();
+        });
+
+        // Tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.panel).classList.add('active');
+            });
+        });
+
+        // API calls
+        async function apiCall(action, params = {}) {
+            const url = new URL(API_BASE, window.location.origin);
+            url.searchParams.set('action', action);
+            Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
+            const response = await fetch(url);
+            return response.json();
+        }
+
+        async function loadStatus() {
+            try {
+                const data = await apiCall('status');
+                if (data.success) {
+                    status = data;
+                    document.getElementById('agent-name').textContent = data.agent || 'Agent Pack';
+                    document.getElementById('model-name').textContent = data.model || '-';
+                    document.getElementById('status-text').textContent = 'Online';
+                    document.getElementById('status-badge').className = 'status-badge online';
+                }
+            } catch (e) {
+                document.getElementById('status-text').textContent = 'Offline';
+                document.getElementById('status-badge').className = 'status-badge offline';
+            }
+        }
+
+        async function loadConfig() {
+            try {
+                const data = await apiCall('config');
+                if (data.success) {
+                    config = data.config;
+
+                    // Provider settings
+                    document.getElementById('setting-provider').value = config.llm?.provider || 'local';
+                    showProviderSettings();
+
+                    // Local settings
+                    document.getElementById('local-endpoint').value = config.llm?.local?.endpoint || 'http://127.0.0.1:11434/api/generate';
+                    document.getElementById('local-model').value = config.llm?.local?.model || 'qwen2.5:7b';
+
+                    // Gemini settings
+                    if (config.llm?.gemini?.api_key_masked) {
+                        document.getElementById('gemini-api-key').placeholder = 'Configured: ' + config.llm.gemini.api_key_masked;
+                    }
+                    document.getElementById('gemini-model').value = config.llm?.gemini?.model || 'gemini-2.0-flash-exp';
+
+                    // Anthropic settings
+                    if (config.llm?.anthropic?.api_key_masked) {
+                        document.getElementById('anthropic-api-key').placeholder = 'Configured: ' + config.llm.anthropic.api_key_masked;
+                    }
+
+                    // OpenAI settings
+                    if (config.llm?.openai?.api_key_masked) {
+                        document.getElementById('openai-api-key').placeholder = 'Configured: ' + config.llm.openai.api_key_masked;
+                    }
+
+                    // Search settings
+                    if (config.search?.cx) {
+                        document.getElementById('search-cx').value = config.search.cx;
+                    }
+                    if (config.search?.api_key_masked) {
+                        document.getElementById('search-api-key').placeholder = 'Configured: ' + config.search.api_key_masked;
+                    } else if (config.search?.api_key) {
+                        document.getElementById('search-api-key').placeholder = 'Configured (key set)';
+                    }
+
+                    // Agent settings
+                    document.getElementById('setting-name').value = config.agent?.name || '';
+                    document.getElementById('setting-prompt').value = config.agent?.system_prompt || '';
+                    document.getElementById('setting-scan-dir').value = config.paths?.scan_directory || '.';
+
+                    // Load models dynamically from Ollama
+                    refreshOllamaModels();
+                }
+            } catch (e) {
+                console.error('Failed to load config:', e);
+            }
+        }
+
+        async function refreshOllamaModels() {
+            const select = document.getElementById('local-model');
+            select.innerHTML = '<option value="">Loading...</option>';
+            try {
+                const response = await fetch('http://localhost:11434/api/tags');
+                const data = await response.json();
+                const models = data.models || [];
+
+                if (models.length === 0) {
+                    select.innerHTML = '<option value="">No models found - run: ollama pull gemma3:1b</option>';
+                    return;
+                }
+
+                const currentModel = config?.llm?.local?.model || '';
+                select.innerHTML = '';
+                models.forEach(m => {
+                    const sizeGB = (m.size / (1024 * 1024 * 1024)).toFixed(1);
+                    const params = m.details?.parameter_size || '';
+                    const opt = document.createElement('option');
+                    opt.value = m.name;
+                    opt.textContent = m.name + ' (' + sizeGB + ' GB' + (params ? ', ' + params : '') + ')';
+                    if (m.name === currentModel) opt.selected = true;
+                    select.appendChild(opt);
+                });
+            } catch (e) {
+                select.innerHTML = '<option value="">Ollama not running</option>';
+                console.error('Failed to load models:', e);
+            }
+        }
+
+        async function refreshExternalModels() {
+            const endpoint = document.getElementById('external-endpoint').value.replace('/api/generate', '');
+            const select = document.getElementById('external-model');
+            select.innerHTML = '<option value="">Loading...</option>';
+            try {
+                const response = await fetch(endpoint + '/api/tags');
+                const data = await response.json();
+                const models = data.models || [];
+
+                if (models.length === 0) {
+                    select.innerHTML = '<option value="">No models found on external Ollama</option>';
+                    return;
+                }
+
+                const currentModel = config?.llm?.external?.model || '';
+                select.innerHTML = '';
+                models.forEach(m => {
+                    const sizeGB = (m.size / (1024 * 1024 * 1024)).toFixed(1);
+                    const params = m.details?.parameter_size || '';
+                    const opt = document.createElement('option');
+                    opt.value = m.name;
+                    opt.textContent = m.name + ' (' + sizeGB + ' GB' + (params ? ', ' + params : '') + ')';
+                    if (m.name === currentModel) opt.selected = true;
+                    select.appendChild(opt);
+                });
+            } catch (e) {
+                select.innerHTML = '<option value="">Cannot reach external Ollama - check ngrok tunnel</option>';
+                console.error('Failed to load external models:', e);
+            }
+        }
+
+        function showProviderSettings() {
+            const provider = document.getElementById('setting-provider').value;
+            document.querySelectorAll('.provider-settings').forEach(el => el.style.display = 'none');
+            document.getElementById('settings-' + provider).style.display = 'block';
+        }
+
+        async function testProvider() {
+            const provider = document.getElementById('setting-provider').value;
+            const statusEl = document.getElementById('provider-status');
+            statusEl.textContent = 'Testing...';
+            statusEl.style.color = 'var(--text-secondary)';
+
+            try {
+                const data = await apiCall('test_provider', { provider });
+                if (data.success) {
+                    statusEl.textContent = '✅ ' + data.message;
+                    statusEl.style.color = 'var(--success)';
+                } else {
+                    statusEl.textContent = '❌ ' + data.error;
+                    statusEl.style.color = '#ef4444';
+                }
+            } catch (e) {
+                statusEl.textContent = '❌ Connection failed';
+                statusEl.style.color = '#ef4444';
+            }
+        }
+
+        async function scanDirectory() {
+            document.getElementById('file-list').innerHTML = '<div class="loading"><div class="spinner"></div><span>Scanning...</span></div>';
+            try {
+                const data = await apiCall('scan');
+                if (data.success) {
+                    document.getElementById('file-count').textContent = data.fileCount || 0;
+                    document.getElementById('context-size').textContent = formatBytes(data.contextSize || 0);
+
+                    const fileList = document.getElementById('file-list');
+                    if (data.files && data.files.length > 0) {
+                        fileList.innerHTML = data.files.map(f => `
+                            <div class="file-item">
+                                <span>${f.path}</span>
+                                <span style="color: var(--text-secondary)">${formatBytes(f.size)}</span>
+                            </div>
+                        `).join('');
+                    } else {
+                        fileList.innerHTML = '<div style="padding: 20px; color: var(--text-secondary);">No files found. Check scan directory in settings.</div>';
+                    }
+                }
+            } catch (e) {
+                document.getElementById('file-list').innerHTML = '<div style="padding: 20px; color: #ef4444;">Failed to scan directory</div>';
+            }
+        }
+
+        async function sendMessage(isAutoMessage = false) {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            if (!message) return;
+
+            // Reset auto timer on manual send
+            if (!isAutoMessage && autoSettings.enabled) {
+                resetAutoTimer();
+            }
+
+            // Add user message (mark auto messages)
+            const label = isAutoMessage ? '[AUTO] ' + message : message;
+            addMessage(label, 'user');
+            input.value = '';
+            input.disabled = true;
+
+            try {
+                const data = await apiCall('chat', { input: message });
+                if (data.success) {
+                    addMessage(data.response, 'assistant');
+                    document.getElementById('memory-count').textContent = data.memoryLength + ' messages';
+
+                    // Update auto cycle count if this was an auto message
+                    if (isAutoMessage) {
+                        autoSettings.cycles_completed = (autoSettings.cycles_completed || 0) + 1;
+                        autoSettings.last_run = new Date().toISOString();
+                        updateAutoStatus();
+                        addAutoLog(`✅ Cycle ${autoSettings.cycles_completed} complete`);
+
+                        // Check cycle limit
+                        const maxCycles = autoSettings.cycles || 0;
+                        if (maxCycles > 0 && autoSettings.cycles_completed >= maxCycles) {
+                            addAutoLog('🏁 All cycles complete!');
+                            stopAutoMode();
+                        }
+                    }
+                } else {
+                    addMessage('Error: ' + (data.error || 'Unknown error'), 'assistant');
+                }
+            } catch (e) {
+                addMessage('Error: Failed to connect to agent', 'assistant');
+            }
+
+            input.disabled = false;
+            input.focus();
+
+            // Restart auto timer after response (if still enabled)
+            if (autoSettings.enabled && !autoSettings.emergency_stop) {
+                resetAutoTimer();
+            }
+        }
+
+        function addMessage(text, role) {
+            const messages = document.getElementById('messages');
+            const div = document.createElement('div');
+            div.className = 'message ' + role;
+            div.innerHTML = `
+                <div>${text.replace(/\n/g, '<br>')}</div>
+                <div class="message-time">${new Date().toLocaleTimeString()}</div>
+            `;
+            messages.appendChild(div);
+            messages.scrollTop = messages.scrollHeight;
+
+            // Trigger TTS for assistant responses (delay lets iframes render first)
+            if (role === 'assistant' && window.speechSynthesis) {
+                setTimeout(() => voiceEngine._speak(text), 500);
+            }
+        }
+
+        // ============================================================================
+        // IMAGE UPLOAD & ANALYSIS
+        // ============================================================================
+
+        let selectedFile = null;
+        let selectedFileData = null;
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            selectedFile = file;
+            const previewBar = document.getElementById('image-preview-bar');
+            const previewImg = document.getElementById('preview-img');
+            const previewFilename = document.getElementById('preview-filename');
+
+            // Show preview bar
+            previewBar.style.display = 'block';
+            previewFilename.textContent = file.name + ' (' + formatBytes(file.size) + ')';
+
+            // Read file for preview and analysis
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                selectedFileData = e.target.result;
+
+                // If it's an image, show preview
+                if (file.type.startsWith('image/')) {
+                    previewImg.src = selectedFileData;
+                    previewImg.style.display = 'block';
+                } else {
+                    previewImg.style.display = 'none';
+                }
+            };
+
+            if (file.type.startsWith('image/')) {
+                reader.readAsDataURL(file);
+            } else {
+                reader.readAsText(file);
+            }
+        }
+
+        function clearImagePreview() {
+            selectedFile = null;
+            selectedFileData = null;
+            document.getElementById('image-preview-bar').style.display = 'none';
+            document.getElementById('file-upload').value = '';
+        }
+
+        async function analyzeImage() {
+            if (!selectedFile || !selectedFileData) {
+                alert('No file selected');
+                return;
+            }
+
+            // Check file size - base64 is ~33% larger than original
+            const fileSizeEstimate = selectedFileData.length;
+            const fileSizeMB = (fileSizeEstimate / (1024 * 1024)).toFixed(1);
+
+            if (fileSizeEstimate > 8 * 1024 * 1024) {
+                alert(`File too large for analysis: ${fileSizeMB}MB\nMaximum: 8MB\n\nTry a smaller image.`);
+                clearImagePreview();
+                return;
+            }
+
+            console.log(`File size: ${fileSizeMB}MB (limit: 8MB)`);
+
+            const saveLocation = document.getElementById('save-location').value;
+
+            // First, save the file if requested
+            if (saveLocation !== 'none') {
+                await saveUploadedFile(saveLocation);
+            }
+
+            // Add message indicating analysis
+            const isImage = selectedFile.type.startsWith('image/');
+            const analysisMsg = isImage
+                ? `🔍 Analyzing image: ${selectedFile.name}...`
+                : `📄 Analyzing file: ${selectedFile.name}...`;
+            addMessage(analysisMsg, 'user');
+
+            // Send to LLM for analysis
+            try {
+                const url = new URL(API_BASE, window.location.origin);
+                url.searchParams.set('action', 'analyze');
+
+                // Handle both File objects and browser-selected objects
+                const fileName = selectedFile.name || 'unknown';
+                const fileType = selectedFile.type || 'image/png';
+
+                const payload = {
+                    filename: fileName,
+                    type: fileType,
+                    data: selectedFileData.includes(',') ? selectedFileData.split(',')[1] : selectedFileData,
+                    isBase64: fileType.startsWith('image/')
+                };
+
+                console.log('Sending analyze request:', { url: url.toString(), payload: { ...payload, data: payload.data.substring(0, 100) + '...' } });
+
+                // Use AbortController for timeout (7 minutes to match PHP timeout)
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => {
+                    console.error('Request timeout - aborting');
+                    controller.abort();
+                }, 420000);  // 7 minutes = 420 seconds
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                    signal: controller.signal
+                });
+
+                clearTimeout(timeoutId);
+
+                console.log('Response status:', response.status);
+
+                // Check if response is JSON
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    const text = await response.text();
+                    console.error('Non-JSON response:', text);
+                    addMessage('❌ Server error: ' + text.substring(0, 200), 'assistant');
+                    return;
+                }
+
+                const data = await response.json();
+                console.log('Response data:', data);
+
+                if (data.success) {
+                    addMessage(data.response, 'assistant');
+                } else {
+                    addMessage('❌ Analysis failed: ' + (data.error || 'Unknown error'), 'assistant');
+                }
+            } catch (e) {
+                const errorMsg = e.name === 'AbortError'
+                    ? 'Request timeout (took too long)'
+                    : e.message;
+                addMessage('❌ Connection error: ' + errorMsg, 'assistant');
+                console.error('Analyze error:', e);
+                console.error('Error type:', e.name);
+                console.error('Full error:', e);
+            }
+
+            // Clear preview after analysis
+            clearImagePreview();
+        }
+
+        async function saveUploadedFile(location) {
+            if (!selectedFile || !selectedFileData) return;
+
+            try {
+                const url = new URL(API_BASE, window.location.origin);
+                url.searchParams.set('action', 'upload');
+
+                const payload = {
+                    filename: selectedFile.name,
+                    location: location, // 'upload' or 'data'
+                    type: selectedFile.type,
+                    data: selectedFileData.split(',')[1] || selectedFileData,
+                    isBase64: selectedFile.type.startsWith('image/')
+                };
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    addMessage(`✅ Saved to ${location}/${selectedFile.name}`, 'assistant');
+                } else {
+                    addMessage(`⚠️ Save failed: ${data.error}`, 'assistant');
+                }
+            } catch (e) {
+                console.error('Save error:', e);
+            }
+        }
+
+        function showImageBrowser() {
+            // Create modal for browsing images
+            let modal = document.getElementById('image-browser-modal');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'image-browser-modal';
+                modal.style.cssText = 'display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 1000; padding: 20px; overflow: auto;';
+                modal.innerHTML = `
+                    <div class="card" style="max-width: 800px; margin: 20px auto;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h3>🖼️ Browse Images</h3>
+                            <button class="btn btn-secondary" onclick="closeImageBrowser()">✕</button>
+                        </div>
+                        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                            <button class="btn btn-secondary" onclick="loadFolderImages('upload')" style="flex: 1;">📁 upload/</button>
+                            <button class="btn btn-secondary" onclick="loadFolderImages('data')" style="flex: 1;">📁 data/</button>
+                        </div>
+                        <div id="image-browser-content" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; max-height: 500px; overflow-y: auto;">
+                            <div style="color: var(--text-secondary); grid-column: 1/-1; text-align: center; padding: 40px;">
+                                Select a folder to browse images
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            }
+            modal.style.display = 'block';
+        }
+
+        function closeImageBrowser() {
+            const modal = document.getElementById('image-browser-modal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        async function loadFolderImages(folder) {
+            const content = document.getElementById('image-browser-content');
+            content.innerHTML = '<div class="loading"><div class="spinner"></div><span>Loading...</span></div>';
+
+            try {
+                const data = await apiCall('list_images', { folder: folder });
+                if (data.success && data.images && data.images.length > 0) {
+                    content.innerHTML = data.images.map(img => `
+                        <div style="background: var(--bg-tertiary); border-radius: 8px; padding: 8px; cursor: pointer; text-align: center;"
+                             onclick="selectBrowserImage('${folder}', '${img.name}')">
+                            <img src="${img.url}" style="max-width: 100%; max-height: 100px; border-radius: 4px; object-fit: cover;">
+                            <div style="font-size: 11px; margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${img.name}</div>
+                        </div>
+                    `).join('');
+                } else {
+                    content.innerHTML = `<div style="color: var(--text-secondary); grid-column: 1/-1; text-align: center; padding: 40px;">
+                        No images found in ${folder}/
+                    </div>`;
+                }
+            } catch (e) {
+                content.innerHTML = `<div style="color: #ef4444; grid-column: 1/-1; text-align: center; padding: 40px;">
+                    Failed to load images
+                </div>`;
+                console.error('Load images error:', e);
+            }
+        }
+
+        async function selectBrowserImage(folder, filename) {
+            closeImageBrowser();
+
+            // Load the image for analysis
+            try {
+                const data = await apiCall('get_image', { folder: folder, filename: filename });
+                if (data.success) {
+                    selectedFile = { name: filename, type: 'image/' + filename.split('.').pop() };
+                    selectedFileData = 'data:image/' + filename.split('.').pop() + ';base64,' + data.data;
+
+                    // Show in preview
+                    const previewBar = document.getElementById('image-preview-bar');
+                    const previewImg = document.getElementById('preview-img');
+                    const previewFilename = document.getElementById('preview-filename');
+
+                    previewBar.style.display = 'block';
+                    previewImg.src = selectedFileData;
+                    previewImg.style.display = 'block';
+                    previewFilename.textContent = filename + ' (from ' + folder + '/)';
+
+                    // Set save location to 'none' since it's already saved
+                    document.getElementById('save-location').value = 'none';
+                }
+            } catch (e) {
+                console.error('Select image error:', e);
+                alert('Failed to load image');
+            }
+        }
+
+        async function clearMemory() {
+            if (!confirm('Clear conversation memory?')) return;
+            await apiCall('clear', { id: 'agent' });
+            document.getElementById('messages').innerHTML = `
+                <div class="message assistant">
+                    <div>Memory cleared. How can I help you?</div>
+                    <div class="message-time">Just now</div>
+                </div>
+            `;
+            document.getElementById('memory-count').textContent = '0 messages';
+        }
+
+        async function loadContext() {
+            document.getElementById('context-content').textContent = 'Loading...';
+            const data = await apiCall('context');
+            if (data.success) {
+                document.getElementById('context-content').textContent = data.context || 'No context loaded. Click Rescan on Dashboard.';
+            }
+        }
+
+        // Tools state
+        let allTools = {};
+        let editingToolId = null;
+
+        async function loadTools() {
+            const grid = document.getElementById('tools-grid');
+            grid.innerHTML = '<div class="loading"><div class="spinner"></div><span>Loading tools...</span></div>';
+
+            try {
+                const data = await apiCall('tools');
+                if (data.success) {
+                    allTools = data.tools;
+                    renderTools();
+                }
+            } catch (e) {
+                grid.innerHTML = '<div style="color: #ef4444;">Failed to load tools</div>';
+            }
+        }
+
+        function renderTools() {
+            const grid = document.getElementById('tools-grid');
+            const toolIds = Object.keys(allTools);
+
+            if (toolIds.length === 0) {
+                grid.innerHTML = '<div style="color: var(--text-secondary); padding: 20px;">No tools configured. Click "Add Tool" to create one.</div>';
+                return;
+            }
+
+            grid.innerHTML = toolIds.map(id => {
+                const tool = allTools[id];
+                const enabledClass = tool.enabled ? 'enabled' : '';
+                const icon = getToolIcon(tool.type, id);
+                return `
+                    <div class="tool-card ${enabledClass}" data-tool="${id}">
+                        <div style="display: flex; justify-content: space-between; align-items: start;">
+                            <div class="tool-icon">${icon}</div>
+                            <div style="display: flex; gap: 5px;">
+                                <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 12px;" onclick="editTool('${id}')">✏️</button>
+                                <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 12px;" onclick="toggleTool('${id}')">${tool.enabled ? '🔴' : '🟢'}</button>
+                                <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 12px;" onclick="deleteTool('${id}')">🗑️</button>
+                            </div>
+                        </div>
+                        <div class="tool-name">${tool.name}</div>
+                        <div class="tool-desc">${tool.description}</div>
+                        <div style="margin-top: 8px; font-size: 11px; color: var(--text-secondary);">
+                            Type: ${tool.type} | ${tool.enabled ? '✅ Enabled' : '⏸️ Disabled'}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getToolIcon(type, id) {
+            const icons = {
+                'file_read': '📖', 'read_file': '📖',
+                'file_list': '📁', 'list_files': '📁',
+                'file_write': '✍️', 'write_file': '✍️',
+                'http_get': '🌐',
+                'calculate': '🔢',
+                'datetime': '🕐',
+                'shell_command': '💻',
+                'web_search': '🔍',
+                'api': '🔌',
+                'internal': '⚙️'
+            };
+            return icons[id] || icons[type] || '🔧';
+        }
+
+        function showAddToolModal() {
+            editingToolId = null;
+            document.getElementById('modal-title').textContent = 'Add New Tool';
+            document.getElementById('tool-id').value = '';
+            document.getElementById('tool-id').disabled = false;
+            document.getElementById('tool-name').value = '';
+            document.getElementById('tool-description').value = '';
+            document.getElementById('tool-type').value = 'internal';
+            document.getElementById('tool-handler').value = 'read_file';
+            document.getElementById('tool-endpoint').value = '';
+            document.getElementById('tool-method').value = 'GET';
+            document.getElementById('tool-parameters').value = '';
+            document.getElementById('tool-enabled').checked = true;
+            document.getElementById('tool-save-status').textContent = '';
+            showToolTypeOptions();
+            document.getElementById('tool-modal').style.display = 'block';
+        }
+
+        function editTool(toolId) {
+            const tool = allTools[toolId];
+            if (!tool) return;
+
+            editingToolId = toolId;
+            document.getElementById('modal-title').textContent = 'Edit Tool: ' + tool.name;
+            document.getElementById('tool-id').value = toolId;
+            document.getElementById('tool-id').disabled = true;
+            document.getElementById('tool-name').value = tool.name || '';
+            document.getElementById('tool-description').value = tool.description || '';
+            document.getElementById('tool-type').value = tool.type || 'internal';
+            document.getElementById('tool-enabled').checked = tool.enabled !== false;
+            document.getElementById('tool-parameters').value = JSON.stringify(tool.parameters || {}, null, 2);
+            document.getElementById('tool-save-status').textContent = '';
+            showToolTypeOptions();
+            document.getElementById('tool-modal').style.display = 'block';
+        }
+
+        function closeToolModal() {
+            document.getElementById('tool-modal').style.display = 'none';
+            editingToolId = null;
+        }
+
+        function showToolTypeOptions() {
+            const type = document.getElementById('tool-type').value;
+            document.getElementById('internal-options').style.display = type === 'internal' ? 'block' : 'none';
+            document.getElementById('api-options').style.display = type === 'api' ? 'block' : 'none';
+        }
+
+        async function saveTool() {
+            const statusEl = document.getElementById('tool-save-status');
+            statusEl.textContent = 'Saving...';
+
+            const toolId = document.getElementById('tool-id').value.trim();
+            if (!toolId) {
+                statusEl.textContent = '❌ Tool ID required';
+                return;
+            }
+
+            let params = {};
+            try {
+                const paramsStr = document.getElementById('tool-parameters').value.trim();
+                if (paramsStr) {
+                    params = JSON.parse(paramsStr);
+                }
+            } catch (e) {
+                statusEl.textContent = '❌ Invalid JSON in parameters';
+                return;
+            }
+
+            const type = document.getElementById('tool-type').value;
+            const toolData = {
+                id: toolId,
+                name: document.getElementById('tool-name').value || toolId,
+                description: document.getElementById('tool-description').value || '',
+                type: type,
+                enabled: document.getElementById('tool-enabled').checked,
+                parameters: params
+            };
+
+            if (type === 'internal') {
+                toolData.handler = document.getElementById('tool-handler').value;
+            } else if (type === 'api') {
+                toolData.endpoint = document.getElementById('tool-endpoint').value;
+                toolData.method = document.getElementById('tool-method').value;
+            }
+
+            try {
+                const url = new URL(API_BASE, window.location.origin);
+                url.searchParams.set('action', 'tool_save');
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(toolData)
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    statusEl.textContent = '✅ Saved!';
+                    await loadTools();
+                    setTimeout(() => closeToolModal(), 1000);
+                } else {
+                    statusEl.textContent = '❌ ' + (data.error || 'Save failed');
+                }
+            } catch (e) {
+                statusEl.textContent = '❌ Connection error';
+            }
+        }
+
+        async function deleteTool(toolId) {
+            if (!confirm(`Delete tool "${toolId}"?`)) return;
+
+            try {
+                const data = await apiCall('tool_delete', { tool: toolId });
+                if (data.success) {
+                    await loadTools();
+                } else {
+                    alert('Failed to delete: ' + (data.error || 'Unknown error'));
+                }
+            } catch (e) {
+                alert('Connection error');
+            }
+        }
+
+        async function toggleTool(toolId) {
+            const tool = allTools[toolId];
+            if (!tool) return;
+
+            tool.enabled = !tool.enabled;
+
+            try {
+                const url = new URL(API_BASE, window.location.origin);
+                url.searchParams.set('action', 'tool_save');
+
+                await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: toolId, ...tool })
+                });
+
+                await loadTools();
+            } catch (e) {
+                console.error('Toggle error:', e);
+            }
+        }
+
+        async function testTool() {
+            const toolId = document.getElementById('tool-id').value.trim();
+            if (!toolId) {
+                document.getElementById('tool-save-status').textContent = '❌ Save tool first';
+                return;
+            }
+
+            document.getElementById('tool-save-status').textContent = 'Testing...';
+
+            try {
+                const data = await apiCall('tool_test', { tool: toolId });
+                if (data.test === 'passed') {
+                    document.getElementById('tool-save-status').textContent = '✅ Test passed!';
+                } else {
+                    document.getElementById('tool-save-status').textContent = '❌ Test failed: ' + JSON.stringify(data.result);
+                }
+            } catch (e) {
+                document.getElementById('tool-save-status').textContent = '❌ Connection error';
+            }
+        }
+
+        async function saveSettings() {
+            const statusEl = document.getElementById('save-status');
+            statusEl.textContent = 'Saving...';
+            statusEl.style.color = 'var(--text-secondary)';
+
+            // Build settings object
+            const settings = {
+                llm: {
+                    provider: document.getElementById('setting-provider').value,
+                    local: {
+                        endpoint: document.getElementById('local-endpoint').value,
+                        model: document.getElementById('local-model').value
+                    },
+                    external: {
+                        endpoint: document.getElementById('external-endpoint').value,
+                        model: document.getElementById('external-model').value
+                    },
+                    gemini: {
+                        model: document.getElementById('gemini-model').value
+                    },
+                    anthropic: {
+                        model: document.getElementById('anthropic-model').value
+                    },
+                    openai: {
+                        model: document.getElementById('openai-model').value
+                    }
+                },
+                agent: {
+                    name: document.getElementById('setting-name').value,
+                    system_prompt: document.getElementById('setting-prompt').value
+                },
+                paths: {
+                    scan_directory: document.getElementById('setting-scan-dir').value
+                }
+            };
+
+            // Only include API keys if they were actually entered (not placeholder)
+            const geminiKey = document.getElementById('gemini-api-key').value;
+            const anthropicKey = document.getElementById('anthropic-api-key').value;
+            const openaiKey = document.getElementById('openai-api-key').value;
+
+            if (geminiKey && geminiKey.length > 10) {
+                settings.llm.gemini.api_key = geminiKey;
+            }
+            if (anthropicKey && anthropicKey.length > 10) {
+                settings.llm.anthropic.api_key = anthropicKey;
+            }
+            if (openaiKey && openaiKey.length > 10) {
+                settings.llm.openai.api_key = openaiKey;
+            }
+
+            // Search settings
+            const searchCx = document.getElementById('search-cx').value;
+            const searchKey = document.getElementById('search-api-key').value;
+            if (searchCx || searchKey) {
+                settings.search = {};
+                if (searchCx) settings.search.cx = searchCx;
+                if (searchKey && searchKey.length > 10) settings.search.api_key = searchKey;
+            }
+
+            try {
+                // POST to save_config endpoint
+                const url = new URL(API_BASE, window.location.origin);
+                url.searchParams.set('action', 'save_config');
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(settings)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    statusEl.textContent = '✅ Settings saved!';
+                    statusEl.style.color = 'var(--success)';
+                    // Reload config to reflect changes
+                    await loadConfig();
+                    await loadStatus();
+                } else {
+                    statusEl.textContent = '❌ ' + (data.error || 'Save failed');
+                    statusEl.style.color = '#ef4444';
+                }
+            } catch (e) {
+                statusEl.textContent = '❌ Connection failed';
+                statusEl.style.color = '#ef4444';
+                console.error('Save error:', e);
+            }
+
+            // Clear status after 3 seconds
+            setTimeout(() => { statusEl.textContent = ''; }, 3000);
+        }
+
+        // ============================================================================
+        // AUTO MODE
+        // ============================================================================
+
+        const AUTO_API = window.location.pathname.replace(/\/[^\/]*$/, '') + '/api/auto.php';
+        let autoInterval = null;
+        let autoSettings = {};
+
+        async function loadAutoSettings() {
+            try {
+                const response = await fetch(AUTO_API + '?action=get');
+                const data = await response.json();
+                if (data.success) {
+                    autoSettings = data.settings;
+                    document.getElementById('auto-prompt').value = autoSettings.prompt || '';
+                    document.getElementById('auto-cycles').value = autoSettings.cycles || 0;
+                    // Support both old timer_minutes and new timer_seconds
+                    const timerVal = autoSettings.timer_seconds || (autoSettings.timer_minutes ? autoSettings.timer_minutes * 60 : 30);
+                    document.getElementById('auto-timer').value = timerVal;
+                    autoSettings.timer_seconds = timerVal;
+                    updateAutoStatus();
+                }
+            } catch (e) {
+                console.error('Failed to load auto settings:', e);
+            }
+        }
+
+        function updateAutoStatus() {
+            const statusEl = document.getElementById('auto-status');
+            const cyclesEl = document.getElementById('auto-cycles-display');
+            const lastRunEl = document.getElementById('auto-last-run');
+            const chatCycleEl = document.getElementById('auto-cycle-count');
+
+            if (autoSettings.emergency_stop) {
+                statusEl.textContent = '⛔ STOPPED';
+                statusEl.style.color = '#ef4444';
+            } else if (autoSettings.enabled) {
+                statusEl.textContent = '🟢 Running';
+                statusEl.style.color = 'var(--success)';
+            } else {
+                statusEl.textContent = '⏸️ Paused';
+                statusEl.style.color = 'var(--text-secondary)';
+            }
+
+            const target = autoSettings.cycles || '∞';
+            const cycleText = `${autoSettings.cycles_completed || 0} / ${target}`;
+            cyclesEl.textContent = cycleText;
+            if (chatCycleEl) chatCycleEl.textContent = cycleText;
+
+            // Update last run time
+            if (lastRunEl && autoSettings.last_run) {
+                const lastDate = new Date(autoSettings.last_run);
+                lastRunEl.textContent = lastDate.toLocaleTimeString();
+            }
+
+            // Also update the UI buttons
+            updateAutoUI();
+        }
+
+        async function saveAutoSettings() {
+            const statusEl = document.getElementById('auto-save-status');
+            statusEl.textContent = 'Saving...';
+
+            const timerSeconds = parseInt(document.getElementById('auto-timer').value) || 30;
+            const settings = {
+                prompt: document.getElementById('auto-prompt').value,
+                cycles: parseInt(document.getElementById('auto-cycles').value) || 0,
+                timer_seconds: Math.max(5, Math.min(1800, timerSeconds))
+            };
+
+            try {
+                const response = await fetch(AUTO_API + '?action=save', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(settings)
+                });
+                const data = await response.json();
+                if (data.success) {
+                    autoSettings = { ...autoSettings, ...settings };
+                    statusEl.textContent = '✅ Saved!';
+                    setTimeout(() => { statusEl.textContent = ''; }, 2000);
+                } else {
+                    statusEl.textContent = '❌ ' + data.error;
+                }
+            } catch (e) {
+                statusEl.textContent = '❌ Connection error';
+            }
+        }
+
+        // Toggle auto mode from chat button
+        function toggleAutoMode() {
+            if (autoSettings.enabled) {
+                stopAutoMode();
+            } else {
+                startAutoMode();
+            }
+        }
+
+        // Update UI to reflect auto mode state
+        function updateAutoUI() {
+            const toggleBtn = document.getElementById('auto-toggle-btn');
+            const emergencyBtn = document.getElementById('emergency-btn');
+            const statusBar = document.getElementById('auto-status-bar');
+
+            if (autoSettings.enabled) {
+                toggleBtn.textContent = '⏸️ Pause';
+                toggleBtn.style.background = 'var(--warning, #f59e0b)';
+                emergencyBtn.style.display = 'inline-block';
+                statusBar.style.display = 'block';
+                document.getElementById('auto-status-text').textContent = 'Waiting...';
+            } else {
+                toggleBtn.textContent = '▶️ Auto';
+                toggleBtn.style.background = 'var(--success)';
+                emergencyBtn.style.display = 'none';
+                statusBar.style.display = 'none';
+            }
+        }
+
+        // Reset the inactivity timer
+        function resetAutoTimer() {
+            if (autoInterval) {
+                clearTimeout(autoInterval);
+                autoInterval = null;
+            }
+
+            if (!autoSettings.enabled || autoSettings.emergency_stop) return;
+
+            const timerSeconds = autoSettings.timer_seconds || 30;
+            const timerMs = timerSeconds * 1000;
+
+            // Update countdown display
+            let countdown = timerSeconds;
+            const countdownEl = document.getElementById('auto-next-time');
+            const statusTextEl = document.getElementById('auto-status-text');
+
+            if (countdownEl) countdownEl.textContent = countdown + 's';
+            if (statusTextEl) statusTextEl.textContent = 'Waiting ' + countdown + 's';
+
+            // Countdown interval
+            const countdownInterval = setInterval(() => {
+                countdown--;
+                if (countdownEl) countdownEl.textContent = countdown + 's';
+                if (statusTextEl) statusTextEl.textContent = 'Waiting ' + countdown + 's';
+                if (countdown <= 0) clearInterval(countdownInterval);
+            }, 1000);
+
+            // Set timeout for auto-send
+            autoInterval = setTimeout(() => {
+                clearInterval(countdownInterval);
+                if (autoSettings.enabled && !autoSettings.emergency_stop) {
+                    autoSendPrompt();
+                }
+            }, timerMs);
+        }
+
+        // Auto-send the configured prompt
+        function autoSendPrompt() {
+            if (!autoSettings.prompt) {
+                addAutoLog('⚠️ No prompt configured');
+                return;
+            }
+
+            // Check cycle limit before sending
+            const maxCycles = autoSettings.cycles || 0;
+            if (maxCycles > 0 && autoSettings.cycles_completed >= maxCycles) {
+                addAutoLog('✅ Completed all cycles');
+                stopAutoMode();
+                return;
+            }
+
+            addAutoLog(`🔄 Auto-sending prompt...`);
+
+            // Insert prompt into chat input and send
+            const input = document.getElementById('chat-input');
+            input.value = autoSettings.prompt;
+            sendMessage(true); // true = auto message
+        }
+
+        async function startAutoMode() {
+            // Check if prompt is configured
+            if (!autoSettings.prompt) {
+                alert('Please configure a prompt in the Auto tab settings first!');
+                return;
+            }
+
+            // Save current settings first
+            await saveAutoSettings();
+
+            autoSettings.enabled = true;
+            autoSettings.emergency_stop = false;
+            autoSettings.cycles_completed = 0;
+            updateAutoStatus();
+            updateAutoUI();
+            addAutoLog('🟢 Auto mode started - waiting for inactivity');
+
+            // Start the inactivity timer
+            resetAutoTimer();
+        }
+
+        async function stopAutoMode() {
+            if (autoInterval) {
+                clearTimeout(autoInterval);
+                autoInterval = null;
+            }
+
+            try {
+                await fetch(AUTO_API + '?action=save', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ enabled: false })
+                });
+            } catch (e) {
+                console.error('Stop error:', e);
+            }
+
+            autoSettings.enabled = false;
+            updateAutoStatus();
+            updateAutoUI();
+            addAutoLog('⏹️ Auto mode stopped');
+        }
+
+        async function emergencyStop() {
+            if (autoInterval) {
+                clearTimeout(autoInterval);
+                autoInterval = null;
+            }
+
+            try {
+                await fetch(AUTO_API + '?action=stop');
+            } catch (e) {
+                console.error('Emergency stop error:', e);
+            }
+
+            autoSettings.enabled = false;
+            autoSettings.emergency_stop = true;
+            updateAutoStatus();
+            updateAutoUI();
+            addAutoLog('🚨 EMERGENCY STOP');
+
+            // Flash the emergency button
+            const btn = document.getElementById('emergency-btn');
+            if (btn) {
+                btn.style.background = '#fff';
+                btn.style.color = '#ef4444';
+                setTimeout(() => {
+                    btn.style.background = '#ef4444';
+                    btn.style.color = '#fff';
+                }, 200);
+            }
+        }
+
+        function addAutoLog(message) {
+            const logEl = document.getElementById('auto-log');
+            const time = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.innerHTML = `<span style="color: var(--text-secondary);">[${time}]</span> ${message}`;
+            logEl.insertBefore(entry, logEl.firstChild);
+
+            // Keep only last 50 entries
+            while (logEl.children.length > 50) {
+                logEl.removeChild(logEl.lastChild);
+            }
+        }
+
+        // Load auto settings on init
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAutoSettings();
+        });
+
+        function formatBytes(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        // VOICE ENGINE - Full STT/TTS with Google voices, chunking, VAD
+        const VOICE_SUPPORTED = !!(window.SpeechRecognition || window.webkitSpeechRecognition) && !!window.speechSynthesis;
+
+        class VoiceEngine {
+            constructor() {
+                this.state = 'IDLE';
+                this.mode = 'simple';
+                this.transcript = '';
+                this.isSupported = VOICE_SUPPORTED;
+                this.recognition = null;
+                this.synth = window.speechSynthesis;
+                this.currentUtterance = null;
+
+                this.vadConfig = {
+                    silenceThreshold: 2500,
+                    speechStartDelay: 100,
+                    interruptThreshold: 50,
+                    channelClearWait: 1000
+                };
+
+                this.silenceTimer = null;
+
+                // DOM refs
+                this.btn = null;
+                this.chatInput = null;
+
+                this._init();
+            }
+
+            _init() {
+                this.btn = document.getElementById('voiceBtn');
+                this.chatInput = document.getElementById('chat-input');
+
+                if (!this.isSupported) {
+                    if (this.btn) {
+                        this.btn.style.opacity = '0.5';
+                        this.btn.style.cursor = 'not-allowed';
+                    }
+                    console.warn('[Voice] Browser does not support Web Speech API');
+                    return;
+                }
+
+                // Pre-load voices
+                if (this.synth) {
+                    this.synth.getVoices();
+                    this.synth.onvoiceschanged = () => this.synth.getVoices();
+                }
+
+                if (this.btn) {
+                    this.btn.addEventListener('click', () => this.toggle());
+                }
+
+                console.log('[Voice] Engine initialized, supported:', this.isSupported);
+            }
+
+            setState(newState) {
+                const old = this.state;
+                this.state = newState;
+                console.log(`[Voice] ${old} -> ${newState}`);
+                this._updateUI();
+            }
+
+            setMode(mode) {
+                this.mode = mode;
+                console.log('[Voice] Mode:', mode);
+            }
+
+            toggle() {
+                if (!this.isSupported) {
+                    alert('Voice not supported. Use Chrome or Edge.');
+                    return;
+                }
+
+                switch (this.state) {
+                    case 'IDLE':
+                        this._startListening();
+                        break;
+                    case 'LISTENING':
+                        if (this.mode === 'simple') {
+                            this._stopAndSend();
+                        } else {
+                            this._stopAll();
+                        }
+                        break;
+                    case 'SPEAKING':
+                        this._stopSpeaking();
+                        this.setState('IDLE');
+                        break;
+                    case 'PROCESSING':
+                        break;
+                    case 'INTERRUPTED':
+                        this._stopAll();
+                        break;
+                    default:
+                        this._stopAll();
+                }
+            }
+
+            // ===== STT =====
+
+            _startListening() {
+                this.transcript = '';
+                this.chatInput.value = '';
+
+                const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+                this.recognition = new SpeechRec();
+                this.recognition.continuous = false;
+                this.recognition.interimResults = true;
+                this.recognition.lang = 'en-US';
+                this.recognition.maxAlternatives = 1;
+
+                this.recognition.onresult = (e) => this._onResult(e);
+                this.recognition.onend = () => this._onEnd();
+                this.recognition.onerror = (e) => this._onError(e);
+                this.recognition.onspeechstart = () => this._onSpeechStart();
+
+                try {
+                    this.recognition.start();
+                    this.setState('LISTENING');
+                } catch (e) {
+                    console.error('[Voice] Start error:', e);
+                    this.setState('IDLE');
+                    alert('Microphone unavailable');
+                }
+            }
+
+            _onResult(event) {
+                let interim = '';
+                let final = '';
+
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const r = event.results[i];
+                    if (r.isFinal) {
+                        final += r[0].transcript;
+                    } else {
+                        interim += r[0].transcript;
+                    }
+                }
+
+                if (final) {
+                    this.transcript += final + ' ';
+                }
+
+                // Show real-time transcription
+                this.chatInput.value = this.transcript + interim;
+
+                // Advanced mode: reset silence timer on any speech
+                if (this.mode === 'advanced') {
+                    this._resetSilenceTimer();
+                }
+
+                if (this.mode === 'advanced' && this.state === 'PROCESSING') {
+                    this.setState('LISTENING');
+                }
+            }
+
+            _onEnd() {
+                if (this.mode === 'advanced' && (this.state === 'LISTENING' || this.state === 'PROCESSING')) {
+                    try {
+                        setTimeout(() => {
+                            if (this.state === 'LISTENING' || this.state === 'PROCESSING') {
+                                this.recognition.start();
+                            }
+                        }, 100);
+                    } catch (e) { /* already running */ }
+                }
+            }
+
+            _onError(event) {
+                console.error('[Voice] Error:', event.error);
+
+                switch (event.error) {
+                    case 'not-allowed':
+                    case 'service-not-allowed':
+                        alert('Microphone permission denied');
+                        this.setState('IDLE');
+                        break;
+                    case 'no-speech':
+                        if (this.mode === 'advanced' && this.state === 'LISTENING') {
+                            try { this.recognition.start(); } catch (e) {}
+                        }
+                        break;
+                    case 'aborted':
+                        break;
+                    default:
+                        if (this.state === 'LISTENING') {
+                            console.warn('[Voice] Error: ' + event.error);
+                        }
+                }
+            }
+
+            _onSpeechStart() {
+                // Advanced mode interrupt: user speaks while bot is talking
+                if (this.mode === 'advanced' && this.state === 'SPEAKING') {
+                    this._stopSpeaking();
+                    this.setState('INTERRUPTED');
+                    this.transcript = '';
+                    this.chatInput.value = '';
+                    setTimeout(() => {
+                        this.setState('LISTENING');
+                        this._resetSilenceTimer();
+                    }, this.vadConfig.channelClearWait);
+                }
+            }
+
+            // ===== SILENCE DETECTION (Advanced) =====
+
+            _resetSilenceTimer() {
+                this._clearSilenceTimer();
+                this.silenceTimer = setTimeout(() => {
+                    this._onSilenceTimeout();
+                }, this.vadConfig.silenceThreshold);
+            }
+
+            _clearSilenceTimer() {
+                if (this.silenceTimer) {
+                    clearTimeout(this.silenceTimer);
+                    this.silenceTimer = null;
+                }
+            }
+
+            _onSilenceTimeout() {
+                if (this.state === 'LISTENING' && this.transcript.trim()) {
+                    this._sendTranscript();
+                }
+            }
+
+            // ===== SEND =====
+
+            _stopAndSend() {
+                this._clearSilenceTimer();
+                if (this.recognition) {
+                    try { this.recognition.stop(); } catch (e) {}
+                }
+
+                setTimeout(() => {
+                    if (this.transcript.trim()) {
+                        this._sendTranscript();
+                    } else {
+                        this.setState('IDLE');
+                    }
+                }, 400);
+            }
+
+            _sendTranscript() {
+                const text = this.transcript.trim();
+                if (!text) {
+                    if (this.mode === 'simple') this.setState('IDLE');
+                    return;
+                }
+
+                this.transcript = '';
+                this.chatInput.value = text;
+                this.setState('PROCESSING');
+
+                // Call existing sendMessage
+                sendMessage();
+            }
+
+            _stopAll() {
+                this._clearSilenceTimer();
+                if (this.recognition) {
+                    try { this.recognition.stop(); } catch (e) {}
+                    this.recognition = null;
+                }
+                this._stopSpeaking();
+                this.transcript = '';
+                this.setState('IDLE');
+            }
+
+            // ===== TTS with Google Voices =====
+
+            _stopSpeaking() {
+                if (this.synth) {
+                    this.synth.cancel();
+                }
+                this.currentUtterance = null;
+            }
+
+            onBotResponse(message) {
+                if (!message || this.state === 'IDLE') {
+                    if (this.mode === 'advanced' && this.state !== 'IDLE') {
+                        this.setState('LISTENING');
+                        this.transcript = '';
+                        this.chatInput.value = '';
+                        this._resetSilenceTimer();
+                    } else {
+                        this.setState('IDLE');
+                    }
+                    return;
+                }
+
+                this._speak(message);
+            }
+
+            _cleanForSpeech(text) {
+                if (!text) return '';
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(text, 'text/html');
+                doc.querySelectorAll('style, script, code, pre, svg').forEach(el => el.remove());
+                let raw = doc.body.textContent || doc.body.innerText || '';
+                raw = raw
+                    .replace(/```[\s\S]*?```/g, ' ')
+                    .replace(/`([^`]*)`/g, '$1')
+                    .replace(/\*\*(.+?)\*\*/g, '$1')
+                    .replace(/\*(.+?)\*/g, '$1');
+                const tokens = raw.split(/\s+/);
+                const speakable = tokens.filter(token => {
+                    if (!token) return false;
+                    if (!/[a-zA-Z]/.test(token)) return false;
+                    if (/^[0-9a-f]{4,}$/i.test(token)) return false;
+                    if (/^https?:/i.test(token)) return false;
+                    if (/^www\./i.test(token)) return false;
+                    if (/^[A-Z]:\\/i.test(token)) return false;
+                    if (/^\/[a-z].*\//i.test(token)) return false;
+                    return true;
+                });
+                let clean = speakable.join(' ')
+                    .replace(/\.\s*\./g, '.')
+                    .replace(/\s+/g, ' ')
+                    .trim();
+                return clean;
+            }
+
+            _speak(text) {
+                if (!text || !this.synth) { this._onSpeakEnd(); return; }
+
+                const clean = this._cleanForSpeech(text);
+
+                if (!clean) { this._onSpeakEnd(); return; }
+
+                this.synth.cancel();
+
+                // Chunk for Chrome compatibility
+                const chunks = this._chunkText(clean, 180);
+                this.setState('SPEAKING');
+
+                const speakNext = (i) => {
+                    if (i >= chunks.length || this.state !== 'SPEAKING') {
+                        this._onSpeakEnd();
+                        return;
+                    }
+
+                    const utterance = new SpeechSynthesisUtterance(chunks[i]);
+                    utterance.rate = 1.0;
+                    utterance.pitch = 1.0;
+                    utterance.volume = 1.0;
+                    utterance.lang = 'en-US';
+
+                    // Prefer Google/Natural/Premium voices
+                    const voices = this.synth.getVoices();
+                    const preferred = voices.find(v =>
+                        v.name.includes('Google') ||
+                        v.name.includes('Natural') ||
+                        v.name.includes('Premium') ||
+                        v.name.includes('Microsoft')
+                    );
+                    if (preferred) utterance.voice = preferred;
+
+                    utterance.onend = () => speakNext(i + 1);
+                    utterance.onerror = () => speakNext(i + 1);
+                    this.currentUtterance = utterance;
+                    this.synth.speak(utterance);
+                };
+
+                speakNext(0);
+            }
+
+            _chunkText(text, maxLen) {
+                const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+                const chunks = [];
+                let current = '';
+                for (const s of sentences) {
+                    if ((current + s).length > maxLen && current) {
+                        chunks.push(current.trim());
+                        current = s;
+                    } else {
+                        current += s;
+                    }
+                }
+                if (current.trim()) chunks.push(current.trim());
+                return chunks;
+            }
+
+            _onSpeakEnd() {
+                if (this.mode === 'advanced' && this.state === 'SPEAKING') {
+                    this.setState('LISTENING');
+                    this.transcript = '';
+                    this.chatInput.value = '';
+                    this._resetSilenceTimer();
+                    if (!this.recognition || this.recognition.readyState !== 'running') {
+                        this._startListening();
+                    }
+                } else {
+                    this.setState('IDLE');
+                }
+            }
+
+            // ===== UI =====
+
+            _updateUI() {
+                if (!this.btn) return;
+                const btn = this.btn;
+
+                btn.classList.remove('recording', 'speaking', 'processing');
+
+                switch (this.state) {
+                    case 'IDLE':
+                        btn.title = 'Start voice input';
+                        break;
+                    case 'LISTENING':
+                        btn.title = this.mode === 'simple' ? 'Stop and send' : 'Stop voice';
+                        btn.classList.add('recording');
+                        break;
+                    case 'PROCESSING':
+                        btn.classList.add('processing');
+                        break;
+                    case 'SPEAKING':
+                        btn.title = 'Stop speaking';
+                        btn.classList.add('speaking');
+                        break;
+                    case 'INTERRUPTED':
+                        btn.classList.add('recording');
+                        break;
+                }
+            }
+        }
+
+        // Initialize voice engine
+        const voiceEngine = new VoiceEngine();
+    </script>
+    <script src="/js/win-frame.js"></script>
+    <script src="/js/windows.js"></script>
+    <script src="/js/override.js"></script>
+</body>
+</html>

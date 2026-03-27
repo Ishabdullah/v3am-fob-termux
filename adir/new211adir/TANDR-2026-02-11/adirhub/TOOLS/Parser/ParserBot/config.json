@@ -1,0 +1,191 @@
+{
+  "app": {
+    "name": "TANDRSocial",
+    "version": "1.0.0",
+    "description": "Social Media Content Management AI for TANDR Builder",
+    "environment": "production",
+    "access": "employee-only"
+  },
+  "llm": {
+    "provider": "llamacpp",
+    "ollama": {
+      "endpoint": "http://127.0.0.1:11434/api/generate",
+      "model": "glm-5:cloud",
+      "max_tokens": 128000,
+      "temperature": 0.7,
+      "stream": false
+    },
+    "anthropic": {
+      "api_key": "",
+      "endpoint": "https://api.anthropic.com/v1/messages",
+      "model": "claude-3-haiku-20240307",
+      "max_tokens": 4096,
+      "temperature": 0.7
+    },
+    "fallback": {
+      "enabled": true,
+      "provider": "ollama"
+    },
+    "model": "glm:5-cloud (Cloud)",
+    "llamacpp": {
+      "endpoint": "http://127.0.0.1:8080/completion",
+      "model": "default",
+      "max_tokens": 4096,
+      "temperature": 0.7
+    }
+  },
+  "security": {
+    "allowed_read_dirs": [
+      "data/social-knowledge",
+      "adir/logs/fb-feeds",
+      "adir/logs/post-queue"
+    ],
+    "allowed_write_dirs": [
+      "adir/logs",
+      "adir/logs/post-drafts",
+      "adir/logs/fb-feeds",
+      "adir/logs/post-queue",
+      "data/social-knowledge"
+    ],
+    "allowed_read_extensions": [
+      ".md",
+      ".txt",
+      ".json"
+    ],
+    "allowed_write_extensions": [
+      ".txt",
+      ".json",
+      ".md"
+    ],
+    "rate_limit": {
+      "enabled": true,
+      "requests_per_minute": 60,
+      "requests_per_hour": 500,
+      "requests_per_day": 2000
+    },
+    "cors": {
+      "enabled": true,
+      "allowed_origins": [
+        "*"
+      ]
+    }
+  },
+  "knowledge": {
+    "base_path": "data/social-knowledge",
+    "auto_refresh": true,
+    "cache_ttl": 300,
+    "max_context_files": 20,
+    "file_scan_on_start": true
+  },
+  "conversation": {
+    "max_history": 30,
+    "max_message_length": 5000,
+    "log_conversations": true,
+    "log_path": "adir/logs/conversations.txt",
+    "session_timeout": 3600
+  },
+  "system_prompt": {
+    "role": "You are ParserBot, the document parser and data extraction service for the FOB fleet.\n  You take raw, messy, or unstructured data and return clean structured output.\n\n  WHAT YOU DO\n  - Parse raw text, logs, exports, and documents into clean markdown\n  - Extract structured data: contacts, leads, dates, names, addresses, notes\n  - Convert data between formats (raw text \u2192 table, list \u2192 structured MD, etc.)\n  - Organize and deduplicate information\n  - Produce call sheets, contact lists, and summaries from source material\n\n  HOW TO SEND DATA\n  Paste raw content directly into the chat with a brief instruction:\n  - \"Extract all contacts from this\"\n  - \"Convert this to a markdown table\"\n  - \"Pull the names, phones, and emails from this list\"\n  - \"Format this as a call sheet\"\n\n  OUTPUT FORMAT\n  Default to clean markdown. Use tables for structured data, headers for sections, code\n  blocks for raw output when asked. Always confirm what was extracted and flag anything\n  ambiguous or missing.\n\n  WHAT YOU ARE NOT\n  - You do not fetch or access external data sources\n  - You do not store data between sessions\n  - You do not make decisions about what to do with the data \u2014 that is the user's job\n\n  You are a precision tool. Input goes in, clean structured output comes out.",
+    "instructions": [
+      "Research social media trends and competitor content",
+      "Draft posts based on company voice and industry best practices",
+      "Save all drafts to post-drafts/ directory with context",
+      "Provide data-driven recommendations",
+      "Use markdown formatting for readability",
+      "Always explain your reasoning for content suggestions",
+      "Track what content performs well and learn from it"
+    ],
+    "restrictions": [
+      "Do not post directly to social media",
+      "Do not access customer private data",
+      "Do not share API tokens or credentials",
+      "Do not execute system commands",
+      "Only read public social media content"
+    ]
+  },
+  "ui": {
+    "theme": "professional",
+    "brand_color": "#00d9ff",
+    "background_color": "#0a0e27",
+    "show_typing_indicator": true,
+    "markdown_enabled": true,
+    "code_highlighting": true,
+    "max_messages_displayed": 50,
+    "auto_scroll": true,
+    "timestamp_format": "HH:mm"
+  },
+  "logging": {
+    "enabled": true,
+    "level": "info",
+    "log_errors": true,
+    "log_conversations": true,
+    "log_analytics": true,
+    "error_log_path": "adir/logs/errors.txt",
+    "analytics_log_path": "adir/logs/analytics.txt"
+  },
+  "analytics": {
+    "enabled": true,
+    "track_conversations": true,
+    "track_response_time": true,
+    "track_user_agents": true,
+    "track_drafts_created": true,
+    "track_research_queries": true
+  },
+  "features": {
+    "markdown_rendering": true,
+    "code_blocks": true,
+    "file_upload": false,
+    "image_support": false,
+    "voice_input": false,
+    "suggestions": true,
+    "graph_api": true
+  },
+  "facebook_graph_api": {
+    "enabled": true,
+    "api_version": "v21.0",
+    "page_id": "YOUR_FACEBOOK_PAGE_ID",
+    "access_token": "YOUR_FACEBOOK_ACCESS_TOKEN",
+    "permissions": [
+      "pages_read_engagement",
+      "pages_manage_posts",
+      "read_insights"
+    ],
+    "endpoints": {
+      "page_feed": "/YOUR_FACEBOOK_PAGE_ID/feed",
+      "page_posts": "/YOUR_FACEBOOK_PAGE_ID/posts",
+      "page_insights": "/YOUR_FACEBOOK_PAGE_ID/insights",
+      "search": "/search"
+    },
+    "rate_limits": {
+      "calls_per_hour": 200,
+      "burst_limit": 50
+    },
+    "feed_monitoring": {
+      "enabled": false,
+      "check_interval_minutes": 60,
+      "pages_to_monitor": [
+        "YOUR_FACEBOOK_PAGE_ID"
+      ],
+      "keywords_to_track": [
+        "construction",
+        "remodeling",
+        "home improvement",
+        "contractor",
+        "renovation"
+      ]
+    }
+  },
+  "_meta": {
+    "name": "ParserBot Knowledge Bot",
+    "version": "2.0.0",
+    "template": "TANDRSocial",
+    "description": "Knowledge bot deployed by KB-Maker",
+    "deployed": "2026-03-10T14:56:40.957Z"
+  },
+  "port": 10108,
+  "knowledge_path": "C:\\FOB\\adir\\new211adir\\TANDR-2026-02-11\\adirhub\\TOOLS\\Parser",
+  "voice": {
+    "enabled": true,
+    "auto_speak": "auto"
+  }
+}

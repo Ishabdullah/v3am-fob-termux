@@ -1,0 +1,12 @@
+{
+  "name": "imagegen",
+  "version": "1.0.0",
+  "description": "ImageGen - SD WebUI relay + VeilEdge UI on port 9230",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

@@ -1,0 +1,199 @@
+# ADIR FOLDER STRUCTURE
+
+**Purpose**: Explains what every folder and file does
+**Read After**: 01_README.txt
+
+---
+
+## 📁 COMPLETE FOLDER LAYOUT
+
+Every adir/ directory has this structure:
+
+```
+adir/
+├── 01_README.txt         ← START HERE (overview)
+├── 02_STRUCTURE.txt      ← THIS FILE (explains structure)
+├── 03_WORKFLOW.txt       ← Procedures (read next)
+├── 04_EXAMPLES.txt       ← Examples (read last)
+├── 05_TEMPLATES/         ← TEMPLATES TO COPY
+│   ├── CURRENT.txt      ← Task tracking template
+│   ├── WORKING.txt      ← Context template
+│   ├── FEED.txt         ← Coordination template
+│   └── SESSION.txt      ← Recovery template
+├── LOGS/                 ← ACTION LOG FOLDER
+│   └── action_log.txt   ← Master log (append here)
+└── [created from templates]
+    ├── CURRENT.txt      ← Current tasks (copy from template)
+    ├── WORKING.txt      ← Working context (copy from template)
+    ├── FEED.txt         ← Feed/coordination (copy from template)
+    └── SESSION.txt      ← Session recovery (copy from template)
+```
+
+---
+
+## 📄 FILE PURPOSES
+
+### Instruction Files (01-04)
+Read in order. Same in every adir/ directory.
+
+| File | What It Is |
+|------|-----------|
+| 01_README.txt | Overview, quick start |
+| 02_STRUCTURE.txt | This file - structure explanation |
+| 03_WORKFLOW.txt | Step-by-step procedures |
+| 04_EXAMPLES.txt | Real-world examples |
+
+### Template Files (05_TEMPLATES/)
+Copy these to create coordination files.
+
+| Template | Creates | Purpose |
+|----------|---------|---------|
+| CURRENT.txt | adir/CURRENT.txt | Task tracking |
+| WORKING.txt | adir/WORKING.txt | Context/memory |
+| FEED.txt | adir/FEED.txt | Agent coordination |
+| SESSION.txt | adir/SESSION.txt | Interruption recovery |
+
+### Coordination Files (created in adir/)
+Your actual working files. Copy from templates.
+
+| File | Purpose |
+|------|---------|
+| CURRENT.txt | "What do I work on now?" List of tasks |
+| WORKING.txt | "What context do I need?" Project decisions |
+| FEED.txt | "Any messages for me?" Inter-agent coordination |
+| SESSION.txt | "Where was I?" Recovery from interruptions |
+
+### Log File (LOGS/)
+Write-once, append-only tracking.
+
+| File | Purpose |
+|------|---------|
+| action_log.txt | Every action you take (timestamp + action) |
+
+---
+
+## 🗺️ THE FREEWAY CONCEPT
+
+As you navigate, the drive builds itself:
+
+### Day 1 - Root Only
+```
+drive/
+└── adir/                    ← You are here
+    ├── 01-04 instructions
+    ├── 05_TEMPLATES/
+    ├── LOGS/
+    └── coordination files
+```
+
+### Day 2 - Agent explores /projects/
+```
+drive/
+├── adir/                    ← Root (master log)
+└── projects/
+    └── adir/                ← NEW: Created when agent entered
+        ├── 01-04 instructions
+        ├── 05_TEMPLATES/
+        ├── LOGS/
+        └── coordination files
+```
+
+### Day 3 - Agent explores /data/exports/
+```
+drive/
+├── adir/
+├── projects/
+│   └── adir/
+└── data/
+    └── exports/
+        └── adir/            ← NEW: Created when agent entered
+            ├── 01-04 instructions
+            ├── 05_TEMPLATES/
+            ├── LOGS/
+            └── coordination files
+```
+
+Each adir/ is **independent** but all logs flow to the root.
+
+---
+
+## 📍 WHAT TO READ WHEN
+
+### "What do I do now?"
+→ Read adir/CURRENT.txt
+
+### "What's the project context?"
+→ Read adir/WORKING.txt
+
+### "Any messages for me?"
+→ Read adir/FEED.txt
+
+### "Where was I if interrupted?"
+→ Read adir/SESSION.txt
+
+### "What happened recently?"
+→ Read adir/LOGS/action_log.txt
+
+### "How does this work?"
+→ Read adir/01-04 instruction files
+
+---
+
+## 🎯 FOLDER RECOGNITION
+
+When you see a folder named `adir/`:
+- ✅ This is a coordination center
+- ✅ Read the instruction files
+- ✅ Check CURRENT.txt, WORKING.txt, FEED.txt
+- ✅ Understand what work needs doing
+
+When you see `adir/05_TEMPLATES/`:
+- ✅ These are templates
+- ✅ Copy files from here to create working copies in adir/
+- ✅ Don't edit templates, copy them
+
+When you see `adir/LOGS/`:
+- ✅ This is where history is kept
+- ✅ Append actions here with timestamps
+- ✅ Read to understand what's been done
+
+---
+
+## 🔄 ON-DEMAND CREATION
+
+You DON'T create nested adir/ folders upfront.
+
+Instead:
+1. Agent navigates to `/projects/something/`
+2. Checks: Is there adir/ here?
+3. If NO → Create adir/, copy 01-04 files, copy 05_TEMPLATES/
+4. If YES → Read existing adir/ files
+5. Continue work
+
+This way:
+- No empty folders
+- Map builds as agent explores
+- Each directory only has what it needs
+
+---
+
+## 🛣️ THE FREEWAY ADVANTAGE
+
+**Token Efficiency**:
+- Agent only reads files in current adir/
+- Doesn't scan unknown directories
+- Doesn't re-read files it's already seen
+- LOGS/action_log.txt shows clear navigation path
+
+**Scalability**:
+- Works on small drives or massive ones
+- Starts simple, grows with exploration
+- No "how do I organize this?" problem
+
+**Permissions**:
+- Read-only? → Can still navigate and understand
+- Write access? → Can build stops as you go
+
+---
+
+*Structure explained. Next: Read 03_WORKFLOW.txt*

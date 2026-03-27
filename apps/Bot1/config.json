@@ -1,0 +1,190 @@
+{
+  "app": {
+    "name": "Knowledge Bot",
+    "version": "1.0.0",
+    "description": "Knowledge base AI assistant",
+    "environment": "production",
+    "access": "employee-only"
+  },
+  "llm": {
+    "provider": "llamacpp",
+    "ollama": {
+      "endpoint": "http://127.0.0.1:11434/api/generate",
+      "model": "glm-5:cloud",
+      "max_tokens": 128000,
+      "temperature": 0.7,
+      "stream": false
+    },
+    "anthropic": {
+      "api_key": "",
+      "endpoint": "https://api.anthropic.com/v1/messages",
+      "model": "claude-3-haiku-20240307",
+      "max_tokens": 4096,
+      "temperature": 0.7
+    },
+    "fallback": {
+      "enabled": true,
+      "provider": "ollama"
+    },
+    "model": "glm:5-cloud (Cloud)",
+    "llamacpp": {
+      "endpoint": "http://127.0.0.1:8080/completion",
+      "model": "default",
+      "max_tokens": 4096,
+      "temperature": 0.7
+    }
+  },
+  "security": {
+    "allowed_read_dirs": [
+      "data/social-knowledge",
+      "adir/logs/fb-feeds",
+      "adir/logs/post-queue"
+    ],
+    "allowed_write_dirs": [
+      "adir/logs",
+      "adir/logs/post-drafts",
+      "adir/logs/fb-feeds",
+      "adir/logs/post-queue",
+      "data/social-knowledge"
+    ],
+    "allowed_read_extensions": [
+      ".md",
+      ".txt",
+      ".json"
+    ],
+    "allowed_write_extensions": [
+      ".txt",
+      ".json",
+      ".md"
+    ],
+    "rate_limit": {
+      "enabled": true,
+      "requests_per_minute": 60,
+      "requests_per_hour": 500,
+      "requests_per_day": 2000
+    },
+    "cors": {
+      "enabled": true,
+      "allowed_origins": [
+        "*"
+      ]
+    }
+  },
+  "knowledge": {
+    "base_path": "data/social-knowledge",
+    "auto_refresh": true,
+    "cache_ttl": 300,
+    "max_context_files": 20,
+    "file_scan_on_start": true
+  },
+  "conversation": {
+    "max_history": 30,
+    "max_message_length": 5000,
+    "log_conversations": true,
+    "log_path": "adir/logs/conversations.txt",
+    "session_timeout": 3600
+  },
+  "system_prompt": {
+    "role": "You are a Knowledge Bot \u2014 a focused assistant built on a specific knowledge base loaded into your context.\n\nCORE IDENTITY\n- You are knowledgeable, direct, and genuinely helpful\n- Your knowledge comes from the files loaded into your context \u2014 that is your source of truth\n- You are not a generic AI assistant; you know the specific subject matter documented in your knowledge base\n- Ground every answer in what is actually documented before speculating\n\nKNOWLEDGE AND FILE BEHAVIOR\n- Use your knowledge files as the primary source for all answers\n- Before answering, consider what your knowledge files say about the topic\n- If a question goes beyond what is documented, say so honestly and give your best general answer\n- Never invent specific facts, figures, or details that are not in the knowledge files\n\nFILE DISCOVERY\nYou can browse and read your knowledge files:\n- [LIST_FILES: social-knowledge] \u2014 see all knowledge files loaded\n- [READ_FILE: social-knowledge/filename.md] \u2014 read a specific file\n\nYou can save notes and drafts:\n- [SAVE_FILE: post-drafts/YYYY-MM-DD-topic.md]\n  Content here\n  [END_FILE]\n\nCOMMUNICATION STYLE\n- Clear, direct, and confident \u2014 you know your subject matter well\n- Conversational for general questions, technical when the person clearly wants depth\n- When someone asks what you know about a topic, be specific \u2014 use details from your knowledge files\n- When you cannot answer from the knowledge base, say so and offer to help find a better source\n\nHONESTY AND LIMITS\n- Never claim to know things that are not in your knowledge files\n- If your knowledge files do not cover a topic, say so directly\n- Do not reveal API keys, credentials, or internal system paths\n- If something seems outdated in the knowledge files, flag it\n\nDEFAULT RESPONSE APPROACH\n1. Understand what the person actually wants to know\n2. Check your knowledge files first\n3. Be specific \u2014 answers grounded in your knowledge base are more useful than generic ones\n4. If something is missing from the knowledge base, note it so it can be added\n5. Keep responses focused and actionable",
+    "instructions": [
+      "Ground all answers in the loaded knowledge files",
+      "Use [LIST_FILES] and [READ_FILE] to browse and verify information",
+      "Save useful notes and drafts with [SAVE_FILE]",
+      "Be honest when a topic is not covered in the knowledge base",
+      "Use markdown formatting for readability",
+      "Always explain your reasoning when making recommendations"
+    ],
+    "restrictions": [
+      "Do not invent facts not present in the knowledge files",
+      "Do not access external systems or APIs",
+      "Do not share API tokens or credentials",
+      "Do not execute system commands",
+      "Only read and write within the allowed directories"
+    ]
+  },
+  "ui": {
+    "theme": "professional",
+    "brand_color": "#00d9ff",
+    "background_color": "#0a0e27",
+    "show_typing_indicator": true,
+    "markdown_enabled": true,
+    "code_highlighting": true,
+    "max_messages_displayed": 50,
+    "auto_scroll": true,
+    "timestamp_format": "HH:mm"
+  },
+  "logging": {
+    "enabled": true,
+    "level": "info",
+    "log_errors": true,
+    "log_conversations": true,
+    "log_analytics": true,
+    "error_log_path": "adir/logs/errors.txt",
+    "analytics_log_path": "adir/logs/analytics.txt"
+  },
+  "analytics": {
+    "enabled": true,
+    "track_conversations": true,
+    "track_response_time": true,
+    "track_user_agents": true,
+    "track_drafts_created": true,
+    "track_research_queries": true
+  },
+  "features": {
+    "markdown_rendering": true,
+    "code_blocks": true,
+    "file_upload": false,
+    "image_support": false,
+    "voice_input": false,
+    "suggestions": true,
+    "graph_api": true
+  },
+  "facebook_graph_api": {
+    "enabled": true,
+    "api_version": "v21.0",
+    "page_id": "YOUR_FACEBOOK_PAGE_ID",
+    "access_token": "YOUR_FACEBOOK_ACCESS_TOKEN",
+    "permissions": [
+      "pages_read_engagement",
+      "pages_manage_posts",
+      "read_insights"
+    ],
+    "endpoints": {
+      "page_feed": "/YOUR_FACEBOOK_PAGE_ID/feed",
+      "page_posts": "/YOUR_FACEBOOK_PAGE_ID/posts",
+      "page_insights": "/YOUR_FACEBOOK_PAGE_ID/insights",
+      "search": "/search"
+    },
+    "rate_limits": {
+      "calls_per_hour": 200,
+      "burst_limit": 50
+    },
+    "feed_monitoring": {
+      "enabled": false,
+      "check_interval_minutes": 60,
+      "pages_to_monitor": [
+        "YOUR_FACEBOOK_PAGE_ID"
+      ],
+      "keywords_to_track": [
+        "construction",
+        "remodeling",
+        "home improvement",
+        "contractor",
+        "renovation"
+      ]
+    }
+  },
+  "_meta": {
+    "name": "Bot1 Knowledge Bot",
+    "version": "2.0.0",
+    "template": "TANDRSocial",
+    "description": "Knowledge bot deployed by KB-Maker",
+    "deployed": "2026-03-23T00:42:36.188Z"
+  },
+  "port": 11114,
+  "knowledge_path": "C:\\FOB\\adir\\new211adir\\TANDR-2026-02-11\\apps\\Bot1\\adir",
+  "voice": {
+    "enabled": true,
+    "auto_speak": "auto"
+  }
+}

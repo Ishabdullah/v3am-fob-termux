@@ -1,0 +1,41 @@
+# buildingabot Tool BOOT
+
+## Service Identity
+- **Name:** buildingabot
+- **Role:** BAB API syntax reference, documentation hub, and file transfer intermediary
+- **Type:** Documentation + File Transfer Tool (ADIR Hub resident)
+- **Location:** C:\FOB\adir\new211adir\TANDR-2026-02-11\adirhub\TOOLS\buildingabot\
+- **Purpose:** Centralize BAB API knowledge and enable content transfer to external processing
+
+---
+
+## What This Tool Does
+
+### 1. BAB API Reference Documentation
+- **Syntax guides** - Proper usage of bab_api tool
+- **Parameter documentation** - What each action requires
+- **Example commands** - Real-world usage patterns
+- **Error codes & solutions** - Troubleshooting guide
+- **Best practices** - How to structure requests for reliability
+
+### 2. File Transfer Hub
+- **Accept content** - Receives files from agents via BAB API
+- **Stage for processing** - Holds files ready for external systems
+- **Track transfers** - Logs what's been sent and when
+- **Enable workflows** - Bridge between TANDR agents and external processors
+
+### 3. Communication Relay
+- **Inbox** - Receives instructions and content to process
+- **Outbox** - Sends processed results back
+- **Status tracking** - Logs all file movements
+- **Error handling** - Records failed transfers
+
+---
+
+## Quick Start
+
+### Access This Tool
+```
+Path: C:\FOB\adir\new211adir\TANDR-2026-02-11\adirhub\TOOLS\buildingabot\
+BAB Mirror: /workspace/sites/tandr-ops/buildingabot/
+API Tool: [TOOL_CALL: bab_api

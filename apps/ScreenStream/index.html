@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCREEN STREAM | FOB</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Courier New', monospace;
+  background: #090909;
+  color: #fff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.header {
+  background: #141414;
+  border-bottom: 2px solid #ed1b2f;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.header-title { color: #ed1b2f; font-size: 15px; font-weight: bold; letter-spacing: 3px; }
+.header-port { color: #444; font-size: 11px; }
+#indicator {
+  width: 12px; height: 12px; border-radius: 50%;
+  background: #333; display: inline-block;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+#indicator.live { background: #22c55e; box-shadow: 0 0 10px #22c55e; }
+
+.controls {
+  background: #0d0d0d;
+  border-bottom: 1px solid #222;
+  padding: 14px 20px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+button {
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  font-size: 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 14px 30px;
+  letter-spacing: 1px;
+  transition: background 0.15s, color 0.15s;
+}
+.btn-start { background: #ed1b2f; color: #fff; border: none; }
+.btn-start:hover { background: #c81024; }
+.btn-stop  { background: #1a1a1a; color: #ed1b2f; border: 2px solid #ed1b2f; }
+.btn-stop:hover { background: #ed1b2f; color: #000; }
+.btn-snap  { background: #1a1a1a; color: #ccc; border: 2px solid #333; }
+.btn-snap:hover { border-color: #ed1b2f; color: #ed1b2f; }
+
+#status {
+  padding: 7px 20px;
+  background: #0a0a0a;
+  font-size: 11px;
+  color: #555;
+  border-bottom: 1px solid #1a1a1a;
+  letter-spacing: 1px;
+}
+
+.video-wrap {
+  flex: 1;
+  background: #000;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+video {
+  width: 100%;
+  flex: 1;
+  display: block;
+  background: #000;
+  max-height: calc(100vh - 220px);
+  object-fit: contain;
+}
+canvas { display: none; }
+
+.snap-wrap { display: none; border-top: 2px solid #ed1b2f; }
+.snap-label { padding: 6px 20px; background: #0a0a0a; font-size: 11px; color: #22c55e; }
+.snap-wrap img { width: 100%; display: block; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <span class="header-title">[ SCREEN STREAM ]</span>
+  <span class="header-port">FOB | PORT 9240</span>
+  <span id="indicator"></span>
+</div>
+
+<div class="controls">
+  <button class="btn-start" onclick="ssStart()">&#9654; START</button>
+  <button class="btn-stop"  onclick="ssStop()">&#9632; STOP</button>
+  <button class="btn-snap"  onclick="ssSnap()">&#128247; SNAP</button>
+</div>
+
+<div id="status">IDLE — Click START to share your screen</div>
+
+<div class="video-wrap">
+  <video id="video" autoplay muted playsinline></video>
+  <canvas id="canvas"></canvas>
+</div>
+
+<div class="snap-wrap" id="snap-wrap">
+  <div class="snap-label">&#9650; SNAP CAPTURED</div>
+  <img id="snap-img" />
+</div>
+
+<script>
+var stream = null;
+var video  = document.getElementById('video');
+var canvas = document.getElementById('canvas');
+var status = document.getElementById('status');
+var indicator = document.getElementById('indicator');
+
+var frameInterval = null;   // auto-post timer
+var pollInterval  = null;   // snap-poll timer
+var frameCount    = 0;
+var postErrors    = 0;
+
+function setStatus(msg, color) {
+  status.textContent = msg;
+  status.style.color = color || '#555';
+}
+
+// Capture current video frame and POST to server
+function postFrame() {
+  if (!stream || !video.videoWidth) return;
+  canvas.width  = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  var b64 = canvas.toDataURL('image/jpeg', 0.85);
+  fetch('/api/frame', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ image: b64, streaming: true })
+  }).then(function(r){ return r.json(); }).then(function(d){
+    if (d.ok) {
+      frameCount++;
+      postErrors = 0;
+      setStatus('STREAMING LIVE  |  FRAMES: ' + frameCount, '#22c55e');
+    }
+  }).catch(function(){ postErrors++; });
+}
+
+// Poll server: did an agent request a snap?
+function pollSnap() {
+  fetch('/api/snap-poll').then(function(r){ return r.json(); }).then(function(d){
+    if (d.requested) {
+      // Post a fresh frame immediately
+      postFrame();
+      setStatus('SNAP REQUESTED BY AGENT — SENT', '#f59e0b');
+      setTimeout(function(){ setStatus('STREAMING LIVE  |  FRAMES: ' + frameCount, '#22c55e'); }, 1500);
+    }
+  }).catch(function(){});
+}
+
+function ssStart() {
+  navigator.mediaDevices.getDisplayMedia({ video: { frameRate: { ideal: 15 } }, audio: false })
+    .then(function(s) {
+      stream = s;
+      video.srcObject = s;
+      indicator.className = 'live';
+      frameCount = 0;
+      postErrors = 0;
+      setStatus('STREAMING LIVE', '#22c55e');
+      s.getVideoTracks()[0].addEventListener('ended', ssStop);
+
+      // Post first frame immediately, then every 2s
+      postFrame();
+      frameInterval = setInterval(postFrame, 2000);
+      // Poll for agent snap requests every 500ms
+      pollInterval  = setInterval(pollSnap, 500);
+    })
+    .catch(function(e) { setStatus('ERROR: ' + e.message, '#ed1b2f'); });
+}
+
+function ssStop() {
+  if (frameInterval) { clearInterval(frameInterval); frameInterval = null; }
+  if (pollInterval)  { clearInterval(pollInterval);  pollInterval  = null; }
+  // Tell server streaming stopped
+  fetch('/api/frame', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ streaming: false })
+  }).catch(function(){});
+  if (stream) { stream.getTracks().forEach(function(t){ t.stop(); }); stream = null; }
+  video.srcObject = null;
+  indicator.className = '';
+  setStatus('STOPPED', '#555');
+}
+
+function ssSnap() {
+  if (!stream) { setStatus('NO STREAM — start first', '#ed1b2f'); return; }
+  canvas.width  = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  var dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+  document.getElementById('snap-img').src = dataUrl;
+  document.getElementById('snap-wrap').style.display = 'block';
+  setStatus('SNAP CAPTURED', '#f59e0b');
+  // Also push to server
+  fetch('/api/frame', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ image: dataUrl, streaming: true })
+  }).catch(function(){});
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,292 @@
+# ADIR WORKFLOW PROCEDURES
+
+**Purpose**: Step-by-step how to use Adir
+**Read After**: 02_STRUCTURE.txt
+
+---
+
+## 🎯 THREE PHASES
+
+Every work session has three phases:
+
+```
+ARRIVAL → WORK → DEPARTURE
+```
+
+---
+
+## 1️⃣ ARRIVAL (When you enter a directory)
+
+### Step 1: Check for adir/
+```
+Look for: adir/ folder in current directory
+Found it? → Go to Step 3
+Not found? → Go to Step 2
+```
+
+### Step 2: Create adir/ (if needed)
+```
+mkdir adir
+mkdir adir/05_TEMPLATES
+mkdir adir/LOGS
+touch adir/LOGS/action_log.txt
+```
+
+### Step 3: Copy instruction files (if creating new adir/)
+```
+If you just created adir/:
+  Copy 01_README.txt, 02_STRUCTURE.txt,
+  03_WORKFLOW.txt, 04_EXAMPLES.txt
+  from your root adir/ to this new adir/
+
+If adir/ already existed:
+  Skip this - files should already be there
+```
+
+### Step 4: Copy templates (if creating new adir/)
+```
+If you just created adir/:
+  Copy the entire 05_TEMPLATES/ folder
+  from your root adir/ to this new adir/
+
+If adir/ already existed:
+  Skip this - templates should already be there
+```
+
+### Step 5: Read coordination files
+```
+Order:
+1. Read adir/CURRENT.txt      (What do I do?)
+2. Read adir/WORKING.txt      (What's the context?)
+3. Read adir/FEED.txt         (Any messages?)
+4. Read adir/SESSION.txt      (Where was I?)
+5. Read adir/LOGS/action_log.txt (What happened?)
+```
+
+### Result: Full context! Ready to work.
+
+---
+
+## 2️⃣ WORK (While you're working)
+
+### Update CURRENT.txt
+```
+When you start a task:
+  Open adir/CURRENT.txt
+  Find the task
+  Mark it as in-progress
+
+When you complete a task:
+  Open adir/CURRENT.txt
+  Mark it as completed [x]
+  Move to COMPLETED section
+```
+
+### Update WORKING.txt
+```
+When you make a decision:
+  Open adir/WORKING.txt
+  Add to "DECISIONS MADE":
+    - What: [decision name]
+    - Why: [reason]
+    - Impact: [what changes]
+
+When you learn something important:
+  Open adir/WORKING.txt
+  Add to "NOTES":
+    - What you learned
+    - Why it matters
+```
+
+### Update FEED.txt (Wheel Protocol)
+```
+Format: [YourName] Action: [what]. Next: [what's needed]. For: [who].
+
+When you complete something:
+  [Agent1] Completed: Task X. Next: Testing needed. For: Agent2.
+
+When you're blocked:
+  [Agent1] Blocked: Need API docs. Next: Waiting on docs. For: Team.
+
+When you change focus:
+  [Agent1] Status: Moving to Phase 2. For: Whoever cares.
+
+Keep it simple. One line per update.
+```
+
+### Append to LOGS/action_log.txt
+```
+For EVERY action:
+  [YYYY-MM-DD HH:MM] [YourName] Action description
+
+Examples:
+2026-02-02 14:30 Agent1 Started task X
+2026-02-02 15:00 Agent1 Completed task X
+2026-02-02 15:15 Agent1 Created adir/ in /projects/backend/
+2026-02-02 16:00 Agent1 Ended session
+```
+
+---
+
+## 3️⃣ DEPARTURE (When you stop working)
+
+### Update CURRENT.txt
+```
+Mark all completed tasks as [x]
+Move them to COMPLETED section
+Add any new tasks you discovered
+Update priorities if needed
+```
+
+### Update WORKING.txt
+```
+Document what you accomplished
+Document what you learned
+Document what you decided
+Summarize current state
+```
+
+### Update FEED.txt
+```
+Post final status:
+[YourName] Status: [final status]. For: Next session/other agents.
+
+If handing off to someone else:
+[YourName] Handoff: Task at 90%. Next: Final review. For: Agent2.
+```
+
+### Update SESSION.txt
+```
+If it exists:
+  Edit it to say:
+  - What you did
+  - What state things are in
+  - What to do next time
+  - Any important context
+
+If it doesn't exist:
+  Copy from 05_TEMPLATES/SESSION.txt
+  Fill in what you did
+```
+
+### Final log entry
+```
+Open adir/LOGS/action_log.txt
+Append:
+[YYYY-MM-DD HH:MM] [YourName] Session complete. [Summary].
+```
+
+---
+
+## 🌐 NAVIGATING TO A NEW DIRECTORY
+
+### Step 1: Decide to navigate
+```
+You decide to explore /projects/backend/
+```
+
+### Step 2: Go there
+```
+cd /projects/backend/
+```
+
+### Step 3: Check for adir/
+```
+ls adir/
+Found? → Read CURRENT.txt, start work
+Not found? → Create adir/ (see ARRIVAL section above)
+```
+
+### Step 4: Return when done
+```
+Update this directory's adir/ files (WORK section above)
+Navigate back to parent
+Update parent's adir/FEED.txt to note you visited child directory
+```
+
+---
+
+## 🔄 IF YOU GET INTERRUPTED
+
+### Immediately on restart:
+
+**Step 1: Read SESSION.txt**
+```
+Open: adir/SESSION.txt
+Understand: What was I doing? What state was I in?
+```
+
+**Step 2: Read CURRENT.txt**
+```
+Open: adir/CURRENT.txt
+Understand: What tasks were active?
+```
+
+**Step 3: Read WORKING.txt**
+```
+Open: adir/WORKING.txt
+Understand: What context do I need?
+```
+
+**Step 4: Read LOGS/action_log.txt**
+```
+Open: adir/LOGS/action_log.txt
+Understand: What did I last do?
+```
+
+**Step 5: Resume**
+```
+Pick up exactly where you left off.
+Full context. No lost work.
+```
+
+---
+
+## ✅ QUICK CHECKLIST
+
+### ARRIVAL
+- [ ] Check for adir/
+- [ ] Create if needed
+- [ ] Copy files if needed
+- [ ] Read CURRENT.txt
+- [ ] Read WORKING.txt
+- [ ] Read FEED.txt
+- [ ] Read SESSION.txt (if exists)
+
+### WORK
+- [ ] Update CURRENT.txt as tasks progress
+- [ ] Update WORKING.txt as decisions made
+- [ ] Update FEED.txt as coordinating
+- [ ] Append to LOGS/action_log.txt for each action
+
+### DEPARTURE
+- [ ] Update CURRENT.txt (mark complete)
+- [ ] Update WORKING.txt (document outcomes)
+- [ ] Update FEED.txt (post status/handoff)
+- [ ] Update SESSION.txt (prepare next)
+- [ ] Log final action
+
+### INTERRUPTED
+- [ ] Read SESSION.txt first
+- [ ] Read CURRENT.txt
+- [ ] Read WORKING.txt
+- [ ] Read LOGS/action_log.txt
+- [ ] Resume work
+
+---
+
+## 🎯 CORE PRINCIPLE
+
+**Read Files → Do Work → Update Files → Log Action**
+
+Every cycle:
+1. Read coordination files (understand state)
+2. Do work (make progress)
+3. Update coordination files (record state)
+4. Log action (audit trail)
+
+Repeat until done.
+
+---
+
+*Workflow complete. Next: Read 04_EXAMPLES.txt*

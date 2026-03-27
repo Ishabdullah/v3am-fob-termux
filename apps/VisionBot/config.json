@@ -1,0 +1,182 @@
+{
+  "app": {
+    "name": "VisionBot",
+    "version": "1.0.0",
+    "description": "Visual memory service - stores and retrieves timestamped screen observations",
+    "environment": "production",
+    "access": "internal"
+  },
+  "llm": {
+    "provider": "llamacpp",
+    "ollama": {
+      "endpoint": "http://127.0.0.1:11434/api/generate",
+      "model": "qwen2.5:7b",
+      "max_tokens": 128000,
+      "temperature": 0.7,
+      "stream": false
+    },
+    "anthropic": {
+      "api_key": "",
+      "endpoint": "https://api.anthropic.com/v1/messages",
+      "model": "claude-3-haiku-20240307",
+      "max_tokens": 4096,
+      "temperature": 0.7
+    },
+    "fallback": {
+      "enabled": true,
+      "provider": "ollama"
+    },
+    "model": "moondream",
+    "llamacpp": {
+      "endpoint": "http://127.0.0.1:8080/completion",
+      "model": "default",
+      "max_tokens": 4096,
+      "temperature": 0.7
+    }
+  },
+  "security": {
+    "allowed_read_dirs": [
+      "data/knowledge",
+      "adir/logs/vision-log"
+    ],
+    "allowed_write_dirs": [
+      "adir/logs",
+      "adir/logs/vision-log",
+      "data/knowledge"
+    ],
+    "allowed_read_extensions": [
+      ".md",
+      ".txt",
+      ".json"
+    ],
+    "allowed_write_extensions": [
+      ".txt",
+      ".json",
+      ".md"
+    ],
+    "rate_limit": {
+      "enabled": true,
+      "requests_per_minute": 60,
+      "requests_per_hour": 500,
+      "requests_per_day": 2000
+    },
+    "cors": {
+      "enabled": true,
+      "allowed_origins": [
+        "*"
+      ]
+    }
+  },
+  "knowledge": {
+    "base_path": "data/knowledge",
+    "auto_refresh": true,
+    "cache_ttl": 300,
+    "max_context_files": 20,
+    "file_scan_on_start": true
+  },
+  "conversation": {
+    "max_history": 30,
+    "max_message_length": 5000,
+    "log_conversations": true,
+    "log_path": "adir/logs/conversations.txt",
+    "session_timeout": 3600
+  },
+  "system_prompt": {
+    "role": "You are VisionBot, the visual memory service for the FOB agent fleet. You log and\n  retrieve timestamped screen observations captured by the vision bridge.                 \n  RECEIVING OBSERVATIONS\n  Observations arrive in this format:\n  [TIMESTAMP] CROP=region PROMPT=what_was_asked RESULT=what_was_seen\n\n  When you receive one, save it immediately:\n  [SAVE_FILE: vision-log/YYYY-MM-DD.txt]\n  [TIMESTAMP] CROP=region PROMPT=prompt RESULT=result\n  [END_FILE]\n  Confirm with: \"Logged.\"\n\n  ANSWERING QUERIES\n  When asked about past visual state, read the relevant log files and report exactly what\n  was observed. Include timestamp, region, and result. If nothing was logged for that time\n   or topic, say so plainly.\n\n  FILE OPERATIONS\n  [LIST_FILES: vision-log] \u2014 list all log files\n  [READ_FILE: vision-log/YYYY-MM-DD.txt] \u2014 read a day's log\n\n  BEHAVIOR\n  - You are a logging and retrieval service \u2014 keep responses short\n  - Do not speculate about what the screen might show \u2014 only report what was logged\n  - If no logs exist yet, say: \"No observations logged yet.\"\n  - You are accessible to agents and users via the TANDRmgr relay",
+    "instructions": [
+      "Store every vision observation with its timestamp",
+      "Append to daily log files (one file per day)",
+      "Answer queries about past screen state from your logs",
+      "Return the most recent matching observation when asked what something looks like"
+    ],
+    "restrictions": [
+      "Do not execute system commands",
+      "Do not modify files outside your allowed directories"
+    ]
+  },
+  "ui": {
+    "theme": "professional",
+    "brand_color": "#00d9ff",
+    "background_color": "#0a0e27",
+    "show_typing_indicator": true,
+    "markdown_enabled": true,
+    "code_highlighting": true,
+    "max_messages_displayed": 50,
+    "auto_scroll": true,
+    "timestamp_format": "HH:mm"
+  },
+  "logging": {
+    "enabled": true,
+    "level": "info",
+    "log_errors": true,
+    "log_conversations": true,
+    "log_analytics": true,
+    "error_log_path": "adir/logs/errors.txt",
+    "analytics_log_path": "adir/logs/analytics.txt"
+  },
+  "analytics": {
+    "enabled": true,
+    "track_conversations": true,
+    "track_response_time": true,
+    "track_user_agents": true,
+    "track_drafts_created": true,
+    "track_research_queries": true
+  },
+  "features": {
+    "markdown_rendering": true,
+    "code_blocks": true,
+    "file_upload": false,
+    "image_support": false,
+    "voice_input": false,
+    "suggestions": true,
+    "graph_api": true
+  },
+  "facebook_graph_api": {
+    "enabled": true,
+    "api_version": "v21.0",
+    "page_id": "YOUR_FACEBOOK_PAGE_ID",
+    "access_token": "YOUR_FACEBOOK_ACCESS_TOKEN",
+    "permissions": [
+      "pages_read_engagement",
+      "pages_manage_posts",
+      "read_insights"
+    ],
+    "endpoints": {
+      "page_feed": "/YOUR_FACEBOOK_PAGE_ID/feed",
+      "page_posts": "/YOUR_FACEBOOK_PAGE_ID/posts",
+      "page_insights": "/YOUR_FACEBOOK_PAGE_ID/insights",
+      "search": "/search"
+    },
+    "rate_limits": {
+      "calls_per_hour": 200,
+      "burst_limit": 50
+    },
+    "feed_monitoring": {
+      "enabled": false,
+      "check_interval_minutes": 60,
+      "pages_to_monitor": [
+        "YOUR_FACEBOOK_PAGE_ID"
+      ],
+      "keywords_to_track": [
+        "construction",
+        "remodeling",
+        "home improvement",
+        "contractor",
+        "renovation"
+      ]
+    }
+  },
+  "_meta": {
+    "name": "VisionBot Knowledge Bot",
+    "version": "2.0.0",
+    "template": "TANDRSocial",
+    "description": "Knowledge bot deployed by KB-Maker",
+    "deployed": "2026-03-19T15:09:41.209Z"
+  },
+  "port": 10337,
+  "knowledge_path": "C:/FOB/adir/new211adir/TANDR-2026-02-11/apps/VisionBot/data/knowledge",
+  "voice": {
+    "enabled": false,
+    "auto_speak": "auto"
+  }
+}

@@ -1,0 +1,5 @@
+**324 Ports and paths are changed ref data**
+
+# V3AM API Endpoints Guide\n**Source:** Jerry's notes\n**Saved:** 2026-02-14\n\n## Live URLs\n- Production: https://v3am.ngrok.app\n- Static files: https://v3am.com/3AI/\n\n## Main Chat API\nEndpoint: /chat_api.php\nMethod: GET\nParams:\n- input (required) - Your message\n- page (required) - Context: dashboard, external_ai, health_check\n- user (optional) - Default: external_ai\n- clear (optional) - true to reset conversation\n\nExample: https://v3am.ngrok.app/chat_api.php?input=Hello&page=external_ai&user=tandr_agent\n\n## Emergence Characters\nEndpoint: /chat_api_emergence.php\nRoles: emergence-friend, emergence-journey, emergence-sower, emergence-gardener, emergence-silence, emergence-workshop, emergence-storyteller\n\n## Operations\n- Read logs: /ai_dashboard.php?limit=20\n- Write logs: /post_log.php?target=main&user=NAME&content=MESSAGE\n- List projects: list_files.php (v3am.com/3AI/)\n- List project files: list_files.php?project=SLUG\n- Create files: create_file.php?path=PROJECT/FILE&content=TEXT\n- Read files: read_file.php?path=??? (STILL TESTING)\n
+
+**324 Ports and paths are changed ref data**

@@ -1,0 +1,131 @@
+{
+  "name": "[EXAMPLE] 04 - Hiring Campaign (Multi-Layer)",
+  "description": "Full hiring campaign with Layer 1 (job post), Layer 2 (commercial/image/video), Layer 3 (services), Layer 4 (publish). Agentic Prompt: prompthiringad1. Agent: Randy (9201). Cycles: 15-25.",
+  "nodes": [
+    {
+      "id": "trigger1",
+      "type": "trigger.manual",
+      "title": "Start Hiring Campaign",
+      "x": 100,
+      "y": 100,
+      "data": {}
+    },
+    {
+      "id": "layer1",
+      "type": "action.http",
+      "title": "Layer 1: Create Hiring Ad",
+      "x": 350,
+      "y": 100,
+      "data": {
+        "method": "GET",
+        "url": "http://localhost:9201/agent/api/agent.php?action=chat&input=Execute_prompthiringad1_position_DeckBuilder_level_Experienced",
+        "body": ""
+      }
+    },
+    {
+      "id": "gate1",
+      "type": "logic.if",
+      "title": "User approves Layer 1?",
+      "x": 600,
+      "y": 100,
+      "data": {
+        "expr": "$.vars.layer1_approved == true"
+      }
+    },
+    {
+      "id": "layer2a",
+      "type": "action.http",
+      "title": "Layer 2a: Commercial Script",
+      "x": 850,
+      "y": 50,
+      "data": {
+        "method": "GET",
+        "url": "http://localhost:9201/agent/api/agent.php?action=chat&input=Execute_promptcommercial1_position_DeckBuilder_based_on_approved_post",
+        "body": ""
+      }
+    },
+    {
+      "id": "layer2b",
+      "type": "action.http",
+      "title": "Layer 2b: Image Prompt",
+      "x": 850,
+      "y": 150,
+      "data": {
+        "method": "GET",
+        "url": "http://localhost:9201/agent/api/agent.php?action=chat&input=Execute_promptimagepal1_position_DeckBuilder_diverse_team",
+        "body": ""
+      }
+    },
+    {
+      "id": "layer2c",
+      "type": "action.http",
+      "title": "Layer 2c: Video Brief",
+      "x": 850,
+      "y": 250,
+      "data": {
+        "method": "GET",
+        "url": "http://localhost:9201/agent/api/agent.php?action=chat&input=Execute_promptvideopal1_position_DeckBuilder_production_brief",
+        "body": ""
+      }
+    },
+    {
+      "id": "complete",
+      "type": "action.delay",
+      "title": "Campaign complete - review outputs",
+      "x": 1100,
+      "y": 150,
+      "data": {
+        "ms": "1000"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "trigger1",
+      "to": "layer1",
+      "cond": null
+    },
+    {
+      "from": "layer1",
+      "to": "gate1",
+      "cond": null
+    },
+    {
+      "from": "gate1",
+      "to": "layer2a",
+      "cond": "true"
+    },
+    {
+      "from": "gate1",
+      "to": "layer2b",
+      "cond": "true"
+    },
+    {
+      "from": "gate1",
+      "to": "layer2c",
+      "cond": "true"
+    },
+    {
+      "from": "layer2a",
+      "to": "complete",
+      "cond": null
+    },
+    {
+      "from": "layer2b",
+      "to": "complete",
+      "cond": null
+    },
+    {
+      "from": "layer2c",
+      "to": "complete",
+      "cond": null
+    }
+  ],
+  "vars": {
+    "prompt": "prompthiringad1 + Layer 2 prompts",
+    "agent": "Randy (9201)",
+    "cycles_estimated": "15-25",
+    "position": "DeckBuilder",
+    "layer1_approved": false
+  }
+}

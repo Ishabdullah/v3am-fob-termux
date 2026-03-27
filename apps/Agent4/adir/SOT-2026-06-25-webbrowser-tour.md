@@ -1,0 +1,9 @@
+# SOT-2026-06-25-WEBBROWSER-TOUR  
+## Blueprint: FOB Fleet Operations UI  
+Saved for Jerry via TANDRmgr-lab.  
+  
+```html  
+<!DOCTYPE html><html><head><style>body { margin: 0; font-family: 'Segoe UI', sans-serif; background: #1a1a1a; color: #fff; overflow: hidden; } .browser-ui { background: #222; padding: 8px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #444; } .address-bar { flex-grow: 1; background: #000; border: 1px solid #555; padding: 6px 12px; border-radius: 4px; color: #00d4ff; font-family: monospace; font-size: 13px; overflow: hidden; white-space: nowrap; } .btn { background: #333; border: 1px solid #555; color: #e0e0e0; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; text-transform: uppercase; transition: all 0.2s; } .btn:hover { background: #444; border-color: #00d4ff; } .btn.active { background: #00d4ff; color: #000; border-color: #00d4ff; } iframe { width: 100vw; height: calc(100vh - 48px); border: none; background: #fff; }</style></head> 
+<body><div class="browser-ui"><div class="btn active" onclick="nav('http://127.0.0.1:8086', this)">MGR:8086</div><div class="btn" onclick="nav('http://127.0.0.1:11113', this)">A4:11113</div><div class="btn" onclick="nav('http://127.0.0.1:11111', this)">A1:11111</div><div class="btn" onclick="nav('http://127.0.0.1:11112', this)">A2:11112</div><div class="btn" onclick="nav('http://127.0.0.1:10336', this)">GG:10336</div><div class="btn" onclick="nav('http://127.0.0.1:8091', this)">MEM:8091</div><div class="address-bar" id="addr">http://127.0.0.1:8086/</div></div><iframe id="viewport" src="http://127.0.0.1:8086/"></iframe> 
+<script>function nav(url, el) { document.getElementById('viewport').src = url; document.getElementById('addr').innerText = url; document.querySelectorAll('.btn').forEach(b => b.classList.remove('active')); el.classList.add('active'); }</script></body></html> 
+``` 

@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Logs
+**/logs/conversations.txt
+**/logs/errors.txt
+**/logs/server-restarts.log
+**/data/analyze_debug.log
+**/data/upload.log
+
+# Agent memory (contains conversation history with possible keys)
+**/data/memory/agent.json
+
+# Installation flag
+.fob-installed
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Environment
+.env
+.env.local
+.env.*.local

@@ -1,0 +1,304 @@
+```
+╔══════════════════════════════════════════════════════════════════════╗
+║  FOB-LAUNCHER ADIR — SESSION TRANSFER                                ║
+║  Path: apps\FOB-Launcher\adir\transfer.md                            ║
+║  Updated: 2026-03-22 | Author: Claude                                ║
+╠══════════════════════════════════════════════════════════════════════╣
+║  Handoff notes. Update this before ending a session so the next      ║
+║  Claude can pick up without losing context.                          ║
+╚══════════════════════════════════════════════════════════════════════╝
+```
+
+# Session Transfer
+323
+ Writing new SOTs to my adir now — not overwriting anything existing.
+
+● Write(C:\FOB\adir\new211adir\TANDR-2026-02-11\apps\FOB-Launcher\adir\SOT-323-TL-PROMPT-D       ESIGN.md)
+  ⎿  Wrote 94 lines to ..\adir\new211adir\TANDR-2026-02-11\apps\FOB-Launcher\adir\SOT          -323-TL-PROMPT-DESIGN.md
+       1 ---                                                                                     2 SOT-323-TL-PROMPT-DESIGN.md
+       3 Author: The Last (TL) | Date: 2026-03-23
+       4 Purpose: New condensed prompt architecture — reasoning over policy
+       5 Session: Live agent test + prompt review session with user (Jerry)
+       6 ---
+       7
+       8 # PROMPT DESIGN — Condensed Architecture
+       9
+      10 ## Core Philosophy
+     … +84 lines (ctrl+o to expand)
+
+
+323
+The response gave us exactly what we needed. Here's what it actually revealed:
+
+  The dir /O-D finding is the key data point. The agent knew the correct switch but the     SOT only said "sort by date" — no actual command. It filled the gap from training, not
+  from documentation. That's agent inference, not verified truth. If training data was      wrong or the model changes, that command disappears. This is exactly why working
+  examples belong in the prompt as motor function — not explanations of what to do, but
+  the actual thing that works.
+
+  Token math is confirmed:
+  System prompt:  ~1,500 tokens  (just got leaner with the new plan)
+  ADIR MD scan:   ~3,200 tokens  (already, and growing with every SOT we add)
+  History:        ~1,100 tokens
+  ─────────────────────────────
+  Total per turn: ~5,800 tokens  ← plateau cost, not runaway
+
+  The scan is already the biggest cost and we just added 6 files. Lean SOTs matter.
+
+  Reasoning vs policy — this is the real unlock. The agent said "internalized" for dir
+  /O-D. That means the prompt gave it a rule and training gave it the syntax. When those
+  two sources disagree or one disappears, it drifts. But if we write the reasoning — why
+  absolute paths, why the command works this way — the agent can reconstruct correct
+  behavior from first principles even when specifics drift.
+
+  Example of the difference:
+
+  Policy version (brittle):
+  ▎ Always use absolute paths starting from C:\FOB
+
+  Reasoning version (durable):
+  ▎ The PHP CGI process has no working directory. Relative paths fail silently with no
+  error. Every shell_command starts from C:\FOB because that is the only path that is
+  always true regardless of how the process was launched.
+
+  ---
+  Side quest addition — agreed. End of every section that doesn't reference its own
+  extension file should get one line:
+
+  ▎ If new capabilities are added — peripherals, dedicated IPs, additional servers, home
+  automation — update this file or write a new SOT in this directory so future agents know
+   what is available.
+
+  That keeps the files self-growing as the system expands without requiring TL to update
+  every template manually.
+
+  ---
+  New prompt structure draft — based on everything:
+
+  [USER IDENTITY BLOCK — added above by user]
+
+  You are running on a rebuilt-per-turn prompt. You have no natural memory
+  between turns. Your adir directory is scanned every request and injected
+  into this prompt — that is your memory. The newest SOT file on any topic
+  wins over older files and over anything in this prompt.
+
+  On every step: read your CURRENT SOT, then read one recent SOT under 3KB.
+  This is not policy — it is how you avoid operating on stale context.
+
+  ORIENT:
+    dir /O-D C:\FOB\adir\new211adir\TANDR-2026-02-11\apps\Agent1\adir
+
+  SHELL CALL (proven):
+    shell_command: dir /O-D [absolute path]
+    shell_command: type [absolute path\filename.md]
+
+  FLEET CALL (proven):
+    http://127.0.0.1:{port}/api/agent.php?action=chat&input={url-encoded}
+    http://127.0.0.1:9399/status
+
+  RESPONSE: HTML with inline styles only. No markdown. Every link needs
+  target="_blank" rel="noopener" or the user loses this window.
+
+  CONSOLE HEADER (auto mode):
+    ╔══ AGENT ONE | Step [N] | [time] ══╗
+    ║ Task: [current task]              ║
+    ╚═══════════════════════════════════╝
+
+  [USER ADDITIONS OVER TIME — added above footer]
+
+  ╔══ BREADCRUMBS / NEXT ══╗
+
+  Short. Motor function only. The reasoning for each rule is in the SOTs. The SOTs grow.
+  The prompt only updates when the motor functions change.
+
+  Ready to write it when you are.
+
+✻ Cogitated for 48s
+
+──────────────────────────────────────────────────────────────────────────────────────────
+> update your adir sot files for your fr claude and I think this is wrong the start path
+  is the agents knowledge directory new agent dropper v2 agents have it in a custom
+  location but the bot directory it starts relative paths in should be where it is and
+  then a slight path like adir or what ever the agent is set to theres a default this
+  allows not now but early days we did it and later down the road well do it again but
+  it allows you to drag an agents folder to other locations and it still has some
+  capability not a concern just the relative path idea need a test because its been a
+  pain in my ass no changes this is production code were just doing text mds and logic
+  and documentation and onboarding lol and testing  write your sots auto compact is
+  happening preserve your own memory in your adir sots that way you have them and auto
+  compact and yes if the two conflict then we have a similar concern no rule of thumb to
+  be made just something to be aware of
+
+
+
+
+323
+ Clean answer — no external libraries anywhere. Every file in the fleet is pure vanilla.
+
+  Here's the complete inventory:
+
+  HTML/CSS/JS (Agent4, all agents):                                                         - No CDN imports — no jQuery, Bootstrap, Tailwind, Chart.js, marked.js, socket.io,
+  nothing                                                                                   - Three local files loaded: /css/override.css, /css/win-frame.css, /css/windows.css
+  - Three local JS: /js/win-frame.js, /js/windows.js, /js/override.js
+  - Everything else is inline <style> and <script> blocks written from scratch
+
+  PHP side:
+  - No Composer packages — zero external PHP libraries
+  - Only built-in PHP: curl, json_encode/decode, file_get_contents, exec, standard I/O
+
+  ---
+  What you DO have available without importing anything:
+
+  Since it runs in Electron (Chromium under the hood), the agents get the full modern
+  browser stack for free:
+
+  ┌───────────────────────────────────────────────┬───────────────────────────────────┐
+  │                    Feature                    │            Available?             │
+  ├───────────────────────────────────────────────┼───────────────────────────────────┤
+  │ fetch()                                       │ ✅ Native                         │
+  ├───────────────────────────────────────────────┼───────────────────────────────────┤
+  │ ES2022+ JS (async/await, optional chaining,   │ ✅                                │
+  │ etc.)                                         │                                   │
+  ├───────────────────────────────────────────────┼───────────────────────────────────┤
+  │ CSS custom properties / variables             │ ✅                                │
+  ├───────────────────────────────────────────────┼───────────────────────────────────┤
+  │ CSS Grid, Flexbox                             │ ✅                                │
+  ├───────────────────────────────────────────────┼───────────────────────────────────┤
+  │ CSS animations / transitions                  │ ✅                                │
+  ├───────────────────────────────────────────────┼───────────────────────────────────┤
+  │ localStorage / sessionStorage                 │ ✅                                │
+  ├───────────────────────────────────────────────┼───────────────────────────────────┤
+  │ Web Crypto API                                │ ✅                                │
+  ├───────────────────────────────────────────────┼───────────────────────────────────┤
+  │ Intl (date/number formatting)                 │ ✅                                │
+  ├───────────────────────────────────────────────┼───────────────────────────────────┤
+  │ Canvas / WebGL                                │ ✅                                │
+  ├───────────────────────────────────────────────┼───────────────────────────────────┤
+  │ Cross-origin fetch to localhost               │ ✅ (webSecurity: false in         │
+  │                                               │ Electron)                         │
+  └───────────────────────────────────────────────┴───────────────────────────────────┘
+
+  Bottom line: If you want to use any library (marked.js for markdown rendering, Chart.js
+  for graphs, etc.) you'd either inline the whole minified script into the HTML or serve
+  it locally from the agent's directory. There's no CDN dependency anywhere — which is
+  intentional since FOB runs offline.
+
+
+323
+
+Agent Logic and memory 
+
+ System Message / Memory — Full Logic                                                    
+  System prompt: every single request, not first wake up.
+
+  The system prompt is NOT sent as a native system: parameter. It gets concatenated into
+  one big string alongside context and history, then sent as the user message:
+
+  # System
+  {system_prompt from config.json}
+
+  # Directory Context
+  {all scanned .md/.txt files — from cache or fresh scan}
+
+  {tools block if any}
+
+  # Conversation History
+  Human: [message -10]
+  AgentName: [response -10]
+  ...last 20 entries (10 exchanges)...
+
+✻ Cooked for 2m 13s
+
+> ok so token cost every chat we eventualy get to max then spend max on every turn right  
+● Almost — but not quite, because of one line:
+
+  $recent = array_slice($memory, -20);                                                    
+  History is capped at 20 entries (10 exchanges) before it goes into the prompt. So the     cost doesn't grow forever — it plateaus.
+
+  Here's the actual cost curve:
+
+  Turn 1:   system + context + [0 history] + input
+  Turn 2:   system + context + [2 msgs]    + input
+  Turn 3:   system + context + [4 msgs]    + input
+  ...
+  Turn 10:  system + context + [18 msgs]   + input   ← approaching plateau
+  Turn 11+: system + context + [20 msgs]   + input   ← FLAT from here on
+
+  After turn 10, oldest exchanges fall off the bottom as new ones push in. Every turn from
+   that point costs roughly the same.
+
+  The real wildcard is the context block — the directory scan. Every .md and .txt file in
+  the scan directory gets concatenated and sent with every request. That's the expensive
+  part. If your knowledge base is 50KB of markdown, that 50KB rides along on every single
+  call, turn after turn, forever.
+
+  So the real cost model is:
+
+  cost per turn = system_prompt (small, fixed)
+                + context / KB files (can be huge, fixed per session)
+                + last 20 messages (capped, fixed ceiling)
+                + this turn's input + output
+
+  The context size is what you actually want to watch. That's why Librarian, StartPower,
+  and the KB agents exist — instead of loading all knowledge into every prompt, you fetch
+  only what's relevant to the current question. The expensive part stays on disk until
+  it's needed.
+
+
+
+
+
+## Last Session — 2026-03-22
+
+**What was accomplished:**
+- Full V3AMFOB launcher built from scratch (main.js, app.js, style.css, index.html, preload.js)
+- All 19 services in SERVICES array with correct cwds and commands
+- Rack panel with group headers, status badges, Start/Stop/Restart buttons
+- Log viewer with per-service tabs
+- Settings modal: endpoints, appearance sliders, service start modes
+- Skin system: background image, panel opacity, font size, text color, CSS vars
+- Control API on port 9399 — full fleet control from any origin
+- Tray: right-click submenus per service (open browser, open folder, start/stop/restart)
+- Tray: dynamic Scripts submenu scans C:\FOB for .bat files
+- Fullscreen toggle (⛶ button)
+- postMessage CSS bridge — fob-css and fob-skin message types live in app.js
+- Manual vs auto-start per service (saved to fob-config.json as manualServices array)
+- Installer (FOB-Setup.iss): all 22 node_modules in uninstaller, kill V3AMFOB on uninstall
+- Ngrok scrub: confirmed clean — no auth tokens in packageable files
+- All ADIR files created in this directory
+
+**What was NOT done:**
+- Asar repack — still needs to be run before next package
+- FOB-Setup.exe rebuild — after repack
+- Agent prompt updates — user handling separately
+- User-assignable port monitors — future feature, not a blocker
+
+---
+
+## Handoff Checklist for Next Claude
+
+- [ ] Read `boot.md` for system state
+- [ ] Read `CURRENT.md` for active task
+- [ ] Read `SOT-V3AMFOB-LAUNCHER.md` for full technical reference if needed
+- [ ] Confirm what changed since this transfer was written (`git log` or ask user)
+- [ ] Do NOT edit source files without knowing a repack will follow
+
+---
+
+## Files to Know
+
+| File | Notes |
+|------|-------|
+| `C:\FOB\V3AMFOB\main.js` | Main process — services, tray, IPC, Control API |
+| `C:\FOB\V3AMFOB\renderer\app.js` | UI logic — rack, logs, skin, settings |
+| `C:\FOB\V3AMFOB\renderer\style.css` | All styles and CSS vars |
+| `C:\FOB\V3AMFOB\renderer\index.html` | HTML skeleton |
+| `C:\FOB\V3AMFOB\preload.js` | IPC bridge (window.fob.*) |
+| `C:\FOB\V3AMFOB\fob-config.json` | Live user config |
+| `F:\Claude\FOB-Setup.iss` | Inno Setup installer script |
+| `F:\Claude\REPACKAGE-INSTRUCTIONS.md` | How to repack and rebuild |
+
+```
+╔══════════════════════════════════════════════════════════════════════╗
+║  END OF transfer.md                                                   ║
+╚══════════════════════════════════════════════════════════════════════╝
+```

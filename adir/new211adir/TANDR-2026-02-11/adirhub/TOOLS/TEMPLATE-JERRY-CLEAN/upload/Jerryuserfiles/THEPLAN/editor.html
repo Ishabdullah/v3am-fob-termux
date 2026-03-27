@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE PLAN - Live Editor</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        header {
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        h1 {
+            color: #333;
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin: 30px 0;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        .tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+        .tab:hover {
+            color: #667eea;
+        }
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .feed-viewer {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .feed-message {
+            background: white;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .feed-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .feed-author {
+            font-weight: 600;
+            color: #667eea;
+        }
+        .feed-time {
+            color: #999;
+            font-size: 13px;
+        }
+        .feed-action {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #e0e0e0;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        .entry-editor {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+            min-height: 600px;
+        }
+        .entry-list {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            overflow-y: auto;
+            max-height: 600px;
+        }
+        .entry-item {
+            background: white;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+        .entry-item:hover {
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+        .entry-item.active {
+            background: #667eea;
+            color: white;
+        }
+        .entry-viewer {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            overflow-y: auto;
+            max-height: 600px;
+        }
+        textarea {
+            width: 100%;
+            min-height: 400px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            resize: vertical;
+        }
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin: 10px 10px 10px 0;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        .info-box {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .success-box {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        pre {
+            background: #2d2d2d;
+            color: #f8f8f8;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 13px;
+        }
+        .form-group {
+            margin: 15px 0;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        input[type="text"], input[type="datetime-local"], select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📋 THE PLAN - Live Editor</h1>
+            <p style="color: #666; margin-top: 10px;">View and edit documentation entries when CLI rate limit hits</p>
+            <a href="index.html" style="color: #667eea; text-decoration: none; margin-top: 10px; display: inline-block;">← Back to Index</a>
+        </header>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('feed')">📡 Feed Viewer</button>
+            <button class="tab" onclick="showTab('entries')">📝 Entry Viewer</button>
+            <button class="tab" onclick="showTab('new-message')">➕ Add Message</button>
+            <button class="tab" onclick="showTab('new-entry')">📄 New Entry</button>
+        </div>
+
+        <!-- FEED VIEWER TAB -->
+        <div id="feed-tab" class="tab-content active">
+            <div class="info-box">
+                <strong>📡 Activity Feed</strong><br>
+                View the latest messages from all Claude instances. This shows exactly what's been done and what's next.
+            </div>
+
+            <div class="feed-viewer" id="feed-viewer">
+                <p style="color: #999;">Loading feed...</p>
+            </div>
+
+            <button class="btn" onclick="loadFeed()">🔄 Refresh Feed</button>
+        </div>
+
+        <!-- ENTRY VIEWER TAB -->
+        <div id="entries-tab" class="tab-content">
+            <div class="info-box">
+                <strong>📝 Entry Viewer</strong><br>
+                Browse and read all documentation entries. Click an entry to view its content.
+            </div>
+
+            <div class="entry-editor">
+                <div class="entry-list" id="entry-list">
+                    <p style="color: #999;">Loading entries...</p>
+                </div>
+                <div class="entry-viewer" id="entry-content">
+                    <p style="color: #999;">Select an entry to view its content</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- NEW MESSAGE TAB -->
+        <div id="new-message-tab" class="tab-content">
+            <div class="success-box">
+                <strong>➕ Add New Message to Feed</strong><br>
+                When you make changes manually, log them here so the next Claude session knows what happened.
+            </div>
+
+            <div class="form-group">
+                <label>Your Name/Role:</label>
+                <input type="text" id="msg-author" placeholder="e.g., Human User, Browser Claude, Manual Edit">
+            </div>
+
+            <div class="form-group">
+                <label>Action Type:</label>
+                <select id="msg-action">
+                    <option value="MANUAL_EDIT">MANUAL_EDIT</option>
+                    <option value="VERIFICATION_COMPLETE">VERIFICATION_COMPLETE</option>
+                    <option value="FILE_CREATED">FILE_CREATED</option>
+                    <option value="PLANNING_COMPLETE">PLANNING_COMPLETE</option>
+                    <option value="ISSUE_FOUND">ISSUE_FOUND</option>
+                    <option value="ISSUE_FIXED">ISSUE_FIXED</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Entry Related To:</label>
+                <input type="text" id="msg-entry" placeholder="e.g., cli-workflow-test-2026-01-06.html">
+            </div>
+
+            <div class="form-group">
+                <label>Message:</label>
+                <textarea id="msg-message" rows="4" placeholder="Describe what you did..."></textarea>
+            </div>
+
+            <button class="btn" onclick="addMessage()">💾 Add Message to Feed</button>
+            <button class="btn btn-secondary" onclick="previewMessage()">👁️ Preview JSON</button>
+
+            <div id="message-preview" style="display: none; margin-top: 20px;"></div>
+        </div>
+
+        <!-- NEW ENTRY TAB -->
+        <div id="new-entry-tab" class="tab-content">
+            <div class="warning-box">
+                <strong>📄 Create New Entry</strong><br>
+                When CLI hits rate limit, you can manually create entries here. Copy the generated HTML and save it as a new file.
+            </div>
+
+            <div class="form-group">
+                <label>Entry Title:</label>
+                <input type="text" id="entry-title" placeholder="e.g., Bug Fix Session 2026-01-06">
+            </div>
+
+            <div class="form-group">
+                <label>Entry Type:</label>
+                <select id="entry-type">
+                    <option value="AUDIT">AUDIT</option>
+                    <option value="SYSTEM">SYSTEM</option>
+                    <option value="ARCHITECTURE">ARCHITECTURE</option>
+                    <option value="STATUS">STATUS</option>
+                    <option value="TEST">TEST</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Content (HTML):</label>
+                <textarea id="entry-content-input" rows="15" placeholder="Write your entry content here..."></textarea>
+            </div>
+
+            <button class="btn" onclick="generateEntry()">🔨 Generate Complete HTML</button>
+
+            <div id="generated-entry" style="display: none; margin-top: 20px;">
+                <h3 style="color: #667eea;">Generated Entry HTML:</h3>
+                <textarea id="generated-html" rows="20" style="font-family: 'Courier New', monospace;"></textarea>
+                <p style="margin-top: 10px; color: #666;">
+                    <strong>Next Steps:</strong><br>
+                    1. Copy the HTML above<br>
+                    2. Save it as: <code>entries/[your-title]-2026-01-06.html</code><br>
+                    3. Add a card to index.html pointing to this file
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+
+            if (tabName === 'feed') loadFeed();
+            if (tabName === 'entries') loadEntries();
+        }
+
+        // Load and display feed
+        function loadFeed() {
+            const feedData = {
+                "messages": [
+                    {
+                        "timestamp": "2026-01-06T14:26:00Z",
+                        "author": "Browser Claude",
+                        "instance": "claude-web-verification",
+                        "entry": "cli-workflow-test-2026-01-06.html",
+                        "action": "VERIFICATION_COMPLETE",
+                        "message": "✅ Verified test entry loads correctly. All formatting working.",
+                    },
+                    {
+                        "timestamp": "2026-01-06T14:25:30Z",
+                        "author": "CLI Claude",
+                        "instance": "claude-cli",
+                        "entry": "cli-workflow-test-2026-01-06.html",
+                        "action": "FILE_CREATED",
+                        "message": "✅ Created test entry file successfully",
+                    }
+                ]
+            };
+
+            const viewer = document.getElementById('feed-viewer');
+            viewer.innerHTML = '';
+
+            feedData.messages.forEach(msg => {
+                const div = document.createElement('div');
+                div.className = 'feed-message';
+                div.innerHTML = `
+                    <div class="feed-header">
+                        <div>
+                            <span class="feed-author">${msg.author}</span>
+                            <span class="feed-action">${msg.action}</span>
+                        </div>
+                        <span class="feed-time">${new Date(msg.timestamp).toLocaleString()}</span>
+                    </div>
+                    <div><strong>Entry:</strong> ${msg.entry}</div>
+                    <div style="margin-top: 8px;">${msg.message}</div>
+                `;
+                viewer.appendChild(div);
+            });
+        }
+
+        // Load entries list
+        function loadEntries() {
+            const entries = [
+                { id: 'desktop-audit', title: 'Desktop Audit (Jan 6, 2026)', file: 'desktop-audit-2026-01-06.html' },
+                { id: 'cli-workflow', title: 'CLI Workflow Test', file: 'cli-workflow-test-2026-01-06.html' }
+            ];
+
+            const list = document.getElementById('entry-list');
+            list.innerHTML = '';
+
+            entries.forEach(entry => {
+                const div = document.createElement('div');
+                div.className = 'entry-item';
+                div.textContent = entry.title;
+                div.onclick = () => loadEntryContent(entry.file);
+                list.appendChild(div);
+            });
+        }
+
+        function loadEntryContent(filename) {
+            document.getElementById('entry-content').innerHTML = `
+                <div class="info-box">
+                    <strong>Viewing:</strong> ${filename}<br>
+                    <a href="entries/${filename}" target="_blank" style="color: #667eea;">Open in New Tab →</a>
+                </div>
+                <p style="color: #666;">Entry files can be viewed by opening them in a new tab. The full HTML content is preserved in the entries/ directory.</p>
+            `;
+        }
+
+        // Add new message to feed
+        function addMessage() {
+            const newMsg = {
+                timestamp: new Date().toISOString(),
+                author: document.getElementById('msg-author').value,
+                instance: "manual-browser-edit",
+                entry: document.getElementById('msg-entry').value,
+                action: document.getElementById('msg-action').value,
+                message: document.getElementById('msg-message').value
+            };
+
+            const preview = document.getElementById('message-preview');
+            preview.style.display = 'block';
+            preview.innerHTML = `
+                <div class="success-box">
+                    <strong>✅ Message Created!</strong><br>
+                    Copy this JSON and ask CLI Claude to add it to feed.json:
+                    <pre>${JSON.stringify(newMsg, null, 2)}</pre>
+                </div>
+            `;
+        }
+
+        function previewMessage() {
+            addMessage();
+        }
+
+        // Generate new entry HTML
+        function generateEntry() {
+            const title = document.getElementById('entry-title').value;
+            const type = document.getElementById('entry-type').value;
+            const content = document.getElementById('entry-content-input').value;
+            const date = new Date().toISOString().split('T')[0];
+
+            const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${title} - THE PLAN</title>
+    <style>
+        /* Copy styles from _template.html */
+    </style>
+</head>
+<body>
+<!-- CURRENT STATE -->
+<!--
+STATUS: New Entry
+CREATED: ${date}
+NEXT_STEPS: Add content and integrate with index
+-->
+    <div class="container">
+        <a href="../index.html" class="back-link">← Back to THE PLAN Index</a>
+
+        <div class="header">
+            <h1>
+                <span class="badge badge-${type.toLowerCase()}">${type}</span>
+                ${title}
+            </h1>
+            <div class="meta">Created: ${date} | Author: Manual Entry</div>
+        </div>
+
+        ${content}
+
+        <footer>
+            Entry ID: ${title.toLowerCase().replace(/\s+/g, '-')}-${date}.html<br>
+            Part of THE PLAN Living Documentation System
+        </footer>
+    </div>
+</body>
+</html>`;
+
+            document.getElementById('generated-entry').style.display = 'block';
+            document.getElementById('generated-html').value = html;
+        }
+
+        // Load feed on page load
+        loadFeed();
+    </script>
+</body>
+</html>

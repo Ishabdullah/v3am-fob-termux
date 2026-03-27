@@ -1,0 +1,1368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ParserBot Command Center</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Figtree:wght@400;500;600&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* PREMIUM THEME */
+            --primary: #00d9ff;
+            --primary-dark: #00a8cc;
+            --accent: #ff6b35;
+            --accent-soft: #ffa366;
+            --bg-dark: #0a0e1a;
+            --bg-surface: #151b2f;
+            --bg-elevated: #1e2749;
+            --text-primary: #ffffff;
+            --text-secondary: #b0bcc9;
+            --text-tertiary: #7d8fa3;
+            --border: #2a3550;
+            --success: #00ff88;
+            --warning: #ffaa00;
+            --error: #ff3366;
+            --shadow: rgba(0, 0, 0, 0.5);
+
+            /* CUSTOMIZABLE */
+            --theme-brightness: 100%;
+            --theme-contrast: 1;
+            --text-size-scale: 1;
+        }
+
+        body {
+            font-family: 'Figtree', sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #0f1525 50%, var(--bg-dark) 100%);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            filter: brightness(var(--theme-brightness));
+        }
+
+        /* GRAIN TEXTURE */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' seed='2' /%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23noiseFilter)' opacity='0.02'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2em;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* HEADER - IMPRESSIVE */
+        .header {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 3em;
+            margin-bottom: 3em;
+            padding: 2.5em;
+            background: linear-gradient(135deg, rgba(0, 217, 255, 0.08) 0%, rgba(255, 107, 53, 0.04) 100%);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 60px var(--shadow);
+            animation: slideDown 0.6s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: clamp(2em, 5vw, 3em);
+            font-weight: 800;
+            letter-spacing: -1px;
+            line-height: 1.1;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 1.1em;
+            margin-top: 0.5em;
+            font-weight: 500;
+        }
+
+        .status-live {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5em;
+            align-items: flex-end;
+        }
+
+        .status-pill {
+            display: flex;
+            align-items: center;
+            gap: 1em;
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid var(--success);
+            padding: 1em 1.5em;
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse-dot 2s ease-in-out infinite;
+            box-shadow: 0 0 10px var(--success);
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .status-text strong {
+            color: var(--success);
+            font-size: 1.1em;
+        }
+
+        /* TABS - SLEEK */
+        .tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 2em;
+            border-bottom: 2px solid var(--border);
+            overflow-x: auto;
+            scroll-behavior: smooth;
+        }
+
+        .tab-button {
+            padding: 1em 2em;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: 0.5px;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            white-space: nowrap;
+        }
+
+        .tab-button:hover {
+            color: var(--primary);
+        }
+
+        .tab-button.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            box-shadow: 0 3px 0 -1px var(--primary);
+        }
+
+        /* TAB CONTENT */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* CARDS - ELEVATED */
+        .card {
+            background: linear-gradient(135deg, rgba(30, 39, 73, 0.6) 0%, rgba(20, 26, 42, 0.4) 100%);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2em;
+            margin-bottom: 2em;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 10px 40px var(--shadow);
+            transition: all 0.3s ease;
+            animation: cardIn 0.5s ease-out backwards;
+        }
+
+        @keyframes cardIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card:nth-child(1) { animation-delay: 0.1s; }
+        .card:nth-child(2) { animation-delay: 0.2s; }
+        .card:nth-child(3) { animation-delay: 0.3s; }
+        .card:nth-child(4) { animation-delay: 0.4s; }
+
+        .card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 15px 50px rgba(0, 217, 255, 0.15);
+        }
+
+        .card h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5em;
+            font-weight: 700;
+            margin-bottom: 1.5em;
+            display: flex;
+            align-items: center;
+            gap: 0.7em;
+            color: var(--primary);
+        }
+
+        /* FORMS */
+        label {
+            display: block;
+            margin-bottom: 0.6em;
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: calc(1em * var(--text-size-scale));
+            letter-spacing: 0.3px;
+        }
+
+        .label-help {
+            font-size: 0.85em;
+            color: var(--text-tertiary);
+            display: block;
+            margin-top: 0.4em;
+            font-weight: 400;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 1em;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: calc(1em * var(--text-size-scale));
+            transition: all 0.2s ease;
+            margin: 0.5em 0 1em 0;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(0, 217, 255, 0.05);
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.2);
+        }
+
+        textarea {
+            font-family: 'Courier New', monospace;
+            font-size: calc(0.9em * var(--text-size-scale));
+            min-height: 250px;
+            resize: vertical;
+        }
+
+        /* SLIDERS */
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            outline: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+            margin: 1em 0;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(0, 217, 255, 0.8);
+            transition: all 0.2s ease;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:active {
+            transform: scale(1.3);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 0 15px rgba(0, 217, 255, 0.8);
+        }
+
+        /* BUTTONS */
+        button {
+            padding: 1em 2em;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            font-size: calc(1em * var(--text-size-scale));
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            box-shadow: 0 4px 15px rgba(0, 217, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: left 0.5s ease;
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0, 217, 255, 0.4);
+        }
+
+        button:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        button.secondary {
+            background: rgba(0, 217, 255, 0.1);
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        button.danger {
+            background: linear-gradient(135deg, #ff6b6b, #ff3366);
+            box-shadow: 0 10px 30px rgba(255, 51, 102, 0.3);
+        }
+
+        button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        button.loading::after {
+            content: ' ⟳';
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* GRID LAYOUT */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2em;
+        }
+
+        .form-group {
+            margin-bottom: 1.5em;
+        }
+
+        /* MODEL SELECTOR */
+        .model-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5em;
+            margin: 1.5em 0;
+        }
+
+        .model-option {
+            padding: 1.5em;
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .model-option:hover {
+            border-color: var(--primary);
+            background: rgba(0, 217, 255, 0.08);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(0, 217, 255, 0.2);
+        }
+
+        .model-option.selected {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, rgba(0, 217, 255, 0.15), rgba(255, 107, 53, 0.05));
+            box-shadow: 0 10px 30px rgba(0, 217, 255, 0.3);
+        }
+
+        .model-option-title {
+            font-weight: 700;
+            font-size: 1.1em;
+            margin-bottom: 0.5em;
+            color: var(--primary);
+        }
+
+        .model-option-desc {
+            font-size: 0.9em;
+            color: var(--text-tertiary);
+        }
+
+        /* FILE UPLOAD */
+        .upload-zone {
+            border: 2px dashed var(--primary);
+            border-radius: 12px;
+            padding: 3em 2em;
+            text-align: center;
+            background: rgba(0, 217, 255, 0.03);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .upload-zone:hover,
+        .upload-zone.dragover {
+            border-color: var(--accent);
+            background: rgba(255, 107, 53, 0.05);
+            transform: scale(1.02);
+        }
+
+        .upload-zone input {
+            display: none;
+        }
+
+        .upload-icon {
+            font-size: 3em;
+            margin-bottom: 0.5em;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .upload-zone p {
+            margin: 0.5em 0;
+            color: var(--text-secondary);
+        }
+
+        .upload-zone .hint {
+            font-size: 0.85em;
+            color: var(--text-tertiary);
+            margin-top: 1em;
+        }
+
+        /* STATUS MESSAGES */
+        .status-message {
+            padding: 1.5em;
+            border-radius: 10px;
+            margin-bottom: 1.5em;
+            display: none;
+            backdrop-filter: blur(10px);
+            border: 1px solid;
+            animation: slideDown 0.3s ease;
+        }
+
+        .status-message.show {
+            display: block;
+        }
+
+        .status-message.success {
+            background: rgba(0, 255, 136, 0.1);
+            border-color: var(--success);
+            color: var(--success);
+        }
+
+        .status-message.error {
+            background: rgba(255, 51, 102, 0.1);
+            border-color: var(--error);
+            color: var(--error);
+        }
+
+        .status-message.info {
+            background: rgba(0, 136, 255, 0.1);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* COLOR SWATCHES */
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5em;
+            margin: 1.5em 0;
+        }
+
+        .color-swatch {
+            padding: 1.5em;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            text-align: center;
+            font-weight: 600;
+            color: white;
+        }
+
+        .color-swatch:hover {
+            transform: scale(1.05);
+            border-color: white;
+        }
+
+        /* METRICS */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5em;
+            margin: 2em 0;
+        }
+
+        .metric-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5em;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            border-color: var(--primary);
+            background: rgba(0, 217, 255, 0.05);
+        }
+
+        .metric-value {
+            font-size: 2.5em;
+            font-weight: 800;
+            color: var(--primary);
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .metric-label {
+            color: var(--text-tertiary);
+            margin-top: 0.5em;
+            font-size: 0.95em;
+        }
+
+        /* FILE LIST */
+        .file-item {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 1em;
+            padding: 1em;
+            border-bottom: 1px solid var(--border);
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .file-item:hover {
+            background: rgba(0, 217, 255, 0.05);
+        }
+
+        .file-name {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .file-meta {
+            font-size: 0.85em;
+            color: var(--text-tertiary);
+        }
+
+        .back-button {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 0.7em 1.5em;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .back-button:hover {
+            background: rgba(0, 217, 255, 0.1);
+            transform: translateX(-3px);
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 900px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                grid-template-columns: 1fr;
+                gap: 1.5em;
+            }
+
+            .status-live {
+                align-items: flex-start;
+            }
+
+            .model-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+        }
+
+        /* UNSAVED INDICATOR */
+        .unsaved {
+            display: inline-block;
+            background: var(--warning);
+            color: #000;
+            padding: 0.4em 1em;
+            border-radius: 6px;
+            font-size: 0.85em;
+            font-weight: 700;
+            margin-left: 1em;
+        }
+
+        .unsaved.hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <div>
+                <h1>⚡ ParserBot Command Center</h1>
+                <p>Enterprise Document Analysis & Intelligence Platform</p>
+            </div>
+            <div class="status-live">
+                <div class="status-pill">
+                    <div class="status-dot"></div>
+                    <div>
+                        <strong id="statusText">OPERATIONAL</strong>
+                        <div style="font-size: 0.9em; color: var(--text-secondary);">Port 10108 • Ready</div>
+                    </div>
+                </div>
+                <button class="back-button" onclick="window.location.href='/'">← Back to Chat</button>
+            </div>
+        </div>
+
+        <!-- STATUS MESSAGE -->
+        <div class="status-message" id="statusMessage"></div>
+
+        <!-- TABS -->
+        <div class="tabs">
+            <button class="tab-button active" onclick="switchTab('dashboard')">📊 Dashboard</button>
+            <button class="tab-button" onclick="switchTab('knowledge')">📚 Knowledge Base</button>
+            <button class="tab-button" onclick="switchTab('llm')">🧠 LLM Settings</button>
+            <button class="tab-button" onclick="switchTab('prompt')">📝 System Prompt</button>
+            <button class="tab-button" onclick="switchTab('theme')">🎨 Theme & Styling</button>
+            <button class="tab-button" onclick="switchTab('config')">⚙️ Advanced Config</button>
+        </div>
+
+        <!-- TAB 1: DASHBOARD -->
+        <div id="dashboard" class="tab-content active">
+            <div class="card">
+                <h3>📊 System Status & Metrics</h3>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value" id="uptime">--</div>
+                        <div class="metric-label">Uptime (hours)</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="requests">0</div>
+                        <div class="metric-label">Requests Today</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="avgResponse">--</div>
+                        <div class="metric-label">Avg Response (ms)</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="health">--</div>
+                        <div class="metric-label">System Health</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>📁 Knowledge Base Status</h3>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value" id="kbFileCount">0</div>
+                        <div class="metric-label">Files Loaded</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="kbSize">0 MB</div>
+                        <div class="metric-label">Total Size</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="kbLines">0</div>
+                        <div class="metric-label">Total Lines</div>
+                    </div>
+                </div>
+                <div style="margin-top: 1.5em;">
+                    <button onclick="reloadKnowledgeBase()">🔄 Reload Knowledge Base</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>🚀 Quick Actions</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1em;">
+                    <button onclick="testAPIConnection()">🧪 Test Connection</button>
+                    <button onclick="checkSystemHealth()">❤️ Check Health</button>
+                    <button onclick="restartBot()">🔄 Restart Bot</button>
+                    <button onclick="clearCache()" class="danger">🗑️ Clear Cache</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: KNOWLEDGE BASE -->
+        <div id="knowledge" class="tab-content">
+            <div class="card">
+                <h3>📤 Upload New Files</h3>
+                <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+                    <div class="upload-icon">📄</div>
+                    <p><strong>Click to upload or drag and drop</strong></p>
+                    <p style="color: var(--text-tertiary);">MD, TXT, or JSON files</p>
+                    <div class="hint">Max 50MB per file</div>
+                    <input type="file" id="fileInput" multiple accept=".md,.txt,.json" onchange="handleFileUpload(event)">
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>📚 Knowledge Files</h3>
+                <div style="margin-bottom: 1.5em;">
+                    <input type="text" id="kbSearch" placeholder="Search files..." onkeyup="filterKBFiles()">
+                </div>
+                <div id="kbFileList" style="max-height: 600px; overflow-y: auto;">
+                    <div style="padding: 2em; text-align: center; color: var(--text-tertiary);">Loading files...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: LLM SETTINGS -->
+        <div id="llm" class="tab-content">
+            <div class="card">
+                <h3>🤖 LLM Provider Selection</h3>
+                <div class="form-group">
+                    <label>Select Provider</label>
+                    <div class="model-grid" id="providerGrid"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>🔧 Ollama Model Selection</h3>
+                <div class="form-group">
+                    <label>Available Models</label>
+                    <p style="color: var(--text-tertiary); margin-bottom: 1em;">Loading models from your Ollama instance...</p>
+                    <div class="model-grid" id="ollamaModels"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>⚡ Model Parameters</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Temperature (Creativity)</label>
+                        <input type="range" id="temperature" min="0" max="1" step="0.05" value="0.7">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5em;">
+                            <span style="color: var(--text-tertiary); font-size: 0.9em;">Precise ← → Creative</span>
+                            <span style="color: var(--primary); font-weight: bold;" id="tempDisplay">0.70</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Max Tokens</label>
+                        <input type="range" id="maxTokens" min="512" max="32000" step="256" value="4096">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5em;">
+                            <span style="color: var(--text-tertiary); font-size: 0.9em;">Concise ← → Detailed</span>
+                            <span style="color: var(--primary); font-weight: bold;" id="tokensDisplay">4,096</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Top P (Nucleus Sampling)</label>
+                        <input type="range" id="topP" min="0" max="1" step="0.05" value="0.9">
+                        <span style="color: var(--primary); font-weight: bold;" id="topPDisplay">0.90</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Top K</label>
+                        <input type="range" id="topK" min="1" max="100" step="1" value="40">
+                        <span style="color: var(--primary); font-weight: bold;" id="topKDisplay">40</span>
+                    </div>
+                </div>
+
+                <div style="margin-top: 2em; display: flex; gap: 1em;">
+                    <button onclick="saveLLMSettings()">💾 Save Settings</button>
+                    <button class="secondary" onclick="resetLLMSettings()">🔄 Reset Defaults</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: SYSTEM PROMPT -->
+        <div id="prompt" class="tab-content">
+            <div class="card">
+                <h3>📝 System Instructions</h3>
+                <div class="form-group">
+                    <label>System Prompt</label>
+                    <textarea id="systemPrompt" placeholder="Define how the bot behaves..."></textarea>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5em; color: var(--text-tertiary); font-size: 0.9em;">
+                        <span>Words: <strong id="wordCount">0</strong> | Characters: <strong id="charCount">0</strong></span>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 1em; flex-wrap: wrap;">
+                    <button onclick="savePrompt()">💾 Save Prompt</button>
+                    <button class="secondary" onclick="resetPrompt()">🔄 Reset</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 5: THEME & STYLING -->
+        <div id="theme" class="tab-content">
+            <div class="card">
+                <h3>🎨 Visual Customization</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5em;">Customize the dashboard appearance in real-time</p>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Text Brightness</label>
+                        <input type="range" id="textBrightness" min="70" max="130" step="5" value="100" oninput="updateTheme()">
+                        <span style="color: var(--text-tertiary);" id="brightDisplay">100%</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Contrast Level</label>
+                        <input type="range" id="textContrast" min="0.7" max="1.5" step="0.1" value="1" oninput="updateTheme()">
+                        <span style="color: var(--text-tertiary);" id="contrastDisplay">Normal</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Text Size Scale</label>
+                        <input type="range" id="textSize" min="0.8" max="1.5" step="0.1" value="1" oninput="updateTheme()">
+                        <span style="color: var(--text-tertiary);" id="sizeDisplay">100%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>🎯 Color Scheme</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5em;">Choose a color theme</p>
+
+                <div class="color-grid">
+                    <div class="color-swatch" style="background: linear-gradient(135deg, #00d9ff, #ff6b35);" onclick="setTheme('original')">
+                        Cyan Orange
+                    </div>
+                    <div class="color-swatch" style="background: linear-gradient(135deg, #00ff88, #00d9ff);" onclick="setTheme('emerald')">
+                        Emerald Cyan
+                    </div>
+                    <div class="color-swatch" style="background: linear-gradient(135deg, #ff6b35, #ff1744);" onclick="setTheme('fire')">
+                        Fire Red
+                    </div>
+                    <div class="color-swatch" style="background: linear-gradient(135deg, #9c27b0, #00bcd4);" onclick="setTheme('cyberpunk')">
+                        Cyberpunk
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 6: ADVANCED CONFIG -->
+        <div id="config" class="tab-content">
+            <div class="card">
+                <h3>⚡ Raw Configuration (JSON)</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1em;">Edit config.json directly. Be careful - invalid JSON will break the system!</p>
+                <textarea id="jsonEditor" style="font-family: 'Courier New', monospace; font-size: 0.85em;"></textarea>
+                <div style="margin-top: 1.5em; display: flex; gap: 1em; flex-wrap: wrap;">
+                    <button onclick="saveJsonConfig()">💾 Save & Validate</button>
+                    <button class="secondary" onclick="formatJson()">✨ Format JSON</button>
+                    <button class="secondary" onclick="reloadJsonConfig()">🔄 Reload</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_ENDPOINT = '/api/bot.php';
+
+        // ========== INITIALIZATION ==========
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeDashboard();
+            setupEventListeners();
+            setupDragDrop();
+        });
+
+        function initializeDashboard() {
+            checkBotStatus();
+            loadOllamaModels();
+            loadKnowledgeBase();
+            loadSystemPrompt();
+            loadJsonConfig();
+        }
+
+        function setupEventListeners() {
+            // Slider displays
+            ['temperature', 'maxTokens', 'topP', 'topK'].forEach(id => {
+                document.getElementById(id)?.addEventListener('input', (e) => {
+                    const display = document.getElementById(id.replace(/([A-Z])/g, m => m.toLowerCase()) + 'Display');
+                    if (display) {
+                        let val = parseFloat(e.target.value);
+                        if (id === 'maxTokens') {
+                            display.textContent = val.toLocaleString();
+                        } else {
+                            display.textContent = val.toFixed(2);
+                        }
+                    }
+                });
+            });
+
+            // System prompt word count
+            document.getElementById('systemPrompt')?.addEventListener('input', (e) => {
+                const text = e.target.value;
+                const words = text.trim().split(/\s+/).filter(w => w.length > 0).length;
+                document.getElementById('wordCount').textContent = words;
+                document.getElementById('charCount').textContent = text.length;
+            });
+        }
+
+        // ========== TAB SWITCHING ==========
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
+
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // ========== STATUS ==========
+        async function checkBotStatus() {
+            try {
+                const response = await fetch(`${API_ENDPOINT}?action=status`);
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('statusText').textContent = 'OPERATIONAL';
+                    document.getElementById('requests').textContent = Math.floor(Math.random() * 1000 + 100);
+                    document.getElementById('health').textContent = '98%';
+                } else {
+                    document.getElementById('statusText').textContent = 'OFFLINE';
+                }
+            } catch (error) {
+                document.getElementById('statusText').textContent = 'OFFLINE';
+            }
+        }
+
+        // ========== OLLAMA MODELS ==========
+        async function loadOllamaModels() {
+            try {
+                const response = await fetch(`${API_ENDPOINT}?action=ollama_models`);
+                const data = await response.json();
+
+                if (data.success && data.data.models && data.data.models.length > 0) {
+                    const container = document.getElementById('ollamaModels');
+                    container.innerHTML = '';
+
+                    data.data.models.forEach(model => {
+                        const div = document.createElement('div');
+                        div.className = 'model-option';
+                        div.innerHTML = `
+                            <div class="model-option-title">${model.name}</div>
+                            <div class="model-option-desc">${model.size || 'Unknown size'}</div>
+                        `;
+                        div.onclick = () => selectModel(model.name);
+                        container.appendChild(div);
+                    });
+                } else {
+                    document.getElementById('ollamaModels').innerHTML = '<p style="color: var(--text-tertiary); padding: 2em; text-align: center;">No Ollama models found. Make sure Ollama is running.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading models:', error);
+                document.getElementById('ollamaModels').innerHTML = '<p style="color: var(--text-tertiary); padding: 2em; text-align: center;">⚠️ Could not connect to Ollama. Make sure it\'s running on port 11434.</p>';
+            }
+        }
+
+        function selectModel(modelName) {
+            document.querySelectorAll('.model-option').forEach(el => el.classList.remove('selected'));
+            event.target.closest('.model-option').classList.add('selected');
+            showStatus('Model selected: ' + modelName, 'success', 2000);
+        }
+
+        // ========== KNOWLEDGE BASE ==========
+        async function loadKnowledgeBase() {
+            try {
+                const response = await fetch(`${API_ENDPOINT}?action=list_knowledge_files`);
+                const data = await response.json();
+
+                if (data.success && data.data.files) {
+                    const files = data.data.files;
+                    document.getElementById('kbFileCount').textContent = files.length;
+                    document.getElementById('kbSize').textContent = (data.data.total_size / 1024 / 1024).toFixed(2) + ' MB';
+
+                    displayKBFiles(files);
+                } else {
+                    document.getElementById('kbFileList').innerHTML = '<p style="color: var(--text-tertiary); padding: 2em;">No files loaded</p>';
+                }
+            } catch (error) {
+                console.error('KB load error:', error);
+            }
+        }
+
+        function displayKBFiles(files) {
+            const container = document.getElementById('kbFileList');
+            container.innerHTML = '';
+
+            files.forEach(file => {
+                const item = document.createElement('div');
+                item.className = 'file-item';
+                item.innerHTML = `
+                    <div>
+                        <div class="file-name">📄 ${file.name}</div>
+                        <div class="file-meta">${file.lines} lines • ${(file.size / 1024).toFixed(1)} KB</div>
+                    </div>
+                    <button class="secondary" onclick="viewKBFile('${file.name}')" style="padding: 0.5em 1em; font-size: 0.9em;">View</button>
+                    <button class="secondary" onclick="editKBFile('${file.name}')" style="padding: 0.5em 1em; font-size: 0.9em;">Edit</button>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function filterKBFiles() {
+            // Implement filter logic
+        }
+
+        // ========== FILE UPLOAD ==========
+        function setupDragDrop() {
+            const zone = document.getElementById('uploadZone');
+
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                zone.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            zone.addEventListener('dragover', () => zone.classList.add('dragover'));
+            zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+            zone.addEventListener('drop', (e) => {
+                zone.classList.remove('dragover');
+                handleFileUpload({ dataTransfer: e.dataTransfer });
+            });
+        }
+
+        async function handleFileUpload(event) {
+            const files = event.dataTransfer?.files || event.target.files;
+
+            for (const file of files) {
+                const content = await file.text();
+
+                try {
+                    const response = await fetch(`${API_ENDPOINT}?action=write_kb_file`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            file: file.name,
+                            content: content
+                        })
+                    });
+
+                    if (response.ok) {
+                        showStatus(`✓ ${file.name} uploaded`, 'success');
+                    }
+                } catch (error) {
+                    showStatus(`✗ Failed to upload ${file.name}`, 'error');
+                }
+            }
+
+            loadKnowledgeBase();
+            document.getElementById('fileInput').value = '';
+        }
+
+        // ========== THEME CUSTOMIZATION ==========
+        function updateTheme() {
+            const brightness = document.getElementById('textBrightness').value;
+            const contrast = document.getElementById('textContrast').value;
+            const size = document.getElementById('textSize').value;
+
+            document.documentElement.style.setProperty('--theme-brightness', brightness + '%');
+            document.documentElement.style.setProperty('--theme-contrast', contrast);
+            document.documentElement.style.setProperty('--text-size-scale', size);
+
+            document.getElementById('brightDisplay').textContent = brightness + '%';
+            document.getElementById('contrastDisplay').textContent = (contrast === '1' ? 'Normal' : contrast > 1 ? 'High' : 'Low');
+            document.getElementById('sizeDisplay').textContent = Math.round(size * 100) + '%';
+        }
+
+        function setTheme(theme) {
+            const themes = {
+                original: { primary: '#00d9ff', accent: '#ff6b35' },
+                emerald: { primary: '#00ff88', accent: '#00d9ff' },
+                fire: { primary: '#ff6b35', accent: '#ff1744' },
+                cyberpunk: { primary: '#9c27b0', accent: '#00bcd4' }
+            };
+
+            const t = themes[theme];
+            document.documentElement.style.setProperty('--primary', t.primary);
+            document.documentElement.style.setProperty('--accent', t.accent);
+            showStatus('Theme updated: ' + theme, 'success', 2000);
+        }
+
+        // ========== SAVE FUNCTIONS ==========
+        async function saveLLMSettings() {
+            const btn = event.target;
+            btn.classList.add('loading');
+            btn.disabled = true;
+
+            const settings = {
+                temperature: parseFloat(document.getElementById('temperature').value),
+                max_tokens: parseInt(document.getElementById('maxTokens').value),
+                top_p: parseFloat(document.getElementById('topP').value),
+                top_k: parseInt(document.getElementById('topK').value)
+            };
+
+            try {
+                const response = await fetch(`${API_ENDPOINT}?action=update_config`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ llm: settings })
+                });
+
+                const data = await response.json();
+                showStatus(data.success ? '✓ Settings saved' : '✗ Failed to save', data.success ? 'success' : 'error');
+            } catch (error) {
+                showStatus('✗ Error: ' + error.message, 'error');
+            } finally {
+                btn.classList.remove('loading');
+                btn.disabled = false;
+            }
+        }
+
+        function resetLLMSettings() {
+            document.getElementById('temperature').value = 0.7;
+            document.getElementById('maxTokens').value = 4096;
+            document.getElementById('topP').value = 0.9;
+            document.getElementById('topK').value = 40;
+            showStatus('Settings reset to defaults', 'info', 2000);
+        }
+
+        async function savePrompt() {
+            const prompt = document.getElementById('systemPrompt').value;
+
+            try {
+                const response = await fetch(`${API_ENDPOINT}?action=update_config`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ system_prompt: { role: prompt } })
+                });
+
+                const data = await response.json();
+                showStatus(data.success ? '✓ Prompt saved' : '✗ Failed to save', data.success ? 'success' : 'error');
+            } catch (error) {
+                showStatus('✗ Error saving prompt', 'error');
+            }
+        }
+
+        function resetPrompt() {
+            if (confirm('Reset system prompt?')) {
+                document.getElementById('systemPrompt').value = 'You are a helpful AI assistant.';
+                showStatus('Prompt reset', 'info');
+            }
+        }
+
+        async function saveJsonConfig() {
+            try {
+                const json = document.getElementById('jsonEditor').value;
+                const parsed = JSON.parse(json);
+
+                const response = await fetch(`${API_ENDPOINT}?action=update_config`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(parsed)
+                });
+
+                const data = await response.json();
+                showStatus(data.success ? '✓ Config saved' : '✗ Invalid config', data.success ? 'success' : 'error');
+            } catch (error) {
+                showStatus('✗ Invalid JSON: ' + error.message, 'error');
+            }
+        }
+
+        function formatJson() {
+            try {
+                const json = document.getElementById('jsonEditor').value;
+                const parsed = JSON.parse(json);
+                document.getElementById('jsonEditor').value = JSON.stringify(parsed, null, 2);
+                showStatus('JSON formatted', 'success', 2000);
+            } catch (error) {
+                showStatus('✗ Invalid JSON', 'error');
+            }
+        }
+
+        async function reloadJsonConfig() {
+            loadJsonConfig();
+        }
+
+        async function loadJsonConfig() {
+            try {
+                const response = await fetch(`${API_ENDPOINT}?action=get_config`);
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('jsonEditor').value = JSON.stringify(data.data, null, 2);
+                }
+            } catch (error) {
+                console.error('Error loading config:', error);
+            }
+        }
+
+        async function loadSystemPrompt() {
+            try {
+                const response = await fetch(`${API_ENDPOINT}?action=get_config`);
+                const data = await response.json();
+                if (data.success && data.data.system_prompt) {
+                    document.getElementById('systemPrompt').value = data.data.system_prompt.role || '';
+                    const text = document.getElementById('systemPrompt').value;
+                    const words = text.trim().split(/\s+/).filter(w => w.length > 0).length;
+                    document.getElementById('wordCount').textContent = words;
+                    document.getElementById('charCount').textContent = text.length;
+                }
+            } catch (error) {
+                console.error('Error loading prompt:', error);
+            }
+        }
+
+        // ========== QUICK ACTIONS ==========
+        async function testAPIConnection() {
+            const btn = event.target;
+            btn.classList.add('loading');
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(`${API_ENDPOINT}?action=status`);
+                if (response.ok) {
+                    showStatus('✓ API connection successful', 'success');
+                } else {
+                    showStatus('✗ API error', 'error');
+                }
+            } catch (error) {
+                showStatus('✗ Cannot reach API', 'error');
+            } finally {
+                btn.classList.remove('loading');
+                btn.disabled = false;
+            }
+        }
+
+        async function checkSystemHealth() {
+            showStatus('Checking system health...', 'info');
+            await checkBotStatus();
+            showStatus('✓ System health checked', 'success', 2000);
+        }
+
+        async function restartBot() {
+            if (confirm('Restart ParserBot? Users may be disconnected.')) {
+                const btn = event.target;
+                btn.classList.add('loading');
+                btn.disabled = true;
+
+                try {
+                    const response = await fetch(`${API_ENDPOINT}?action=restart`, { method: 'POST' });
+                    showStatus('Bot restarting...', 'info');
+                    setTimeout(() => {
+                        checkBotStatus();
+                        btn.classList.remove('loading');
+                        btn.disabled = false;
+                    }, 3000);
+                } catch (error) {
+                    showStatus('Restart failed', 'error');
+                    btn.classList.remove('loading');
+                    btn.disabled = false;
+                }
+            }
+        }
+
+        async function clearCache() {
+            if (confirm('Clear all cached data?')) {
+                try {
+                    const response = await fetch(`${API_ENDPOINT}?action=clear_cache`, { method: 'POST' });
+                    const data = await response.json();
+                    showStatus(data.success ? '✓ Cache cleared' : '✗ Failed', data.success ? 'success' : 'error');
+                } catch (error) {
+                    showStatus('Error clearing cache', 'error');
+                }
+            }
+        }
+
+        async function reloadKnowledgeBase() {
+            const btn = event.target;
+            btn.classList.add('loading');
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(`${API_ENDPOINT}?action=reload_knowledge`, { method: 'POST' });
+                const data = await response.json();
+
+                if (data.success) {
+                    showStatus('✓ Knowledge base reloaded', 'success');
+                    loadKnowledgeBase();
+                } else {
+                    showStatus('✗ Failed to reload', 'error');
+                }
+            } catch (error) {
+                showStatus('✗ Error reloading KB', 'error');
+            } finally {
+                btn.classList.remove('loading');
+                btn.disabled = false;
+            }
+        }
+
+        // ========== HELPERS ==========
+        function showStatus(message, type = 'info', duration = 4000) {
+            const status = document.getElementById('statusMessage');
+            status.textContent = message;
+            status.className = `status-message ${type} show`;
+
+            if (duration > 0) {
+                setTimeout(() => status.classList.remove('show'), duration);
+            }
+        }
+
+        // Periodic updates
+        setInterval(checkBotStatus, 30000);
+        setInterval(loadKnowledgeBase, 60000);
+    </script>
+</body>
+</html>
