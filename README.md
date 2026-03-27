@@ -387,6 +387,7 @@ Then restart: `bash restart.sh`
 ## Credits
 
 Original V3AM FOB project by the V3AM Team.  
+https://github.com/proxstransfer-lab/v3am-fob
 Termux port converted by Perplexity Computer.
 
 ---
