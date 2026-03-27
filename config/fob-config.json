@@ -12,7 +12,7 @@
   "llm": {
     "provider": "llamacpp",
     "llamacpp": {
-      "endpoint": "http://127.0.0.1:8080/completion",
+      "endpoint": "http://127.0.0.1:8084/completion",
       "model": "default",
       "temperature": 0.7,
       "max_tokens": 4096

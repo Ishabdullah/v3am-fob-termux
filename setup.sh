@@ -159,9 +159,7 @@ mkdir -p \
   "${FOB_ROOT}/config" \
   "${FOB_ROOT}/models" \
   "${FOB_ROOT}/run" \
-  "${FOB_ROOT}/logs" \
-  "${FOB_ROOT}/adir/new211adir/TANDR-2026-02-11/adirhub/TOOLS" \
-  "${FOB_ROOT}/adir/new211adir/TANDR-2026-02-11/apps"
+  "${FOB_ROOT}/logs"
 
 # Link the v3am-fob-termux project into FOB_ROOT
 # The launcher expects things under $HOME/fob/
@@ -172,13 +170,16 @@ if [ -f "${SCRIPT_DIR}/lib/launcher.js" ]; then
   ln -sf "${SCRIPT_DIR}/dashboard" "${FOB_ROOT}/dashboard"
   ln -sf "${SCRIPT_DIR}/package.json" "${FOB_ROOT}/package.json"
   ln -sf "${SCRIPT_DIR}/fob-server.js" "${FOB_ROOT}/fob-server.js"
-  
+
   # Service directories — link adir and apps into the path the launcher expects
   # Launcher expects: ${HOME}/fob/adir/new211adir/TANDR-2026-02-11/{adirhub,apps}
   SROOT="${FOB_ROOT}/adir/new211adir/TANDR-2026-02-11"
   mkdir -p "${SROOT}"
-  ln -sf "${SCRIPT_DIR}/adir/new211adir/TANDR-2026-02-11/adirhub" "${SROOT}/adirhub" 2>/dev/null || true
-  ln -sf "${SCRIPT_DIR}/apps" "${SROOT}/apps" 2>/dev/null || true
+  # Remove any existing directories/symlinks first to avoid nested symlinks
+  rm -rf "${SROOT}/adirhub" 2>/dev/null || true
+  rm -rf "${SROOT}/apps" 2>/dev/null || true
+  ln -sf "${SCRIPT_DIR}/adir/new211adir/TANDR-2026-02-11/adirhub" "${SROOT}/adirhub"
+  ln -sf "${SCRIPT_DIR}/apps" "${SROOT}/apps"
   ok "Project symlinked into ${FOB_ROOT}"
 fi
 

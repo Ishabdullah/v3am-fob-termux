@@ -1,6 +1,7 @@
 {
   "app": {
     "name": "TANDRmgr-lab",
+    "port": 8086,
     "version": "1.0.0",
     "description": "TANDR Manager Lab - Voice-Enabled Orchestrator",
     "environment": "production"
@@ -38,7 +39,7 @@
       "endpoint": "https://adir.ngrok.app/api/generate"
     },
     "llamacpp": {
-      "endpoint": "http://127.0.0.1:8080/completion",
+      "endpoint": "http://127.0.0.1:8084/completion",
       "model": "default",
       "max_tokens": 4096,
       "temperature": 0.7

@@ -96,7 +96,7 @@ if $START_LLAMA; then
       nohup "${LLAMACPP_BIN}" \
         --model "${MODEL_FILE}" \
         --host 127.0.0.1 \
-        --port 8080 \
+        --port 8084 \
         --ctx-size 4096 \
         --threads $(nproc) \
         --n-gpu-layers 0 \
@@ -110,7 +110,7 @@ if $START_LLAMA; then
       log "Waiting for llama.cpp to load model (may take 30-60s)..."
       for i in $(seq 1 30); do
         sleep 2
-        if curl -s "http://127.0.0.1:8080/health" 2>/dev/null | grep -q "ok\|loading"; then
+        if curl -s "http://127.0.0.1:8084/health" 2>/dev/null | grep -q "ok\|loading"; then
           ok "llama.cpp ready"
           break
         fi
@@ -174,7 +174,7 @@ echo "  ║   V3AM FOB is running!                               ║"
 echo "  ╠══════════════════════════════════════════════════════╣"
 echo "  ║   Dashboard:  http://127.0.0.1:9399/                 ║"
 echo "  ║   API:        http://127.0.0.1:9399/status           ║"
-echo "  ║   llama.cpp:  http://127.0.0.1:8080/health           ║"
+echo "  ║   llama.cpp:  http://127.0.0.1:8084/health           ║"
 echo "  ╠══════════════════════════════════════════════════════╣"
 echo "  ║   Services:                                          ║"
 
