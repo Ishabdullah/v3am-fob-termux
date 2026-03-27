@@ -1164,8 +1164,7 @@
                                 <select id="default-provider" onchange="loadDefaultModelOptions()" style="width: 100%; padding: 8px 12px; background: var(--bg-input); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 13px;">
                                     <option value="anthropic">Anthropic (Claude)</option>
                                     <option value="gemini">Google Gemini</option>
-                                    <option value="ollama">Ollama (Local)</option>
-                                    <option value="ollama_external">Ollama (External - adir.ngrok.app)</option>
+                                    <option value="llamacpp">llama.cpp (Local)</option>
                                 </select>
                             </div>
                             <div class="form-group" style="margin-top: 12px;">
@@ -1193,8 +1192,7 @@
                                 <select id="escalate-provider" onchange="loadEscalateModelOptions()" style="width: 100%; padding: 8px 12px; background: var(--bg-input); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 13px;">
                                     <option value="anthropic">Anthropic (Claude)</option>
                                     <option value="gemini">Google Gemini</option>
-                                    <option value="ollama">Ollama (Local)</option>
-                                    <option value="ollama_external">Ollama (External)</option>
+                                    <option value="llamacpp">llama.cpp (Local)</option>
                                 </select>
                             </div>
                             <div class="form-group" style="margin-top: 12px;">
@@ -1212,19 +1210,19 @@
                     </div>
                 </div>
 
-                <!-- External Ollama Endpoint (hidden by default) -->
+                <!-- llama.cpp Endpoint Config (shown when llamacpp selected) -->
                 <div id="external-ollama-config" style="display: none; margin-bottom: 30px;">
                     <div class="service-card">
                         <div class="service-card-header" style="flex-direction: column; align-items: flex-start;">
-                            <h3 style="color: var(--accent); margin-bottom: 16px; font-size: 14px;">🌐 External Ollama Endpoint</h3>
+                            <h3 style="color: var(--accent); margin-bottom: 16px; font-size: 14px;">🖥️ llama.cpp Endpoint</h3>
                         </div>
                         <div style="padding: 0 16px 16px;">
                             <div class="form-group">
                                 <label style="color: var(--text-dim); font-size: 11px; font-weight: 600; text-transform: uppercase;">Endpoint URL</label>
-                                <input type="text" id="external-ollama-endpoint" placeholder="https://adir.ngrok.app" style="width: 100%; padding: 8px 12px; background: var(--bg-input); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 13px;">
-                                <small style="color: var(--text-muted); font-size: 11px; margin-top: 4px; display: block;">Base URL of external Ollama (without /api/...)</small>
+                                <input type="text" id="external-ollama-endpoint" placeholder="http://127.0.0.1:8084" style="width: 100%; padding: 8px 12px; background: var(--bg-input); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 13px;">
+                                <small style="color: var(--text-muted); font-size: 11px; margin-top: 4px; display: block;">llama.cpp server base URL (default: http://127.0.0.1:8084)</small>
                             </div>
-                            <button class="svc-action-btn" onclick="saveExternalEndpoint()" style="width: 100%; margin-top: 8px;">Save Endpoint</button>
+                            <button class="svc-action-btn" onclick="saveLlamaCppEndpoint()" style="width: 100%; margin-top: 8px;">Save Endpoint</button>
                         </div>
                     </div>
                 </div>
@@ -1390,8 +1388,9 @@
                 { value: 'gemini-2.5', label: 'Gemini 2.5' },
                 { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash' }
             ],
-            ollama: [],
-            ollama_external: []
+            llamacpp: [
+                { value: 'default', label: 'Default (loaded model)' }
+            ]
         };
 
         // ===== INIT =====
@@ -1985,11 +1984,13 @@
                 if (!json.success) return;
 
                 const d = json.data;
-                document.getElementById('default-provider').value = d.default.provider || 'anthropic';
+                document.getElementById('default-provider').value = d.default.provider || 'llamacpp';
                 document.getElementById('default-model').value = d.default.model || '';
-                document.getElementById('escalate-provider').value = d.escalate.provider || 'anthropic';
+                document.getElementById('escalate-provider').value = d.escalate.provider || 'llamacpp';
                 document.getElementById('escalate-model').value = d.escalate.model || '';
-                document.getElementById('external-ollama-endpoint').value = d.external_endpoint || 'https://adir.ngrok.app';
+                if (d.llamacpp_endpoint) {
+                    document.getElementById('external-ollama-endpoint').value = d.llamacpp_endpoint;
+                }
 
                 loadDefaultModelOptions();
                 loadEscalateModelOptions();
@@ -2001,18 +2002,14 @@
             const select = document.getElementById('default-model');
             const current = select.value;
 
-            // Show/hide external endpoint config
+            // Show llama.cpp endpoint config when llamacpp is selected
             document.getElementById('external-ollama-config').style.display =
-                provider === 'ollama_external' ? 'block' : 'none';
+                provider === 'llamacpp' ? 'block' : 'none';
 
-            if (provider === 'ollama_external') {
-                await loadExternalOllamaModels('default-model', current);
-            } else {
-                const models = MODEL_OPTIONS[provider] || [];
-                select.innerHTML = models.map(m => `<option value="${m.value}">${m.label}</option>`).join('');
-                select.value = current;
-                if (!select.value && models.length > 0) select.value = models[0].value;
-            }
+            const models = MODEL_OPTIONS[provider] || [];
+            select.innerHTML = models.map(m => `<option value="${m.value}">${m.label}</option>`).join('');
+            select.value = current;
+            if (!select.value && models.length > 0) select.value = models[0].value;
         }
 
         async function loadEscalateModelOptions() {
@@ -2020,18 +2017,14 @@
             const select = document.getElementById('escalate-model');
             const current = select.value;
 
-            // Show/hide external endpoint config
+            // Show llama.cpp endpoint config when llamacpp is selected
             document.getElementById('external-ollama-config').style.display =
-                provider === 'ollama_external' ? 'block' : 'none';
+                provider === 'llamacpp' ? 'block' : 'none';
 
-            if (provider === 'ollama_external') {
-                await loadExternalOllamaModels('escalate-model', current);
-            } else {
-                const models = MODEL_OPTIONS[provider] || [];
-                select.innerHTML = models.map(m => `<option value="${m.value}">${m.label}</option>`).join('');
-                select.value = current;
-                if (!select.value && models.length > 0) select.value = models[0].value;
-            }
+            const models = MODEL_OPTIONS[provider] || [];
+            select.innerHTML = models.map(m => `<option value="${m.value}">${m.label}</option>`).join('');
+            select.value = current;
+            if (!select.value && models.length > 0) select.value = models[0].value;
         }
 
         async function loadExternalOllamaModels(selectId, current) {
@@ -2092,7 +2085,7 @@
             }
         }
 
-        async function saveExternalEndpoint() {
+        async function saveLlamaCppEndpoint() {
             const endpoint = document.getElementById('external-ollama-endpoint').value.trim();
             if (!endpoint) {
                 showToast('Enter an endpoint URL');
@@ -2100,7 +2093,7 @@
             }
 
             try {
-                const res = await fetch(API_BASE + '?action=set_external_endpoint', {
+                const res = await fetch(API_BASE + '?action=set_llamacpp_endpoint', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ endpoint: endpoint })
@@ -2108,20 +2101,7 @@
 
                 const json = await res.json();
                 if (json.success) {
-                    // Update display with cleaned endpoint
-                    document.getElementById('external-ollama-endpoint').value = json.endpoint || endpoint;
-                    showToast('✅ Endpoint saved');
-
-                    // Reload models from new endpoint
-                    const defaultProvider = document.getElementById('default-provider').value;
-                    const escalateProvider = document.getElementById('escalate-provider').value;
-
-                    if (defaultProvider === 'ollama_external') {
-                        await loadExternalOllamaModels('default-model', '');
-                    }
-                    if (escalateProvider === 'ollama_external') {
-                        await loadExternalOllamaModels('escalate-model', '');
-                    }
+                    showToast('✅ llama.cpp endpoint saved');
                 } else {
                     showToast('❌ ' + (json.error || 'Failed to save'));
                 }
@@ -2191,11 +2171,6 @@
             try {
                 let payload = { provider, model, type: 'default' };
 
-                // If external Ollama, pass endpoint too
-                if (provider === 'ollama_external') {
-                    payload.endpoint = document.getElementById('external-ollama-endpoint').value;
-                }
-
                 console.log('testDefaultModel: Testing', provider, model, 'payload:', payload);
                 const res = await fetch(API_BASE + '?action=test_model', {
                     method: 'POST',
@@ -2244,11 +2219,6 @@
 
             try {
                 let payload = { provider, model, type: 'escalate' };
-
-                // If external Ollama, pass endpoint too
-                if (provider === 'ollama_external') {
-                    payload.endpoint = document.getElementById('external-ollama-endpoint').value;
-                }
 
                 console.log('testEscalateModel: Testing', provider, model, 'payload:', payload);
                 const res = await fetch(API_BASE + '?action=test_model', {

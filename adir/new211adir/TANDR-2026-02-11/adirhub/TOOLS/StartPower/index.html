@@ -561,8 +561,7 @@
                     <div class="form-group">
                         <label>Active Provider</label>
                         <select id="setting-provider" onchange="showProviderSettings()">
-                            <option value="local">Local (Ollama)</option>
-                            <option value="external">External (Ollama via ngrok)</option>
+                            <option value="llamacpp">Local (llama.cpp)</option>
                             <option value="gemini">Google Gemini</option>
                             <option value="anthropic">Anthropic Claude</option>
                             <option value="openai">OpenAI</option>
@@ -572,37 +571,17 @@
                     <span id="provider-status" style="color: var(--text-secondary);"></span>
                 </div>
 
-                <!-- Local Ollama Settings -->
-                <div class="card provider-settings" id="settings-local" style="margin-bottom: 20px;">
-                    <h4 style="margin-bottom: 15px;">🖥️ Local Ollama Settings</h4>
+                <!-- llama.cpp Local Settings -->
+                <div class="card provider-settings" id="settings-llamacpp" style="margin-bottom: 20px;">
+                    <h4 style="margin-bottom: 15px;">🖥️ llama.cpp (Local) Settings</h4>
                     <div class="form-group">
                         <label>Endpoint</label>
-                        <input type="text" id="local-endpoint" placeholder="http://127.0.0.1:11434/api/generate">
+                        <input type="text" id="local-endpoint" placeholder="http://127.0.0.1:8084">
                     </div>
                     <div class="form-group">
-                        <label>Model</label>
-                        <select id="local-model">
-                            <option value="">Loading models...</option>
-                        </select>
-                        <small style="color: var(--text-secondary);">Models from Ollama (localhost:11434)</small>
-                        <button class="btn btn-secondary" onclick="refreshOllamaModels()" style="margin-top: 5px; padding: 4px 12px; font-size: 12px;">Refresh Models</button>
-                    </div>
-                </div>
-
-                <!-- External Ollama Settings -->
-                <div class="card provider-settings" id="settings-external" style="margin-bottom: 20px; display: none;">
-                    <h4 style="margin-bottom: 15px;">🌐 External Ollama Settings (via ngrok)</h4>
-                    <div class="form-group">
-                        <label>Endpoint</label>
-                        <input type="text" id="external-endpoint" placeholder="https://adir.ngrok.app/api/generate" value="https://adir.ngrok.app/api/generate">
-                    </div>
-                    <div class="form-group">
-                        <label>Model</label>
-                        <select id="external-model">
-                            <option value="">Click Refresh to load models</option>
-                        </select>
-                        <small style="color: var(--text-secondary);">Models from external Ollama</small>
-                        <button class="btn btn-secondary" onclick="refreshExternalModels()" style="margin-top: 5px; padding: 4px 12px; font-size: 12px;">Refresh Models</button>
+                        <label>Model Name</label>
+                        <input type="text" id="local-model" placeholder="default">
+                        <small style="color: var(--text-secondary);">llama.cpp server (localhost:8084) — model is set at server startup</small>
                     </div>
                 </div>
 
@@ -783,12 +762,12 @@
                     config = data.config;
 
                     // Provider settings
-                    document.getElementById('setting-provider').value = config.llm?.provider || 'local';
+                    document.getElementById('setting-provider').value = config.llm?.provider || 'llamacpp';
                     showProviderSettings();
 
-                    // Local settings
-                    document.getElementById('local-endpoint').value = config.llm?.local?.endpoint || 'http://127.0.0.1:11434/api/generate';
-                    document.getElementById('local-model').value = config.llm?.local?.model || 'qwen2.5:7b';
+                    // llama.cpp settings
+                    document.getElementById('local-endpoint').value = config.llm?.llamacpp?.endpoint || 'http://127.0.0.1:8084';
+                    document.getElementById('local-model').value = config.llm?.llamacpp?.model || 'default';
 
                     // Gemini settings
                     if (config.llm?.gemini?.api_key_masked) {
@@ -821,72 +800,28 @@
                     document.getElementById('setting-prompt').value = config.agent?.system_prompt || '';
                     document.getElementById('setting-scan-dir').value = config.paths?.scan_directory || '.';
 
-                    // Load models dynamically from Ollama
-                    refreshOllamaModels();
+                    // llama.cpp — model is set at server startup, no dynamic listing needed
                 }
             } catch (e) {
                 console.error('Failed to load config:', e);
             }
         }
 
-        async function refreshOllamaModels() {
-            const select = document.getElementById('local-model');
-            select.innerHTML = '<option value="">Loading...</option>';
+        async function checkLlamaCppStatus() {
+            const statusEl = document.getElementById('provider-status');
             try {
-                const response = await fetch('http://localhost:11434/api/tags');
+                const response = await fetch('http://127.0.0.1:8084/health');
                 const data = await response.json();
-                const models = data.models || [];
-
-                if (models.length === 0) {
-                    select.innerHTML = '<option value="">No models found - run: ollama pull gemma3:1b</option>';
-                    return;
+                if (data.status === 'ok' || data.status === 'loading model') {
+                    statusEl.textContent = '✅ llama.cpp server is running';
+                    statusEl.style.color = 'var(--success)';
+                } else {
+                    statusEl.textContent = '⚠️ llama.cpp: ' + data.status;
+                    statusEl.style.color = 'var(--warning, #f59e0b)';
                 }
-
-                const currentModel = config?.llm?.local?.model || '';
-                select.innerHTML = '';
-                models.forEach(m => {
-                    const sizeGB = (m.size / (1024 * 1024 * 1024)).toFixed(1);
-                    const params = m.details?.parameter_size || '';
-                    const opt = document.createElement('option');
-                    opt.value = m.name;
-                    opt.textContent = m.name + ' (' + sizeGB + ' GB' + (params ? ', ' + params : '') + ')';
-                    if (m.name === currentModel) opt.selected = true;
-                    select.appendChild(opt);
-                });
             } catch (e) {
-                select.innerHTML = '<option value="">Ollama not running</option>';
-                console.error('Failed to load models:', e);
-            }
-        }
-
-        async function refreshExternalModels() {
-            const endpoint = document.getElementById('external-endpoint').value.replace('/api/generate', '');
-            const select = document.getElementById('external-model');
-            select.innerHTML = '<option value="">Loading...</option>';
-            try {
-                const response = await fetch(endpoint + '/api/tags');
-                const data = await response.json();
-                const models = data.models || [];
-
-                if (models.length === 0) {
-                    select.innerHTML = '<option value="">No models found on external Ollama</option>';
-                    return;
-                }
-
-                const currentModel = config?.llm?.external?.model || '';
-                select.innerHTML = '';
-                models.forEach(m => {
-                    const sizeGB = (m.size / (1024 * 1024 * 1024)).toFixed(1);
-                    const params = m.details?.parameter_size || '';
-                    const opt = document.createElement('option');
-                    opt.value = m.name;
-                    opt.textContent = m.name + ' (' + sizeGB + ' GB' + (params ? ', ' + params : '') + ')';
-                    if (m.name === currentModel) opt.selected = true;
-                    select.appendChild(opt);
-                });
-            } catch (e) {
-                select.innerHTML = '<option value="">Cannot reach external Ollama - check ngrok tunnel</option>';
-                console.error('Failed to load external models:', e);
+                statusEl.textContent = '❌ llama.cpp not running (start with start.sh)';
+                statusEl.style.color = '#ef4444';
             }
         }
 
@@ -1546,13 +1481,9 @@
             const settings = {
                 llm: {
                     provider: document.getElementById('setting-provider').value,
-                    local: {
+                    llamacpp: {
                         endpoint: document.getElementById('local-endpoint').value,
                         model: document.getElementById('local-model').value
-                    },
-                    external: {
-                        endpoint: document.getElementById('external-endpoint').value,
-                        model: document.getElementById('external-model').value
                     },
                     gemini: {
                         model: document.getElementById('gemini-model').value

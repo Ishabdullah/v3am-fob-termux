@@ -450,10 +450,8 @@
                         </div>
 
                         <div class="form-group">
-                            <label>LLM Model <span id="modelLoadStatus" style="font-size:11px; color:#888; margin-left:6px;">loading...</span></label>
-                            <select id="llmModel">
-                                <option value="gemma:2b">gemma:2b</option>
-                            </select>
+                            <label>LLM Model <span id="modelLoadStatus" style="font-size:11px; color:#888; margin-left:6px;">checking...</span></label>
+                            <input type="text" id="llmModel" value="default" placeholder="e.g. default" />
                         </div>
 
                         <div class="form-group">
@@ -618,7 +616,7 @@
             document.getElementById('botName').value = '';
             document.getElementById('botPath').value = '';
             document.getElementById('knowledgePath').value = '';
-            loadOllamaModels();
+            checkLlamaCppStatus();
         }
 
         function refreshBotDeployments() {
@@ -805,40 +803,27 @@
             voiceEngine.toggle();
         }
 
-        async function loadOllamaModels() {
-            const sel = document.getElementById('llmModel');
+        async function checkLlamaCppStatus() {
             const status = document.getElementById('modelLoadStatus');
             try {
-                const res = await fetch('http://127.0.0.1:11434/api/tags');
+                const res = await fetch('http://127.0.0.1:8084/health');
                 const data = await res.json();
-                const models = data.models || [];
-                if (models.length > 0) {
-                    const current = sel.value;
-                    sel.innerHTML = '';
-                    models.forEach(m => {
-                        const opt = document.createElement('option');
-                        opt.value = m.name;
-                        const sizeMB = Math.round((m.size || 0) / 1024 / 1024);
-                        const sizeStr = sizeMB > 1024 ? `${(sizeMB/1024).toFixed(1)}GB` : `${sizeMB}MB`;
-                        opt.textContent = `${m.name}  (${sizeStr})`;
-                        if (m.name === current) opt.selected = true;
-                        sel.appendChild(opt);
-                    });
-                    status.textContent = `${models.length} models`;
+                if (data.status === 'ok' || data.status === 'loading model') {
+                    status.textContent = '✅ llama.cpp running';
                     status.style.color = '#0f0';
                 } else {
-                    status.textContent = 'Ollama offline';
+                    status.textContent = '⚠️ ' + data.status;
                     status.style.color = '#f80';
                 }
             } catch(e) {
-                status.textContent = 'error';
+                status.textContent = '❌ llama.cpp offline';
                 status.style.color = '#f44';
             }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             switchTab(0);
-            loadOllamaModels();
+            checkLlamaCppStatus();
         });
     </script>
 </body>

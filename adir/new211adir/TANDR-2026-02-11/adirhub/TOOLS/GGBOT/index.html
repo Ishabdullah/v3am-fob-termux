@@ -820,17 +820,17 @@
             <div class="section-title">LLM Provider</div>
             <label>Active Provider</label>
             <select id="s-provider">
-                <option value="ollama">Local (Ollama)</option>
+                <option value="llamacpp">Local (llama.cpp)</option>
                 <option value="anthropic">Anthropic Claude</option>
                 <option value="gemini">Google Gemini</option>
                 <option value="openai">OpenAI</option>
             </select>
 
-            <div class="section-title">Ollama</div>
+            <div class="section-title">llama.cpp (Local)</div>
             <label>Endpoint</label>
-            <input type="text" id="s-ollama-endpoint" placeholder="http://127.0.0.1:11434/api/generate">
+            <input type="text" id="s-llamacpp-endpoint" placeholder="http://127.0.0.1:8084">
             <label>Model</label>
-            <input type="text" id="s-ollama-model" placeholder="e.g. gemma3:12b">
+            <input type="text" id="s-llamacpp-model" placeholder="e.g. default">
 
             <div class="section-title">Anthropic Claude</div>
             <label>API Key</label>
@@ -1515,9 +1515,9 @@
                 const data = await resp.json();
                 if (data.success) {
                     const c = data.config;
-                    document.getElementById('s-provider').value = c.llm?.provider || 'ollama';
-                    document.getElementById('s-ollama-endpoint').value = c.llm?.ollama?.endpoint || '';
-                    document.getElementById('s-ollama-model').value = c.llm?.ollama?.model || '';
+                    document.getElementById('s-provider').value = c.llm?.provider || 'llamacpp';
+                    document.getElementById('s-llamacpp-endpoint').value = c.llm?.llamacpp?.endpoint || '';
+                    document.getElementById('s-llamacpp-model').value = c.llm?.llamacpp?.model || '';
                     if (c.llm?.anthropic?.api_key_masked) {
                         document.getElementById('s-anthropic-key').placeholder = 'Configured: ' + c.llm.anthropic.api_key_masked;
                     }
@@ -1546,9 +1546,9 @@
             const settings = {
                 llm: {
                     provider: document.getElementById('s-provider').value,
-                    ollama: {
-                        endpoint: document.getElementById('s-ollama-endpoint').value,
-                        model: document.getElementById('s-ollama-model').value
+                    llamacpp: {
+                        endpoint: document.getElementById('s-llamacpp-endpoint').value,
+                        model: document.getElementById('s-llamacpp-model').value
                     },
                     anthropic: { model: document.getElementById('s-anthropic-model').value },
                     gemini: { model: document.getElementById('s-gemini-model').value },

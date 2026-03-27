@@ -11,7 +11,7 @@
     9229
   ],
   "paths": {
-    "knowledge_base": "C:\\FOB\\adir\\new211adir\\TANDR-2026-02-11\\adirhub\\TOOLS\\KB-Maker-v2\\data\\kb-knowledge",
+    "knowledge_base": "./data/kb-knowledge",
     "data_directory": "./data",
     "logs_directory": "./adir/logs",
     "bot_queue": "./adir/logs/bot-queue",
@@ -19,18 +19,12 @@
   },
   "llm": {
     "provider": "llamacpp",
-    "ollama": {
-      "endpoint": "http://127.0.0.1:11434/api/generate",
-      "model": "gemma:2b",
-      "temperature": 0.7,
-      "num_predict": 2048
-    },
     "anthropic": {
       "api_key": "set_your_api_key_here",
       "model": "claude-haiku-4-5-20251001"
     },
     "llamacpp": {
-      "endpoint": "http://127.0.0.1:8080/completion",
+      "endpoint": "http://127.0.0.1:8084/completion",
       "model": "default",
       "max_tokens": 4096,
       "temperature": 0.7

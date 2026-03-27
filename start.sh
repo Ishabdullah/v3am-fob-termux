@@ -104,7 +104,7 @@ if $START_LLAMA; then
 
       LLAMA_PID=$!
       echo "${LLAMA_PID}" > "${PID_DIR}/llama-server.pid"
-      ok "llama.cpp started (PID ${LLAMA_PID}) → http://127.0.0.1:8080"
+      ok "llama.cpp started (PID ${LLAMA_PID}) → http://127.0.0.1:8084"
 
       # Wait for llama.cpp to be ready
       log "Waiting for llama.cpp to load model (may take 30-60s)..."

@@ -7,7 +7,7 @@
   },
   "port": 9210,
   "paths": {
-    "scan_directory": "C:\\FOB\\adir\\new211adir\\TANDR-2026-02-11\\adirhub",
+    "scan_directory": "./adir",
     "data_directory": "./data",
     "ui_directory": "./ui",
     "logs_directory": "./adir/logs"
@@ -16,8 +16,8 @@
     "provider": "gemini",
     "timeout": 360,
     "local": {
-      "endpoint": "https://adir.ngrok.app/api/generate",
-      "model": "gemma3:12b",
+      "endpoint": "http://127.0.0.1:8084/completion",
+      "model": "default",
       "available_models": [],
       "models_path": ""
     },
@@ -34,7 +34,7 @@
       "model": "gpt-4o-mini"
     },
     "llamacpp": {
-      "endpoint": "http://127.0.0.1:8080/completion",
+      "endpoint": "http://127.0.0.1:8084/completion",
       "model": "default",
       "max_tokens": 4096,
       "temperature": 0.7

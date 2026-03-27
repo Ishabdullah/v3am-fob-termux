@@ -8,13 +8,6 @@
   },
   "llm": {
     "provider": "llamacpp",
-    "ollama": {
-      "endpoint": "http://127.0.0.1:11434/api/generate",
-      "model": "glm-5:cloud",
-      "max_tokens": 128000,
-      "temperature": 0.7,
-      "stream": false
-    },
     "anthropic": {
       "api_key": "",
       "endpoint": "https://api.anthropic.com/v1/messages",
@@ -23,12 +16,11 @@
       "temperature": 0.7
     },
     "fallback": {
-      "enabled": true,
-      "provider": "ollama"
+      "enabled": false,
+      "provider": "anthropic"
     },
-    "model": "glm:5-cloud (Cloud)",
     "llamacpp": {
-      "endpoint": "http://127.0.0.1:8080/completion",
+      "endpoint": "http://127.0.0.1:8084/completion",
       "model": "default",
       "max_tokens": 4096,
       "temperature": 0.7
@@ -183,7 +175,7 @@
     "deployed": "2026-03-08T02:52:58.380Z"
   },
   "port": 10333,
-  "knowledge_path": "C:\\FOB\\adir\\new211adir\\TANDR-2026-02-11\\adirhub\\TOOLS\\GorgeGraniteBot\\data\\knowledge",
+  "knowledge_path": "./data/social-knowledge",
   "voice": {
     "enabled": true,
     "auto_speak": "auto"

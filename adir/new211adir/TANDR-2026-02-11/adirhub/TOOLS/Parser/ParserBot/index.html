@@ -582,10 +582,10 @@
             <h2>Settings</h2>
             <div class="section-title">LLM Provider</div>
             <label>Active Provider</label>
-            <select id="s-provider"><option value="ollama">Local (Ollama)</option><option value="anthropic">Anthropic Claude</option><option value="gemini">Google Gemini</option><option value="openai">OpenAI</option></select>
-            <div class="section-title">Ollama</div>
-            <label>Endpoint</label><input type="text" id="s-ollama-endpoint" placeholder="http://127.0.0.1:11434/api/generate">
-            <label>Model</label><input type="text" id="s-ollama-model" placeholder="e.g. gemma3:12b">
+            <select id="s-provider"><option value="llamacpp">Local (llama.cpp)</option><option value="anthropic">Anthropic Claude</option><option value="gemini">Google Gemini</option><option value="openai">OpenAI</option></select>
+            <div class="section-title">llama.cpp (Local)</div>
+            <label>Endpoint</label><input type="text" id="s-llamacpp-endpoint" placeholder="http://127.0.0.1:8084">
+            <label>Model</label><input type="text" id="s-llamacpp-model" placeholder="e.g. default">
             <div class="section-title">Anthropic Claude</div>
             <label>API Key</label><input type="password" id="s-anthropic-key" placeholder="Enter Anthropic API key"><small>console.anthropic.com</small>
             <label>Model</label><select id="s-anthropic-model"><option value="claude-haiku-4-5-20251001">Claude 4.5 Haiku</option><option value="claude-sonnet-4-5-20250929">Claude 4.5 Sonnet</option><option value="claude-opus-4-6">Claude Opus 4.6</option><option value="claude-3-haiku-20240307">Claude 3 Haiku</option></select>
@@ -898,9 +898,9 @@
                 const data = await resp.json();
                 if (data.success) {
                     const c = data.config;
-                    document.getElementById('s-provider').value = c.llm?.provider || 'ollama';
-                    document.getElementById('s-ollama-endpoint').value = c.llm?.ollama?.endpoint || '';
-                    document.getElementById('s-ollama-model').value = c.llm?.ollama?.model || '';
+                    document.getElementById('s-provider').value = c.llm?.provider || 'llamacpp';
+                    document.getElementById('s-llamacpp-endpoint').value = c.llm?.llamacpp?.endpoint || '';
+                    document.getElementById('s-llamacpp-model').value = c.llm?.llamacpp?.model || '';
                     if (c.llm?.anthropic?.api_key_masked) document.getElementById('s-anthropic-key').placeholder = 'Configured: ' + c.llm.anthropic.api_key_masked;
                     document.getElementById('s-anthropic-model').value = c.llm?.anthropic?.model || 'claude-3-haiku-20240307';
                     if (c.llm?.gemini?.api_key_masked) document.getElementById('s-gemini-key').placeholder = 'Configured: ' + c.llm.gemini.api_key_masked;
@@ -914,7 +914,7 @@
         async function saveSettings() {
             const statusEl = document.getElementById('settingsStatus');
             statusEl.textContent = 'Saving...';
-            const settings = { llm: { provider: document.getElementById('s-provider').value, ollama: { endpoint: document.getElementById('s-ollama-endpoint').value, model: document.getElementById('s-ollama-model').value }, anthropic: { model: document.getElementById('s-anthropic-model').value }, gemini: { model: document.getElementById('s-gemini-model').value }, openai: { model: document.getElementById('s-openai-model').value } } };
+            const settings = { llm: { provider: document.getElementById('s-provider').value, llamacpp: { endpoint: document.getElementById('s-llamacpp-endpoint').value, model: document.getElementById('s-llamacpp-model').value }, anthropic: { model: document.getElementById('s-anthropic-model').value }, gemini: { model: document.getElementById('s-gemini-model').value }, openai: { model: document.getElementById('s-openai-model').value } } };
             const antKey = document.getElementById('s-anthropic-key').value;
             const gemKey = document.getElementById('s-gemini-key').value;
             const oaiKey = document.getElementById('s-openai-key').value;
